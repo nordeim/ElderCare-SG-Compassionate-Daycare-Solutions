@@ -1,0 +1,27 @@
+eldercare-sg/
+├── frontend/                 # Next.js 14 application
+│   ├── app/                 # Next.js App Router
+│   ├── components/          # React components
+│   ├── lib/                 # Utilities, analytics, monitoring
+│   ├── public/              # Static assets
+│   └── styles/              # Global styles
+├── backend/                 # Laravel 12 application
+│   ├── app/                 # Application code
+│   ├── bootstrap/           # Bootstrap files
+│   ├── config/              # Configuration files
+│   ├── database/            # Migrations, seeders, factories
+│   ├── public/              # Public directory
+│   ├── resources/           # Views, language files
+│   ├── routes/              # API routes
+│   ├── storage/             # Storage directory
+│   └── tests/               # PHPUnit tests
+├── docker/                  # Docker configuration files
+│   ├── nginx/               # Nginx configuration
+│   ├── php/                 # PHP-FPM configuration
+│   └── mysql/               # MySQL initialization scripts
+├── terraform/               # Infrastructure as Code
+│   ├── modules/             # Terraform modules
+│   └── environments/        # Environment-specific configs
+├── docs/                    # Project documentation
+├── .github/                 # GitHub Actions workflows
+└── scripts/                 # Utility scripts
