@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  # Frontend service
+  # Frontend - Next.js 14
   frontend:
     build:
-      context: ./frontend
+      context: ./docker/frontend
       dockerfile: Dockerfile
-      target: development
+    container_name: eldercare_frontend
     ports:
       - "3000:3000"
     volumes:
@@ -15,106 +15,126 @@ services:
       - /app/.next
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
     depends_on:
       - backend
     networks:
-      - eldercare-network
+      - eldercare_network
     restart: unless-stopped
 
-  # Backend service
+  # Backend - Laravel 12
   backend:
     build:
-      context: ./backend
+      context: ./docker/backend
       dockerfile: Dockerfile
-      target: development
+    container_name: eldercare_backend
     ports:
-      - "8000:80"
-      - "9000:9000"
+      - "8000:8000"
     volumes:
       - ./backend:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
-      - DB_CONNECTION=mysql
       - DB_HOST=mysql
       - DB_PORT=3306
-      - DB_DATABASE=eldercare_dev
+      - DB_DATABASE=eldercare_db
       - DB_USERNAME=eldercare
-      - DB_PASSWORD=password
-      - CACHE_DRIVER=redis
+      - DB_PASSWORD=eldercare_secret
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - SESSION_DRIVER=redis
-      - QUEUE_CONNECTION=redis
     depends_on:
       - mysql
       - redis
     networks:
-      - eldercare-network
+      - eldercare_network
+    restart: unless-stopped
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+  # Nginx - Web Server
+  nginx:
+    image: nginx:alpine
+    container_name: eldercare_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - backend
+    networks:
+      - eldercare_network
     restart: unless-stopped
 
-  # MySQL database
+  # MySQL 8.0
   mysql:
-    image: mariadb:10.6
+    image: mysql:8.0
+    container_name: eldercare_mysql
     ports:
       - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpassword
-      - MYSQL_DATABASE=eldercare_dev
-      - MYSQL_USER=eldercare
-      - MYSQL_PASSWORD=password
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_secret
+      - MYSQL_DATABASE=eldercare_db
+      - MYSQL_USER=eldercare
+      - MYSQL_PASSWORD=eldercare_secret
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     networks:
-      - eldercare-network
+      - eldercare_network
     restart: unless-stopped
 
-  # Redis cache
+  # Redis 7
   redis:
-    image: redis:6-alpine
+    image: redis:7-alpine
+    container_name: eldercare_redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
-    command: redis-server /usr/local/etc/redis/redis.conf
+    command: redis-server --appendonly yes
     networks:
-      - eldercare-network
+      - eldercare_network
     restart: unless-stopped
 
-  # Elasticsearch for search
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+  # MeiliSearch
+  meilisearch:
+    image: getmeili/meilisearch:v1.6
+    container_name: eldercare_meilisearch
     ports:
-      - "9200:9200"
+      - "7700:7700"
     volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
+      - meilisearch_data:/meili_data
+    environment:
+      - MEILI_ENV=development
+      - MEILI_MASTER_KEY=masterKey_dev_only_change_in_production
     networks:
-      - eldercare-network
+      - eldercare_network
     restart: unless-stopped
 
-  # Mailhog for email testing
+  # Mailhog (Email testing)
   mailhog:
-    image: mailhog/mailhog
+    image: mailhog/mailhog:latest
+    container_name: eldercare_mailhog
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
     networks:
-      - eldercare-network
+      - eldercare_network
     restart: unless-stopped
+
+networks:
+  eldercare_network:
+    driver: bridge
 
 volumes:
   mysql_data:
+    driver: local
   redis_data:
-  elasticsearch_data:
-
-networks:
-  eldercare-network:
-    driver: bridge
+    driver: local
+  meilisearch_data:
+    driver: local
