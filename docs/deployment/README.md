@@ -13,6 +13,39 @@ This guide provides instructions for deploying the ElderCare SG application to v
 
 ## Environment Setup
 
+### Environment Templates
+
+| Scope | Template | Copy Command | Notes |
+| --- | --- | --- | --- |
+| Local development | `.env.example` | `cp .env.example .env` | Mirrors Laravel defaults for Docker Compose stack |
+| Frontend (local) | `frontend/.env.local.example` | `cp frontend/.env.local.example frontend/.env.local` | Includes GA/Hotjar/Sentry placeholders |
+| **Staging** | `.env.staging` | `cp .env.staging .env` (inside staging deployment) | Disable debug, point to staging RDS/Redis, enable analytics flags |
+| **Production** | `.env.production.template` | `cp .env.production.template .env.production` (outside Git repo) | Populate with production secrets before deploy |
+| Frontend staging | `frontend/.env.local.example` (copy then edit) | — | Define `NEXT_PUBLIC_API_URL` for staging gateway |
+| Frontend production | `frontend/.env.local.example` (duplicate to `.env.local.production`) | — | Ensure public analytics IDs are populated |
+
+> **Secret Handling:** Never commit populated `.env*` files. Populate sensitive values via secrets management (AWS Secrets Manager, SSM Parameter Store, or GitHub Actions Secrets) and inject during CI/CD.
+
+#### Required Environment Variables (Backend)
+
+- **Core:** `APP_KEY`, `APP_URL`, `APP_ENV`, `APP_DEBUG`
+- **Database:** `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+- **Cache/Queue:** `REDIS_HOST`, `REDIS_PORT`, `QUEUE_CONNECTION`, `CACHE_STORE`
+- **External Services:** `CALENDLY_API_KEY`, `MAILCHIMP_API_KEY`, `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `CLOUDFLARE_STREAM_API_TOKEN`
+- **Storage:** `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`
+- **Monitoring:** `SENTRY_LARAVEL_DSN`, `NEWRELIC_LICENSE_KEY`
+- **Compliance:** `PRIVACY_POLICY_VERSION`, `DATA_RETENTION_DAYS`, `AUDIT_LOG_RETENTION_YEARS`
+
+#### Required Environment Variables (Frontend)
+
+- `NEXT_PUBLIC_API_URL`
+- `NEXT_PUBLIC_APP_URL`
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+- `NEXT_PUBLIC_HOTJAR_ID`
+- `NEXT_PUBLIC_SENTRY_DSN`
+- `API_SECRET_KEY`
+- `REVALIDATE_SECRET`
+
 ### Development Environment
 
 1. Clone the repository:
@@ -66,8 +99,8 @@ This guide provides instructions for deploying the ElderCare SG application to v
 
 3. Set up environment variables:
    ```bash
-   cp .env.example .env
-   # Edit .env with production values
+   cp .env.production.template .env
+   # Populate .env with production secrets (do not check into Git)
    ```
 
 4. Create SSL certificates:
