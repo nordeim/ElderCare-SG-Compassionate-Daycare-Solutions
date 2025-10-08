@@ -169,6 +169,8 @@ Our architecture is designed with scalability, security, and maintainability at 
    ```bash
    cp .env.example .env
    cp frontend/.env.local.example frontend/.env.local
+   # Optional: cp .env.staging .env (staging deploys)
+   # Optional: cp .env.production.template .env.production (production deploys)
    ```
 
 3. **Start with Docker**
@@ -237,13 +239,14 @@ eldercare-sg/
    - Link to relevant issues
    - Request code review
 
-### Testing Strategy
+### Testing & Instrumentation
 
-- **Unit Tests**: Jest for frontend, PHPUnit for backend
+- **Unit Tests**: Jest for frontend (`npm run test`), PHPUnit/Pest for backend (`php artisan test`)
 - **Integration Tests**: Testing Library for React components
-- **E2E Tests**: Playwright for critical user journeys
-- **Accessibility Tests**: axe-core for automated accessibility checks
-- **Performance Tests**: Lighthouse CI for performance monitoring
+- **E2E Tests**: Playwright (`npm run test:e2e`)
+- **Accessibility Tests**: Pa11y/axe via CI (`npm run lighthouse` integrates axe/pa11y workflows)
+- **Performance Tests**: Lighthouse CI (`npm run lighthouse`) with GitHub Actions reporting
+- **Analytics & Monitoring**: GA4, Hotjar, and Sentry initialized through `AnalyticsProvider`; configure env variables per `docs/deployment/monitoring.md`
 
 ---
 
@@ -307,6 +310,11 @@ MAILCHIMP_API_KEY=your_mailchimp_api_key
 - [Design System](./docs/design-system.md)
 - [Accessibility Guide](./docs/accessibility.md)
 - [Deployment Guide](./docs/deployment.md)
+- [Deployment Monitoring](./docs/deployment/monitoring.md)
+- [Terraform Infrastructure](./terraform/README.md)
+- [Phase 1 Execution Plan](./docs/phase1-execution-plan.md)
+- [CI/CD Overview](./docs/ci-cd-overview.md)
+- [Git Workflow](./docs/git-workflow.md)
 - [Contributing Guide](./CONTRIBUTING.md)
 
 ---

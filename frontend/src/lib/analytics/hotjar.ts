@@ -13,11 +13,13 @@ export function initHotjar(): void {
     return
   }
 
-  window.hj =
+  const hjFn: HotjarFunction =
     window.hj ||
     function (...args: unknown[]) {
-      ;(window.hj.q = window.hj.q || []).push(args)
+      ;(hjFn.q = hjFn.q || []).push(args)
     }
+
+  window.hj = hjFn
 
   window._hjSettings = { hjid: Number(HOTJAR_ID), hjsv: Number(HOTJAR_VERSION) }
 
@@ -31,10 +33,14 @@ export function initHotjar(): void {
 
 declare global {
   interface Window {
-    hj: (...args: unknown[]) => void
+    hj: HotjarFunction
     _hjSettings: {
       hjid: number
       hjsv: number
     }
   }
+}
+
+type HotjarFunction = ((...args: unknown[]) => void) & {
+  q?: unknown[][]
 }
