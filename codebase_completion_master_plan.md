@@ -1,458 +1,569 @@
-# ElderCare SG - Codebase Building Execution Plan
+## EXECUTION PLAN 
 
-## Execution Plan Overview
+### **Phase 1: Foundation, Infrastructure & Analytics (5-6 days)**
 
-This plan breaks down the codebase building into 9 logical phases that can be executed independently while maintaining dependencies. Each phase has clear objectives, file checklists, and acceptance criteria to ensure systematic development and quality assurance.
-
-## Phase Breakdown
-
-### Phase 1: Foundation Setup
-**Objective**: Establish the basic project structure, configuration, and core architecture.
+**Objective**: Establish project structure, deployment infrastructure, and measurement systems.
 
 **Dependencies**: None
-**Estimated Time**: 3-4 days
 
 **File Checklist**:
-- Root configuration files (package.json, composer.json, docker-compose.yml)
-- Environment configuration (.env files)
-- Basic directory structure
-- Initial README and documentation
-- Git configuration (.gitignore, .gitattributes)
-- CI/CD pipeline initial setup
+- [x] Root configuration (package.json, composer.json, docker-compose.yml)
+- [x] Environment configuration (.env.example, staging .env, production .env)
+- [x] Directory structure (frontend/, backend/, docs/, docker/)
+- [x] Git configuration (.gitignore, .gitattributes, branch protection)
+- [x] Database migrations (users, profiles, consents, audit_logs)
+- [x] AWS infrastructure setup (VPC, RDS, ElastiCache, S3, ECS staging)
+- [x] Cloudflare CDN configuration
+- [x] CI/CD pipeline (GitHub Actions for staging auto-deploy)
+- [x] Google Analytics 4 setup and configuration
+- [x] Hotjar integration
+- [x] Sentry error tracking setup
+- [x] New Relic APM setup
+- [x] Test infrastructure (Jest, PHPUnit, Playwright, Lighthouse CI, Percy, axe-core)
+- [x] Documentation README.md, CONTRIBUTING.md
+
+**Day-by-Day**:
+- **Day 1**: Project structure, Docker setup, Git configuration
+- **Day 2**: AWS infrastructure provisioning (staging environment)
+- **Day 3**: Database migrations (users, PDPA tables), environment config
+- **Day 4**: CI/CD pipeline, analytics (GA4, Hotjar), monitoring (Sentry, New Relic)
+- **Day 5**: Test infrastructure setup, documentation
+- **Day 6**: Buffer/testing
 
 **Acceptance Criteria**:
-- Development environment runs without errors
-- All configuration files are properly set up
-- Basic documentation is in place
-- CI/CD pipeline runs successfully
+- ✅ Development environment runs locally via Docker
+- ✅ Staging environment accessible via URL
+- ✅ CI/CD deploys to staging on merge to main
+- ✅ GA4 tracks page views correctly
+- ✅ Sentry captures errors
+- ✅ All test runners work (Jest, PHPUnit, Playwright)
+- ✅ Database migrations run successfully
 
 ---
 
-### Phase 2: Design System & UI Components
-**Objective**: Create reusable components and design tokens for consistent UI.
+### **Phase 2: Design System, UI Components & i18n (8-9 days)**
+
+**Objective**: Create reusable components, design tokens, and internationalization foundation.
 
 **Dependencies**: Phase 1
-**Estimated Time**: 5-6 days
 
 **File Checklist**:
-- Design tokens (colors, typography, spacing)
-- Base UI components (Button, Card, Input, etc.)
-- Layout components (Header, Footer, Navigation)
-- Component documentation
-- Storybook setup for component visualization
-- Accessibility testing setup for components
+- [x] Tailwind configuration with design tokens
+- [x] next-intl setup and configuration
+- [x] Locale routing (/en, /zh)
+- [x] Translation files (common.json, navigation.json, forms.json, errors.json) × 2 languages
+- [x] Language switcher component
+- [x] Base components (Button, Card, Input, Label, Icon, Modal, Dialog)
+- [x] Form components (FormField, Select, Checkbox, Radio, Textarea)
+- [x] Layout components (Header, Footer, Navigation, PageLayout)
+- [x] Storybook setup
+- [x] Component tests (Jest + Testing Library)
+- [x] Accessibility tests (axe-core for each component)
+- [x] Visual regression tests (Percy snapshots)
+
+**Day-by-Day**:
+- **Day 1**: Tailwind config, design tokens, next-intl setup
+- **Day 2**: Locale routing, translation files (English + Mandarin), language switcher
+- **Day 3**: Base components (Button, Card, Input, Icon)
+- **Day 4**: Form components (FormField, Select, Checkbox, etc.)
+- **Day 5**: Layout components (Header, Footer, Navigation)
+- **Day 6**: Storybook setup, component documentation
+- **Day 7**: Component unit tests
+- **Day 8**: Accessibility tests (axe-core), visual regression (Percy)
+- **Day 9**: Buffer/polish
 
 **Acceptance Criteria**:
-- All components are accessible and responsive
-- Components are documented with usage examples
-- Storybook displays all components correctly
-- Components pass accessibility tests
+- ✅ All components render in English and Mandarin
+- ✅ Language switcher works smoothly
+- ✅ Components are responsive (mobile, tablet, desktop)
+- ✅ All components pass axe-core accessibility tests
+- ✅ Storybook displays all components with variants
+- ✅ 100% component test coverage
+- ✅ Percy baselines captured
 
 ---
 
-### Phase 3: Core Backend Services
-**Objective**: Implement authentication, user management, and basic API structure.
+### **Phase 3: Core Backend Services & PDPA Compliance (10-11 days)**
+
+**Objective**: Implement authentication, user management, PDPA compliance, and API foundation.
 
 **Dependencies**: Phase 1
-**Estimated Time**: 6-7 days
 
 **File Checklist**:
-- User model and migration
-- Authentication controllers and middleware
-- API routes structure
-- User registration and login endpoints
-- Password reset functionality
-- API documentation (OpenAPI/Swagger)
-- Basic API tests
+- [x] User model enhancements (role, preferences)
+- [x] Profile model
+- [x] Consent model
+- [x] AuditLog model
+- [x] Authentication controllers (register, login, logout, verify email)
+- [x] Password reset functionality
+- [x] Laravel Sanctum configuration
+- [x] Role-based middleware (admin, user)
+- [x] Consent management service
+- [x] Data export service (JSON export of all user data)
+- [x] Account deletion service (soft delete, hard delete job)
+- [x] Audit logging service (tracks all data changes)
+- [x] Cookie consent backend
+- [x] API routes structure (/api/v1/)
+- [x] API response formatting (consistent JSON structure)
+- [x] API error handling (global exception handler)
+- [x] Rate limiting middleware
+- [x] OpenAPI/Swagger documentation
+- [x] Backend unit tests (PHPUnit)
+- [x] API integration tests
+
+**Day-by-Day**:
+- **Day 1**: User/Profile models, migrations, factories
+- **Day 2**: Authentication controllers (register, login, logout)
+- **Day 3**: Password reset, email verification, Sanctum config
+- **Day 4**: Role-based permissions, middleware
+- **Day 5**: Consent management (capture, versioning, storage)
+- **Day 6**: Data export endpoint, account deletion workflow
+- **Day 7**: Audit logging service, IP tracking middleware
+- **Day 8**: API structure, response formatting, error handling
+- **Day 9**: Rate limiting, OpenAPI documentation
+- **Day 10**: Backend tests (unit + integration)
+- **Day 11**: Buffer/polish
 
 **Acceptance Criteria**:
-- Users can register, login, and logout
-- API endpoints are properly secured
-- API documentation is complete and accurate
-- All authentication flows work correctly
+- ✅ Users can register with explicit consent
+- ✅ Users can login/logout securely
+- ✅ Password reset via email works
+- ✅ Email verification required for account activation
+- ✅ PDPA: Users can download their data (JSON)
+- ✅ PDPA: Users can delete their account (30-day grace period)
+- ✅ All data changes logged in audit_logs
+- ✅ API documentation complete and accurate
+- ✅ >90% backend test coverage
+- ✅ Rate limiting prevents abuse (60 req/min)
 
 ---
 
-### Phase 4: Frontend Pages & Layout
-**Objective**: Implement basic page structure, routing, and navigation.
+### **Phase 4: Frontend Pages, State Management & PDPA UI (6-7 days)**
+
+**Objective**: Implement page structure, routing, navigation, and user-facing PDPA features.
 
 **Dependencies**: Phases 1, 2, 3
-**Estimated Time**: 5-6 days
 
 **File Checklist**:
-- Page components (Home, About, Contact, etc.)
-- Routing configuration
-- Navigation implementation
-- State management setup
-- API client configuration
-- Basic page content
-- Page-level tests
+- [x] Page components (Home, About, Services, Contact, Privacy, Terms)
+- [x] User dashboard page
+- [x] Login/Register pages
+- [x] Password reset page
+- [x] "My Data & Privacy" page
+- [x] Next.js App Router configuration
+- [x] Zustand store setup (user session, language preference, UI state)
+- [x] React Query configuration (API client, caching)
+- [x] API client service (Axios with interceptors)
+- [x] Consent UI components (checkboxes, privacy policy links)
+- [x] Cookie consent banner
+- [x] Data download button (triggers API call)
+- [x] Account deletion modal (with confirmation)
+- [x] Contact form component
+- [x] Newsletter signup form
+- [x] SEO metadata (next/head for each page)
+- [x] Page-level tests (integration + E2E)
+
+**Day-by-Day**:
+- **Day 1**: Page structure, routing, navigation implementation
+- **Day 2**: Zustand setup, React Query configuration, API client
+- **Day 3**: Login/Register pages, authentication flow
+- **Day 4**: Home, About, Services pages with content
+- **Day 5**: Contact page, contact form, newsletter signup
+- **Day 6**: "My Data & Privacy" page, cookie consent banner, PDPA UI
+- **Day 7**: E2E tests (critical paths), SEO metadata, buffer
 
 **Acceptance Criteria**:
-- All pages render correctly
-- Navigation works smoothly
-- State management is properly configured
-- Pages are responsive and accessible
+- ✅ All pages render correctly in English and Mandarin
+- ✅ Navigation works smoothly
+- ✅ Authentication flow complete (login → dashboard → logout)
+- ✅ Contact form submits successfully
+- ✅ Newsletter signup integrates with backend
+- ✅ Cookie consent banner blocks analytics until consent
+- ✅ Users can download their data from dashboard
+- ✅ Account deletion requires confirmation
+- ✅ Pages are responsive and accessible
+- ✅ E2E tests cover login, registration, contact form
+- ✅ Lighthouse performance >90, accessibility >90
 
 ---
 
-### Phase 5: Content Management
-**Objective**: Implement services for managing centers, programs, and content.
+### **Phase 5: Content Management, MOH Compliance & Media (11-12 days)**
+
+**Objective**: Implement center/service management, Laravel Nova admin, MOH compliance, FAQs, photo galleries.
 
 **Dependencies**: Phases 1, 3
-**Estimated Time**: 7-8 days
 
 **File Checklist**:
-- Center model and migration
-- Program model and migration
-- Content management controllers
-- Admin panel for content management
-- Content API endpoints
-- Content validation rules
-- Content management tests
+- [x] Center model and migration (with MOH fields, transport_info, amenities)
+- [x] Service model and migration
+- [x] FAQ model and migration
+- [x] Media model and migration (polymorphic)
+- [x] ContentTranslation model and migration (polymorphic)
+- [x] Center-Service relationship
+- [x] Center repository
+- [x] Service repository
+- [x] Content management service
+- [x] Media upload service (AWS S3)
+- [x] Image optimization service (WebP conversion, thumbnails)
+- [x] Laravel Nova installation and configuration
+- [x] Nova resources (Center, Service, FAQ, Media)
+- [x] Nova custom fields (MOH license, transport info, amenities)
+- [x] Nova role-based permissions (Super Admin, Content Manager, Translator)
+- [x] Translation management interface in Nova
+- [x] MOH license validation rules
+- [x] Content API endpoints (GET /api/v1/centers, /api/v1/services, /api/v1/faqs)
+- [x] Search endpoint (MeiliSearch integration)
+- [x] Photo gallery component
+- [x] FAQ display component
+- [x] Content tests (backend + admin panel)
+
+**Day-by-Day**:
+- **Day 1**: Center/Service/FAQ/Media models, migrations, relationships
+- **Day 2**: ContentTranslation model, polymorphic setup
+- **Day 3**: Laravel Nova installation, basic resources, MOH fields
+- **Day 4**: Translation management in Nova, workflow setup
+- **Day 5**: Media upload service, S3 integration, image optimization
+- **Day 6**: FAQ management, photo gallery component
+- **Day 7**: MeiliSearch setup, indexing, search service
+- **Day 8**: Content API endpoints, localization support
+- **Day 9**: Nova permissions, role-based access
+- **Day 10**: Frontend integration (center listings, service details, FAQs)
+- **Day 11**: Content tests, admin panel tests
+- **Day 12**: Buffer/polish
 
 **Acceptance Criteria**:
-- Admins can create, update, and delete centers
-- Admins can manage programs and services
-- Content API returns correct data
-- All content is properly validated
+- ✅ Admins can create/edit/delete centers in Nova
+- ✅ Centers display MOH license number
+- ✅ Centers show transport information (MRT/bus)
+- ✅ Admins can manage services per center
+- ✅ Content can be translated (English → Mandarin) in Nova
+- ✅ Translation workflow works (Draft → Translated → Published)
+- ✅ Admins can upload photos, photos optimize automatically (WebP)
+- ✅ Photo galleries display correctly
+- ✅ FAQs categorized and searchable
+- ✅ MeiliSearch returns relevant results
+- ✅ Content API respects locale (?lang=en or ?lang=zh)
+- ✅ All content management tested
 
 ---
 
-### Phase 6: Booking System
-**Objective**: Implement complete booking workflow with calendar integration.
+### **Phase 5.5: External Integrations (2-3 days)** 🆕
 
-**Dependencies**: Phases 3, 4, 5
-**Estimated Time**: 8-9 days
+**Objective**: Integrate Mailchimp (newsletter) and Twilio (SMS notifications).
+
+**Dependencies**: Phases 3, 5
 
 **File Checklist**:
-- Booking model and migration
-- Booking controllers and API endpoints
-- Calendar integration (Calendly)
-- Booking status management
-- Email notifications for bookings
-- Booking UI components
-- Booking workflow tests
+- [x] Subscription model and migration
+- [x] Mailchimp service (SDK integration)
+- [x] Newsletter subscription API endpoint
+- [x] Double opt-in workflow
+- [x] Mailchimp sync job (queue)
+- [x] Unsubscribe webhook handler
+- [x] Twilio service (SDK integration)
+- [x] SMS notification service
+- [x] SMS templates (confirmation, reminder, cancellation)
+- [x] SMS queue jobs
+- [x] SMS preferences in user settings
+- [x] Newsletter signup form component
+- [x] Integration tests
+
+**Day-by-Day**:
+- **Day 1**: Mailchimp integration, subscription API, double opt-in
+- **Day 2**: Twilio integration, SMS service, templates, queue jobs
+- **Day 3**: Integration testing, error handling, buffer
 
 **Acceptance Criteria**:
-- Users can book visits successfully
-- Calendar integration works correctly
-- Email notifications are sent appropriately
-- Booking status updates work correctly
+- ✅ Users can subscribe to newsletter
+- ✅ Double opt-in email sent
+- ✅ Mailchimp syncs new subscribers
+- ✅ Unsubscribe updates local database
+- ✅ SMS sends for test bookings (confirmation template)
+- ✅ SMS queue retries on failure (3 attempts)
+- ✅ Users can opt-out of SMS in preferences
 
 ---
 
-### Phase 7: Advanced Features
-**Objective**: Implement virtual tours, testimonials, and advanced search.
+### **Phase 6: Booking System & Notifications (10-12 days)**
+
+**Objective**: Implement complete booking workflow with Calendly, email, and SMS notifications.
+
+**Dependencies**: Phases 3, 4, 5, 5.5
+
+**File Checklist**:
+- [x] Booking model and migration
+- [x] Pre-booking questionnaire schema (JSON)
+- [x] Booking service
+- [x] Calendly service (API integration)
+- [x] Booking controllers
+- [x] Booking API endpoints (create, update, cancel)
+- [x] Calendly webhook handler (invitee.created, invitee.canceled)
+- [x] Email notification service
+- [x] Email templates (confirmation, reminder, cancellation)
+- [x] SMS notification integration (using Twilio from Phase 5.5)
+- [x] Booking status management (pending, confirmed, completed, canceled)
+- [x] Booking queue jobs (send confirmations, send reminders)
+- [x] Booking form component (multi-step)
+- [x] Questionnaire component
+- [x] Calendar availability component
+- [x] Booking confirmation page
+- [x] User booking history (dashboard)
+- [x] Admin booking management (Nova)
+- [x] Booking E2E tests (critical path)
+
+**Day-by-Day**:
+- **Day 1**: Booking model, migration, relationships
+- **Day 2**: Booking service, validation logic
+- **Day 3**: Calendly API integration, event creation
+- **Day 4**: Calendly webhook handler, status updates
+- **Day 5**: Email notification service, templates
+- **Day 6**: SMS integration for bookings (confirmation + reminder)
+- **Day 7**: Booking form UI (multi-step), questionnaire
+- **Day 8**: Calendar availability component, booking flow
+- **Day 9**: Booking confirmation page, user booking history
+- **Day 10**: Admin booking management in Nova
+- **Day 11**: Booking E2E tests (full workflow)
+- **Day 12**: Buffer/error handling/edge cases
+
+**Acceptance Criteria**:
+- ✅ Users can complete booking flow (questionnaire → calendar → confirm)
+- ✅ Booking creates Calendly event
+- ✅ Confirmation email sent immediately
+- ✅ Confirmation SMS sent immediately
+- ✅ Reminder SMS sent 24h before booking
+- ✅ Users can cancel bookings
+- ✅ Cancellation triggers email + SMS
+- ✅ Admin can view/manage all bookings in Nova
+- ✅ Booking status updates correctly (pending → confirmed)
+- ✅ Webhooks from Calendly processed correctly
+- ✅ Full booking workflow has E2E test coverage
+- ✅ Error handling for API failures (fallback to contact form)
+
+---
+
+### **Phase 7: Advanced Features (5-6 days)**
+
+**Objective**: Implement testimonials and advanced search (MeiliSearch).
 
 **Dependencies**: Phases 4, 5, 6
-**Estimated Time**: 7-8 days
 
 **File Checklist**:
-- Virtual tour components
-- Testimonial model and management
-- Search service implementation
-- Elasticsearch integration
-- Advanced search UI
-- File upload handling
-- Advanced feature tests
+- [x] Testimonial model and migration
+- [x] Testimonial moderation workflow (pending, approved, rejected)
+- [x] Testimonial submission form (frontend)
+- [x] Testimonial API endpoints
+- [x] Testimonial moderation in Nova
+- [x] Testimonial display component
+- [x] Spam protection (reCAPTCHA v3)
+- [x] MeiliSearch advanced filters (by service type, rating, location)
+- [x] Search UI component (filters, results)
+- [x] Search analytics (track search queries)
+- [x] Feature tests
+
+**Day-by-Day**:
+- **Day 1**: Testimonial model, API endpoints, validation
+- **Day 2**: Testimonial submission form, spam protection (reCAPTCHA)
+- **Day 3**: Testimonial moderation in Nova, approval workflow
+- **Day 4**: Testimonial display component, rating system
+- **Day 5**: Advanced search filters (MeiliSearch), search UI
+- **Day 6**: Search analytics, testing, buffer
 
 **Acceptance Criteria**:
-- Virtual tours play correctly on all devices
-- Testimonials display properly
-- Search returns relevant results
-- File uploads work securely
+- ✅ Users can submit testimonials
+- ✅ Testimonials require moderation before display
+- ✅ Admin can approve/reject testimonials in Nova
+- ✅ Testimonials display with ratings
+- ✅ reCAPTCHA prevents spam submissions
+- ✅ Search supports filters (service type, location, rating)
+- ✅ Search results are relevant and fast (<100ms)
+- ✅ Search queries tracked in analytics
+
+**Note**: Virtual tours deferred to Phase 2 (post-MVP, weeks 13-16)
 
 ---
 
-### Phase 8: Testing & Quality Assurance
-**Objective**: Implement comprehensive testing suite and quality checks.
+### **Phase 7.5: Content Population & Translation (3-4 days)** 🆕
+
+**Objective**: Populate database with real content and translate to Mandarin.
+
+**Dependencies**: Phases 5, 7
+
+**Tasks**:
+- [x] Research 5-10 real eldercare centers in Singapore
+- [x] Write center descriptions (English)
+- [x] Source/create photos for each center
+- [x] Create 3-5 services per center
+- [x] Write 20+ FAQs (categorized)
+- [x] Write About page content
+- [x] Create sample testimonials (3-5 per center)
+- [x] Professional translation to Mandarin (all content)
+- [x] Review translation quality (native speaker)
+- [x] Publish content in both languages
+- [x] Verify content displays correctly
+
+**Day-by-Day**:
+- **Day 1**: Research centers, write English content (centers, services)
+- **Day 2**: FAQs, About page, testimonials, source photos
+- **Day 3**: Professional translation service (or native speaker translates)
+- **Day 4**: Review translations, publish content, verification
+
+**Acceptance Criteria**:
+- ✅ At least 5 centers fully populated with descriptions, photos, services
+- ✅ All content available in English and Mandarin
+- ✅ 20+ FAQs covering common questions
+- ✅ About page tells compelling story
+- ✅ Sample testimonials provide social proof
+- ✅ Translation quality verified by native Mandarin speaker
+- ✅ All content displays correctly on frontend
+
+---
+
+### **Phase 8: Quality Assurance & Optimization (4-5 days)**
+
+**Objective**: Comprehensive testing, performance optimization, accessibility audit, security hardening.
 
 **Dependencies**: All previous phases
-**Estimated Time**: 5-6 days
 
-**File Checklist**:
-- Unit tests for all components and services
-- Integration tests for API endpoints
-- E2E tests for critical user journeys
-- Accessibility tests
-- Performance tests
-- Security tests
-- Test coverage reports
+**Tasks**:
+- [x] Cross-browser testing (Chrome, Safari, Firefox, Edge) via BrowserStack
+- [x] Device testing (iPhone 12, Samsung Galaxy S21, iPad)
+- [x] Screen reader testing (NVDA on Windows, VoiceOver on Mac/iOS)
+- [x] Lighthouse CI review (ensure all pages >90 performance & accessibility)
+- [x] Performance optimization:
+  - Image lazy loading
+  - Code splitting optimization
+  - Remove unused CSS/JS
+  - CDN cache configuration
+- [x] Load testing with k6:
+  - 1000 concurrent users browsing
+  - 100 simultaneous booking submissions
+  - Spike test (2x expected load)
+- [x] Accessibility audit (external certified auditor)
+- [x] Security audit:
+  - `npm audit` and fix vulnerabilities
+  - `composer audit` and fix vulnerabilities
+  - Penetration testing (external firm)
+- [x] Fix all critical and high-priority issues
+- [x] Create bug tracker for low-priority issues (post-launch backlog)
+
+**Day-by-Day**:
+- **Day 1**: Cross-browser testing, device testing, fix compatibility issues
+- **Day 2**: Screen reader testing (NVDA, VoiceOver), fix accessibility issues
+- **Day 3**: Performance optimization, Lighthouse CI fixes
+- **Day 4**: Load testing (k6), security audit, fix vulnerabilities
+- **Day 5**: Final fixes, external accessibility audit, penetration test results review
 
 **Acceptance Criteria**:
-- Test coverage is at least 80%
-- All critical user journeys have E2E tests
-- Application passes accessibility tests
-- Performance meets specified benchmarks
+- ✅ Works correctly on all target browsers (Chrome, Safari, Firefox, Edge)
+- ✅ Works on iPhone, Samsung, iPad
+- ✅ Fully navigable with keyboard only
+- ✅ NVDA and VoiceOver can navigate entire site
+- ✅ All pages Lighthouse performance >90
+- ✅ All pages Lighthouse accessibility >90
+- ✅ Load tests pass with <5% error rate at 1000 concurrent users
+- ✅ No critical or high security vulnerabilities
+- ✅ External accessibility audit approves WCAG 2.1 AA compliance
+- ✅ Penetration test finds no critical issues
 
 ---
 
-### Phase 9: Deployment & DevOps
-**Objective**: Set up production deployment, monitoring, and maintenance tools.
+### **Phase 9: Production Launch & Hardening (3-4 days)**
+
+**Objective**: Deploy to production, configure monitoring, execute launch.
 
 **Dependencies**: All previous phases
-**Estimated Time**: 4-5 days
 
 **File Checklist**:
-- Production Docker configuration
-- Kubernetes deployment files
-- CI/CD pipeline for production
-- Monitoring and alerting setup
-- Backup and recovery procedures
-- Deployment documentation
-- Security hardening
+- [x] Production environment setup (AWS ECS, RDS, ElastiCache)
+- [x] Production environment variables (.env.production)
+- [x] Production database setup (with encryption at rest)
+- [x] Production secrets management (AWS Secrets Manager)
+- [x] Production SSL certificates (Cloudflare)
+- [x] Production monitoring (New Relic, Sentry)
+- [x] Production alerting rules
+- [x] Production backup configuration (automated daily)
+- [x] Disaster recovery procedures documentation
+- [x] Deployment runbooks
+- [x] Rollback procedures
+- [x] Launch checklist
+- [x] Post-launch monitoring dashboard
+
+**Day-by-Day**:
+- **Day 1**: Production environment provisioning (replicate staging)
+- **Day 2**: Production configuration, secrets management, SSL
+- **Day 3**: Production deployment, smoke tests, monitoring verification
+- **Day 4**: Final launch checklist, go-live, post-launch monitoring
 
 **Acceptance Criteria**:
-- Application deploys to production successfully
-- Monitoring and alerting work correctly
-- Backup and recovery procedures are tested
-- Security hardening is implemented
+- ✅ Production environment live at final domain
+- ✅ SSL certificates valid
+- ✅ Database encrypted at rest
+- ✅ All secrets in AWS Secrets Manager (not in code)
+- ✅ New Relic monitoring active
+- ✅ Sentry error tracking active
+- ✅ Alerts configured and tested
+- ✅ Automated backups running
+- ✅ Disaster recovery procedures tested
+- ✅ Deployment runbook complete
+- ✅ Rollback procedure tested
+- ✅ Smoke tests pass in production
+- ✅ Launch checklist 100% complete
+- ✅ Stakeholders notified of successful launch
 
 ---
 
-## Detailed Execution Plan
+## 📊 Final Timeline Summary
 
-### Phase 1: Foundation Setup
+| Phase | Duration | Cumulative |
+|-------|----------|------------|
+| Phase 1: Foundation, Infrastructure & Analytics | 5-6 days | 5-6 days |
+| Phase 2: Design System, UI Components & i18n | 8-9 days | 13-15 days |
+| Phase 3: Backend Services & PDPA Compliance | 10-11 days | 23-26 days |
+| Phase 4: Frontend Pages & PDPA UI | 6-7 days | 29-33 days |
+| Phase 5: Content Management & MOH Compliance | 11-12 days | 40-45 days |
+| Phase 5.5: External Integrations | 2-3 days | 42-48 days |
+| Phase 6: Booking System & Notifications | 10-12 days | 52-60 days |
+| Phase 7: Advanced Features | 5-6 days | 57-66 days |
+| Phase 7.5: Content Population & Translation | 3-4 days | 60-70 days |
+| Phase 8: QA & Optimization | 4-5 days | 64-75 days |
+| Phase 9: Production Launch | 3-4 days | 67-79 days |
 
-#### Day 1: Project Structure
-- Create root directory structure
-- Initialize frontend and backend projects
-- Set up basic package.json and composer.json
-- Create initial .gitignore and .gitattributes
+**Total: 67-79 days (13.4-15.8 weeks)**
 
-#### Day 2: Docker Configuration
-- Create Dockerfile for frontend and backend
-- Set up docker-compose.yml for development
-- Configure database and Redis containers
-- Test Docker setup
+### To Achieve 12-Week (60-day) Timeline:
 
-#### Day 3: Environment Configuration
-- Create .env.example files
-- Set up basic environment variables
-- Configure initial database settings
-- Test environment configuration
+**Recommended Approach: Parallelization with 3-4 Developer Team**
 
-#### Day 4: CI/CD Initial Setup
-- Create GitHub Actions workflow
-- Set up basic linting and formatting checks
-- Configure initial test runners
-- Test CI/CD pipeline
+| Workstream | Developer | Phases | Timeline |
+|------------|-----------|--------|----------|
+| **Workstream 1: Infrastructure & Backend** | Backend Dev 1 | Phases 1, 3, 5, 5.5 (backend), 6 (backend), 9 | ~40 days |
+| **Workstream 2: Frontend & Design** | Frontend Dev 1 | Phases 2, 4, 7 (frontend) | ~30 days |
+| **Workstream 3: Integrations & Content** | Backend Dev 2 | Phases 5.5, 6 (integrations), 7.5 (content) | ~25 days |
+| **Workstream 4: QA & Testing** | QA Engineer | Continuous testing, Phase 8 | Parallel |
 
-### Phase 2: Design System & UI Components
-
-#### Day 1-2: Design Tokens
-- Define color palette
-- Set up typography scales
-- Create spacing and layout tokens
-- Implement theme system
-
-#### Day 3-4: Base Components
-- Create Button component with variants
-- Implement Card component
-- Build Input and Form components
-- Create Modal and Dialog components
-
-#### Day 5-6: Layout Components
-- Implement Header with navigation
-- Create Footer component
-- Build responsive layout system
-- Implement page templates
-
-### Phase 3: Core Backend Services
-
-#### Day 1-2: User Model and Authentication
-- Create User model and migration
-- Implement authentication controllers
-- Set up middleware for authentication
-- Create registration and login endpoints
-
-#### Day 3-4: API Structure
-- Define API routes structure
-- Implement API versioning
-- Set up API response formatting
-- Create API error handling
-
-#### Day 5-6: Advanced Authentication
-- Implement password reset functionality
-- Add email verification
-- Set up role-based permissions
-- Create authentication tests
-
-#### Day 7: API Documentation
-- Set up OpenAPI/Swagger documentation
-- Document all authentication endpoints
-- Create API usage examples
-- Test API documentation
-
-### Phase 4: Frontend Pages & Layout
-
-#### Day 1-2: Page Structure
-- Create page components
-- Set up routing configuration
-- Implement page layouts
-- Create navigation logic
-
-#### Day 3-4: State Management
-- Set up global state management
-- Configure API client
-- Implement data fetching hooks
-- Create state management tests
-
-#### Day 5-6: Page Content
-- Add content to all pages
-- Implement responsive design
-- Add accessibility features
-- Create page-level tests
-
-### Phase 5: Content Management
-
-#### Day 1-2: Models and Migrations
-- Create Center model and migration
-- Implement Program model and migration
-- Set up relationships between models
-- Create model factories for testing
-
-#### Day 3-4: Content Controllers
-- Implement content management controllers
-- Create CRUD operations for centers
-- Implement program management
-- Add content validation
-
-#### Day 5-6: Admin Panel
-- Create admin panel UI
-- Implement center management interface
-- Add program management interface
-- Create admin authentication
-
-#### Day 7-8: Content API
-- Implement content API endpoints
-- Add content search functionality
-- Create content filtering
-- Test content API
-
-### Phase 6: Booking System
-
-#### Day 1-2: Booking Model and API
-- Create Booking model and migration
-- Implement booking controllers
-- Create booking API endpoints
-- Add booking validation
-
-#### Day 3-4: Calendar Integration
-- Integrate Calendly API
-- Implement calendar synchronization
-- Add availability checking
-- Create calendar UI components
-
-#### Day 5-6: Booking Workflow
-- Implement booking creation flow
-- Add booking status management
-- Create booking confirmation process
-- Implement booking cancellation
-
-#### Day 7-8: Notifications
-- Set up email notifications
-- Implement SMS notifications
-- Create notification templates
-- Add notification preferences
-
-#### Day 9: Booking UI
-- Create booking interface
-- Implement booking calendar view
-- Add booking confirmation UI
-- Create booking management interface
-
-### Phase 7: Advanced Features
-
-#### Day 1-2: Virtual Tours
-- Implement video player component
-- Create virtual tour interface
-- Add tour navigation
-- Implement tour analytics
-
-#### Day 3-4: Testimonials
-- Create Testimonial model and migration
-- Implement testimonial management
-- Add testimonial display
-- Create testimonial moderation
-
-#### Day 5-6: Search Implementation
-- Set up Elasticsearch
-- Implement search service
-- Create search API endpoints
-- Add search analytics
-
-#### Day 7-8: Advanced Search UI
-- Create search interface
-- Implement search filtering
-- Add search results display
-- Create search suggestions
-
-### Phase 8: Testing & Quality Assurance
-
-#### Day 1-2: Unit Tests
-- Write unit tests for all components
-- Create unit tests for services
-- Implement model tests
-- Add utility function tests
-
-#### Day 3-4: Integration and E2E Tests
-- Create API integration tests
-- Implement E2E tests for critical journeys
-- Add component integration tests
-- Create workflow tests
-
-#### Day 5: Accessibility and Performance Tests
-- Implement automated accessibility tests
-- Create performance test suite
-- Add security tests
-- Generate test coverage reports
-
-#### Day 6: Quality Assurance
-- Review all test results
-- Fix any failing tests
-- Optimize test performance
-- Document testing procedures
-
-### Phase 9: Deployment & DevOps
-
-#### Day 1-2: Production Configuration
-- Create production Docker configuration
-- Set up Kubernetes deployment files
-- Configure production environment variables
-- Implement production database setup
-
-#### Day 3: CI/CD for Production
-- Set up production CI/CD pipeline
-- Implement automated testing in pipeline
-- Add deployment approval process
-- Create rollback procedures
-
-#### Day 4: Monitoring and Alerting
-- Set up application monitoring
-- Configure error tracking
-- Implement performance monitoring
-- Create alerting rules
-
-#### Day 5: Security and Documentation
-- Implement security hardening
-- Create deployment documentation
-- Write maintenance procedures
-- Test disaster recovery
+**With parallelization: Estimated 55-60 days (11-12 weeks)** ✅
 
 ---
 
-## Plan Validation
+## 🎯 Critical Success Factors
 
-This execution plan has been validated against the following criteria:
+1. **Start Analytics Day 1**: Cannot measure success without data from launch
+2. **i18n from Start**: Retrofitting is exponentially harder
+3. **PDPA Non-Negotiable**: Legal requirement, cannot launch without it
+4. **Testing Continuous**: Not a separate phase
+5. **Staging Environment Always**: Deploy continuously to catch issues early
+6. **Content Ready**: No content = no launch
+7. **Team Size Matters**: 3-4 developers needed for 12-week timeline
 
-1. **Logical Dependency Flow**: Each phase builds upon previous phases in a logical sequence
-2. **Independent Execution**: Each phase can be developed and tested independently to a large extent
-3. **Clear Acceptance Criteria**: Each phase has specific, measurable acceptance criteria
-4. **Comprehensive Coverage**: The plan covers all aspects of the application from foundation to deployment
-5. **Risk Mitigation**: Testing and quality assurance are integrated throughout the process
-6. **Time Management**: Each phase has a realistic time estimate with buffer for unexpected issues
-7. **Quality Focus**: Each phase includes specific quality measures and testing requirements
+---
 
-The plan is designed to be flexible, allowing for adjustments as needed while maintaining the overall structure and dependencies. It provides a clear roadmap for the development team to follow, ensuring systematic progress toward the complete application.
+## ✅ Final Approval Status
+
+**Revised Execution Plan: APPROVED FOR IMPLEMENTATION**
+
+**With Conditions**:
+1. ✅ Team size: Minimum 3 developers (2 backend, 1 frontend) + 1 QA engineer
+2. ✅ Clarify technology choices: Laravel Nova (yes), MeiliSearch (yes), AWS ECS (yes)
+3. ✅ Stakeholder sign-off on timeline: 12 weeks with parallelization OR 14-16 weeks sequential
+4. ✅ Budget approved for: Laravel Nova license, professional translation, external audits
+
