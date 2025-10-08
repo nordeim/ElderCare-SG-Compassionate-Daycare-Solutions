@@ -13,6 +13,7 @@
 - `STAGING_API_URL`, `PRODUCTION_API_URL`: Injected to frontend build steps.
 - `LHCI_GITHUB_APP_TOKEN`: Lighthouse CI auth (already referenced in CI workflow).
 - `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`: For release sourcemaps (queued for Phase 1.5 once monitoring is live).
+- `PERCY_TOKEN`: Required for visual regression captures (`npm run test:percy`).
 - `NEWRELIC_LICENSE_KEY`: Agent activation during deploy.
 - `HOTJAR_SITE_ID`, `GA_MEASUREMENT_ID`: Provided to frontend build as env vars.
 - `MAILCHIMP_API_KEY`, `TWILIO_AUTH_TOKEN`, `CALENDLY_API_KEY`: Used by backend tests/deployments.
