@@ -1,21 +1,58 @@
 {
-    "$schema": "https://json.schemastore.org/package.json",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "build": "vite build",
-        "dev": "vite",
-        "test": "jest",
-        "test:watch": "jest --watch",
-        "test:coverage": "jest --coverage",
-        "test:e2e": "playwright test"
-    },
-    "devDependencies": {
-        "@tailwindcss/vite": "^4.0.0",
-        "axios": "^1.11.0",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^2.0.0",
-        "tailwindcss": "^4.0.0",
-        "vite": "^7.0.7"
-    }
+  "name": "eldercare-sg",
+  "version": "1.0.0",
+  "description": "ElderCare SG - Compassionate Daycare Solutions Platform",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && php artisan serve",
+    "build": "cd frontend && npm run build",
+    "test": "npm run test:frontend && npm run test:backend",
+    "test:frontend": "cd frontend && npm test",
+    "test:backend": "cd backend && php artisan test",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "lint": "npm run lint:frontend && npm run lint:backend",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "cd backend && ./vendor/bin/pint --test",
+    "format": "npm run format:frontend && npm run format:backend",
+    "format:frontend": "cd frontend && npm run format",
+    "format:backend": "cd backend && ./vendor/bin/pint",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:build": "docker-compose build",
+    "docker:logs": "docker-compose logs -f",
+    "migrate": "cd backend && php artisan migrate",
+    "migrate:fresh": "cd backend && php artisan migrate:fresh --seed"
+  },
+  "devDependencies": {
+	"axios": "^1.11.0",
+	"concurrently": "^9.0.1",
+	"jsdom": "^27.0.0",
+	"vite": "^7.1.7",
+	"vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eldercare-sg/platform.git"
+  },
+  "keywords": [
+    "eldercare",
+    "singapore",
+    "daycare",
+    "healthcare",
+    "pdpa",
+    "accessibility"
+  ],
+  "author": "ElderCare SG Team",
+  "license": "MIT"
 }
