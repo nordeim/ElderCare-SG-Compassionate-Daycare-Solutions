@@ -5,8 +5,6 @@ set -e
 
 echo "🐳 Setting up Docker configuration..."
 
-cd eldercare-sg
-
 # Create Docker Compose for development
 cat > docker-compose.yml << 'EOF'
 version: '3.8'

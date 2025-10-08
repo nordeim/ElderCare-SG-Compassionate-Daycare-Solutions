@@ -200,7 +200,7 @@ describe('Button', () => {
 EOF
 
 # Update package.json with test scripts
-cd ../..
+cd ..
 npm pkg set scripts.test="jest"
 npm pkg set scripts.test:watch="jest --watch"
 npm pkg set scripts.test:coverage="jest --coverage"
