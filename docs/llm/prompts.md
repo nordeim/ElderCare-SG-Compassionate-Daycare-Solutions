@@ -6,3 +6,6 @@ what an awesome meticulous planning! yes, please proceed meticulously to create 
 ---
 you have done an excellent job with your amazing complete improved execution plan for the codebase! please keep up the good work. now, please think deeper and think harder to explore meticulously how best to design the complete database schema for the codebase, then create a complete execution plan to create the complete validated working database schema for the codebase, review and validate the plan before proceeding.
 
+---
+docs/AGENT.md Project_Architecture_Document.md , Project_Requirements_Document.md , codebase_completion_master_plan.md , and docs/ai-coding-agent-brief.md
+.
