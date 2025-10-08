@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        $driver = Schema::getConnection()->getDriverName();
+
+        Schema::create('services', function (Blueprint $table) use ($driver) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('center_id');
             $table->string('name');
@@ -32,7 +34,10 @@ return new class extends Migration
             $table->index('status');
             $table->index('deleted_at');
             $table->index(['center_id', 'status']);
-            $table->fullText(['name', 'description']);
+
+            if ($driver === 'mysql') {
+                $table->fullText(['name', 'description']);
+            }
         });
 
         DB::statement("ALTER TABLE services ADD CONSTRAINT chk_services_price CHECK (price IS NULL OR price >= 0)");

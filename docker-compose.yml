@@ -40,8 +40,8 @@ services:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_DATABASE=eldercare_db
-      - DB_USERNAME=eldercare
-      - DB_PASSWORD=eldercare_secret
+      - DB_USERNAME=eldercare_admin
+      - DB_PASSWORD=your_secure_password
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:
@@ -71,7 +71,7 @@ services:
 
   # MySQL 8.0
   mysql:
-    image: mysql:8.0
+    image: mariadb:10.11
     container_name: eldercare_mysql
     ports:
       - "3306:3306"
@@ -79,10 +79,10 @@ services:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
     environment:
-      - MYSQL_ROOT_PASSWORD=root_secret
+      - MYSQL_ROOT_PASSWORD=Admin1234
       - MYSQL_DATABASE=eldercare_db
-      - MYSQL_USER=eldercare
-      - MYSQL_PASSWORD=eldercare_secret
+      - MYSQL_USER=eldercare_admin
+      - MYSQL_PASSWORD=your_secure_password
     command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     networks:
       - eldercare_network

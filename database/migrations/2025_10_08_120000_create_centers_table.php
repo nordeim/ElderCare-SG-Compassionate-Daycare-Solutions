@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('centers', function (Blueprint $table) {
+        $driver = Schema::getConnection()->getDriverName();
+
+        Schema::create('centers', function (Blueprint $table) use ($driver) {
             $table->bigIncrements('id');
 
             // Basic Information
@@ -68,12 +70,17 @@ return new class extends Migration
             $table->index('city');
             $table->index('deleted_at');
             $table->index('created_at');
-            $table->fullText(['name', 'short_description', 'description']);
+
+            if ($driver === 'mysql') {
+                $table->fullText(['name', 'short_description', 'description']);
+            }
         });
 
-        DB::statement("ALTER TABLE centers ADD CONSTRAINT chk_centers_capacity CHECK (capacity > 0)");
-        DB::statement("ALTER TABLE centers ADD CONSTRAINT chk_centers_occupancy CHECK (current_occupancy >= 0 AND current_occupancy <= capacity)");
-        DB::statement("ALTER TABLE centers ADD CONSTRAINT chk_centers_staff_count CHECK (staff_count >= 0)");
+        if ($driver === 'mysql') {
+            DB::statement("ALTER TABLE centers ADD CONSTRAINT chk_centers_capacity CHECK (capacity > 0)");
+            DB::statement("ALTER TABLE centers ADD CONSTRAINT chk_centers_occupancy CHECK (current_occupancy >= 0 AND current_occupancy <= capacity)");
+            DB::statement("ALTER TABLE centers ADD CONSTRAINT chk_centers_staff_count CHECK (staff_count >= 0)");
+        }
     }
 
     /**

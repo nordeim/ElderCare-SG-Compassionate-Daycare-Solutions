@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('faqs', function (Blueprint $table) {
+        $driver = Schema::getConnection()->getDriverName();
+
+        Schema::create('faqs', function (Blueprint $table) use ($driver) {
             $table->bigIncrements('id');
             $table->enum('category', ['general', 'booking', 'services', 'pricing', 'accessibility']);
             $table->string('question', 500);
@@ -22,7 +24,10 @@ return new class extends Migration
 
             $table->index(['category', 'display_order'], 'faqs_category_display_order_index');
             $table->index('status');
-            $table->fullText(['question', 'answer']);
+
+            if ($driver === 'mysql') {
+                $table->fullText(['question', 'answer']);
+            }
         });
     }
 
