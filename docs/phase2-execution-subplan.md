@@ -62,6 +62,14 @@
 - Setup Storybook (`.storybook/main.ts`, `preview.ts`, `tsconfig.storybook.json`) with dark/light & locale toggles.
 - Write component stories with localization controls and design notes referencing tokens.
 - Integrate design linting (e.g., Tailwind plugin for design tokens) and Chromatic/Percy pipeline hooks.
+- **Status Log (2025-10-09 12:44 SGT):**
+  - Storybook bootstrapped with Next.js framework (`.storybook/main.ts`, `.storybook/preview.ts`, `.storybook/tsconfig.json`); global theme and locale toolbars configured.
+  - Addons installed (`essentials`, `interactions`, `a11y`) and npm scripts (`storybook`, `build-storybook`) available.
+  - `build-storybook` currently fails with Webpack hook error `SB_BUILDER-WEBPACK5_0002` (Preview build cannot read `compiler.cache.hooks.shutdown.tap`). Suspected Next.js 14.2.33 × Storybook 8.6 compatibility issue.
+  - Follow-ups:
+    1. Investigate Storybook builder compatibility (test `@storybook/nextjs` downgrade or Vite builder).
+    2. Capture repro logs and open upstream issue if Next.js integration patch not available.
+    3. Block Chromatic/Percy pipeline work until preview build is stable.
 
 ### Workstream E — Testing & Quality Gates (Days 7-8)
 - Implement Jest + Testing Library unit tests (coverage targets per master plan).
