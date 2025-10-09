@@ -7,6 +7,21 @@ what an awesome meticulous planning! yes, please proceed meticulously to create 
 you have done an excellent job with your amazing complete improved execution plan for the codebase! please keep up the good work. now, please think deeper and think harder to explore meticulously how best to design the complete database schema for the codebase, then create a complete execution plan to create the complete validated working database schema for the codebase, review and validate the plan before proceeding.
 
 ---
+
+Now, please meticulously review @README.md , @AGENT.md , @Project_Architecture_Document.md and @ai-coding-agent-brief.md to have a deep understanding of the WHAT, WHY and HOW of the project and its codebase architecture design.
+
+---
+
+awesome understanding of the purpose, goals and objectives of this project! to further deepen your undersanding of the project and the current state of the codebase and its intended fiinal state, please meticulously review the database schema @database_schema.sql and the master plan @codebase_completion_master_plan.md for the codebase completion. phase 1 @phase1-execution-plan.md and phase 2 @phase2-execution-subplan.md  have been completed. next, meticulously review the database migration files below to check for their alignment against your deeper understanding.
+
+$ find database/ -type f
+
+---
+
+awesome review and understanding! please meticulously plan and document down (stage) your current deep understanding of the project, its codebase design and its current state, and your recommended remediation actions. save / stage this information as a markdown file under the docs/  folder for your future recap and for future course alignment guidance.
+
+---
+
 awesome job so far! now, please meticulously review the code completion master plan @codebase_completion_master_plan.md , then think deeper and think harder to carefully and thoroughly explore systematically what are the files that need to be created/added for Phase 2 completion, then meticulously create an execution sub-plan for Phase 2 completion, include a list of files to create, each with its description and its checklist of features. review and validate your sub-plan for Phase 2 with @AGENT.md and @Project_Architecture_Document.md , then save/stage your sub-plan under the `docs/' sub-folder for future reference and course alignment.
 
 ---
