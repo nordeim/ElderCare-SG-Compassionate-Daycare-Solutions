@@ -1,4 +1,9 @@
+/// <reference types="@testing-library/jest-dom" />
+
 import React from 'react'
+import { describe, expect, it } from '@jest/globals'
+import '@testing-library/jest-dom'
+import matchers from '@testing-library/jest-dom/matchers'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -8,6 +13,11 @@ import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { RadioGroup, Radio } from '@/components/ui/radio'
 import { Toggle } from '@/components/ui/toggle'
+import { FormField } from '@/components/forms/form-field'
+import { CheckboxField } from '@/components/forms/checkbox-field'
+import { RadioField } from '@/components/forms/radio-field'
+
+expect.extend(matchers)
 
 describe('UI atoms', () => {
   it('disables Button and shows spinner when isLoading', () => {
@@ -74,5 +84,59 @@ describe('UI atoms', () => {
     await user.click(toggle)
 
     expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('links FormField labels and descriptions correctly', () => {
+    render(
+      <FormField
+        label="Care recipient"
+        description="Select the individual you are managing"
+        errorMessage="Please make a selection"
+      >
+        <Input />
+      </FormField>
+    )
+
+    const input = screen.getByRole('textbox', { name: /care recipient/i })
+    const description = screen.getByText(/select the individual/i)
+    const error = screen.getByText(/please make a selection/i)
+
+    const describedBy = (input.getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean)
+
+    expect(describedBy).toHaveLength(2)
+    describedBy.forEach((id) => {
+      expect(document.getElementById(id)).not.toBeNull()
+    })
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+  })
+
+  it('renders CheckboxField with helper text', () => {
+    render(
+      <CheckboxField
+        label="Enable reminders"
+        helperText="We will notify you before appointments"
+        checkboxProps={{ defaultChecked: true }}
+      />
+    )
+
+    expect(screen.getByRole('checkbox', { name: /enable reminders/i })).toBeChecked()
+    expect(screen.getByText(/notify you before appointments/i)).toBeInTheDocument()
+  })
+
+  it('renders RadioField and selects default option', () => {
+    render(
+      <RadioField
+        label="Preferred centre"
+        options={[
+          { label: 'Central Clinic', value: 'central' },
+          { label: 'East Point', value: 'east' }
+        ]}
+        radioGroupProps={{ defaultValue: 'east' }}
+      />
+    )
+
+    const radios = screen.getAllByRole('radio')
+    expect(radios).toHaveLength(2)
+    expect(radios[1]).toBeChecked()
   })
 })
