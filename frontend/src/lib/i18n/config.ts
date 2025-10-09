@@ -1,4 +1,4 @@
-import { locales as SUPPORTED_LOCALES, defaultLocale as DEFAULT_LOCALE, Locale } from '../../../i18n'
+import { locales as SUPPORTED_LOCALES, defaultLocale as DEFAULT_LOCALE, type Locale } from '../../../i18n'
 
 export { SUPPORTED_LOCALES, DEFAULT_LOCALE }
 export type { Locale }
