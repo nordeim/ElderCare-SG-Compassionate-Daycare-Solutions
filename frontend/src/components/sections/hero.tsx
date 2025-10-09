@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Play, X } from 'lucide-react'
 
 const Hero = () => {
   const [isVideoOpen, setIsVideoOpen] = useState(false)
+  const tHero = useTranslations('common.hero')
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -26,15 +28,11 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
-        <h1 className="text-4xl md:text-6xl font-playfair font-bold mb-6">
-          Compassionate Daycare Solutions for Your Loved Ones
-        </h1>
-        <p className="text-xl md:text-2xl mb-8 text-eldercare-off-white">
-          Providing a safe, engaging, and nurturing environment for seniors in Singapore
-        </p>
+        <h1 className="text-4xl md:text-6xl font-playfair font-bold mb-6">{tHero('title')}</h1>
+        <p className="text-xl md:text-2xl mb-8 text-eldercare-off-white">{tHero('subtitle')}</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button variant="cta" size="lg" asChild>
-            <a href="#booking">Book Visit</a>
+            <a href="#booking">{tHero('cta.primary')}</a>
           </Button>
           <Button
             variant="outline"
@@ -43,7 +41,7 @@ const Hero = () => {
             onClick={() => setIsVideoOpen(true)}
           >
             <Play className="mr-2 h-4 w-4" />
-            Watch Tour
+            {tHero('cta.video')}
           </Button>
         </div>
       </div>

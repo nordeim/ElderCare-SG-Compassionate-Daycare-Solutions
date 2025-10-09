@@ -2,12 +2,17 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const locale = useLocale()
+  const tNav = useTranslations('navigation.primary')
+  const tActions = useTranslations('navigation.actions')
+  const tCommon = useTranslations('common.app')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,27 +37,27 @@ const Header = () => {
     >
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center">
-          <Link href="/" className="text-2xl font-playfair font-bold text-eldercare-deep-blue">
-            ElderCare SG
+          <Link href={`/${locale}`} className="text-2xl font-playfair font-bold text-eldercare-deep-blue">
+            {tCommon('name')}
           </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link href="#programs" className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors">
-            Programs
+            {tNav('programs')}
           </Link>
           <Link href="#philosophy" className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors">
-            Our Philosophy
+            {tNav('philosophy')}
           </Link>
           <Link href="#testimonials" className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors">
-            Testimonials
+            {tNav('testimonials')}
           </Link>
           <Link href="#contact" className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors">
-            Contact
+            {tNav('contact')}
           </Link>
           <Button variant="cta" asChild>
-            <Link href="#booking">Book Visit</Link>
+            <Link href="#booking">{tActions('bookVisit')}</Link>
           </Button>
         </nav>
 
@@ -75,32 +80,32 @@ const Header = () => {
               className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Programs
+              {tNav('programs')}
             </Link>
             <Link
               href="#philosophy"
               className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Our Philosophy
+              {tNav('philosophy')}
             </Link>
             <Link
               href="#testimonials"
               className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Testimonials
+              {tNav('testimonials')}
             </Link>
             <Link
               href="#contact"
               className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Contact
+              {tNav('contact')}
             </Link>
             <Button variant="cta" asChild className="w-full">
               <Link href="#booking" onClick={() => setIsMobileMenuOpen(false)}>
-                Book Visit
+                {tActions('bookVisit')}
               </Link>
             </Button>
           </nav>
