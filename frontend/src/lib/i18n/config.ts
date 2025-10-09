@@ -1,6 +1,7 @@
 import { locales as SUPPORTED_LOCALES, defaultLocale as DEFAULT_LOCALE, Locale } from '../../../i18n'
 
 export { SUPPORTED_LOCALES, DEFAULT_LOCALE }
+export type { Locale }
 
 const localeNames: Record<Locale, string> = {
   en: 'English',

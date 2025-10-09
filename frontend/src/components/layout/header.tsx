@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
+import { LanguageSwitcher } from '@/components/layout/language-switcher'
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -59,6 +60,7 @@ const Header = () => {
           <Button variant="cta" asChild>
             <Link href="#booking">{tActions('bookVisit')}</Link>
           </Button>
+          <LanguageSwitcher inline />
         </nav>
 
         {/* Mobile Menu Button */}
@@ -108,6 +110,9 @@ const Header = () => {
                 {tActions('bookVisit')}
               </Link>
             </Button>
+            <div className="pt-2 border-t border-eldercare-slate-gray-3">
+              <LanguageSwitcher />
+            </div>
           </nav>
         </div>
       )}
