@@ -1,0 +1,20 @@
+{
+  "programs": {
+    "heading": "Program Kami",
+    "subheading": "Kami menawarkan pelbagai program untuk memenuhi keperluan komuniti warga emas kami.",
+    "items": {
+      "dayPrograms": {
+        "title": "Program Harian",
+        "description": "Aktiviti harian yang menarik untuk menyokong kesihatan fizikal dan mental."
+      },
+      "wellness": {
+        "title": "Kesihatan & Kesejahteraan",
+        "description": "Pemantauan kesihatan dan program kesejahteraan yang disesuaikan dengan setiap individu."
+      },
+      "familySupport": {
+        "title": "Sokongan Keluarga",
+        "description": "Sumber dan sokongan untuk membantu keluarga menjaga yang tersayang."
+      }
+    }
+  }
+}
