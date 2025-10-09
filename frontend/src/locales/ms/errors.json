@@ -1,0 +1,9 @@
+{
+  "error": {
+    "generic": "Ralat tidak dijangka berlaku. Sila cuba lagi kemudian.",
+    "required": "Ruangan ini wajib diisi.",
+    "invalidEmail": "Sila masukkan alamat emel yang sah.",
+    "minLength": "Sila masukkan sekurang-kurangnya {min} aksara.",
+    "maxLength": "Sila jangan melebihi {max} aksara."
+  }
+}

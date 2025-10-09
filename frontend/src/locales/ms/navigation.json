@@ -1,0 +1,13 @@
+{
+  "primary": {
+    "home": "Laman Utama",
+    "centers": "Pusat",
+    "services": "Perkhidmatan",
+    "faq": "Soalan Lazim",
+    "contact": "Hubungi Kami"
+  },
+  "actions": {
+    "bookVisit": "Tempah Lawatan",
+    "languageSwitch": "Tukar Bahasa"
+  }
+}

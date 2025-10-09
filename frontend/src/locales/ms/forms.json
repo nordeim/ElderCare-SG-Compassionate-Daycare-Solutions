@@ -1,0 +1,12 @@
+{
+  "form": {
+    "name": "Nama penuh",
+    "email": "Emel",
+    "phone": "Nombor telefon",
+    "message": "Mesej",
+    "submit": "Hantar",
+    "reset": "Set Semula",
+    "success": "Terima kasih! Kami akan menghubungi anda tidak lama lagi.",
+    "error": "Sesuatu telah berlaku. Sila cuba lagi."
+  }
+}
