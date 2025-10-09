@@ -119,6 +119,9 @@
 - Add axe-core automated accessibility tests for every component story.
 - Configure Percy snapshots (baseline run) and Playwright visual regression for dynamic states.
 - Update CI (`.github/workflows/ci.yml`) to run Storybook build, component tests, axe sweeps, Percy.
+- **Status Log (2025-10-09 22:08 SGT):**
+  - Storybook now enforces axe violations via `preview.tsx` (`parameters.a11y.test = 'error'` with WCAG runOnly tags).
+  - `npm run percy:storybook` builds static assets and executes `percy snapshot`; awaiting `PERCY_TOKEN` to generate the initial baseline.
 
 ### Buffer & Polish (Day 9)
 - Resolve QA feedback, update documentation references, ensure coverage metrics meet thresholds.
