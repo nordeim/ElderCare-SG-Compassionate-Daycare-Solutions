@@ -53,6 +53,17 @@ jobs:
         cd frontend
         npm run storybook:test
 
+    - name: Capture Percy Storybook snapshots
+      if: ${{ secrets.PERCY_TOKEN != '' }}
+      env:
+        PERCY_TOKEN: ${{ secrets.PERCY_TOKEN }}
+        STORYBOOK_DISABLE_TELEMETRY: '1'
+        NEXT_TELEMETRY_DISABLED: '1'
+      run: |
+        cd frontend
+        npm install --prefer-offline
+        npm run percy:storybook
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:

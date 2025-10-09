@@ -19,6 +19,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:percy": "percy exec -- playwright test",
+    "percy:storybook": "percy exec --storybook --build-storybook-script \"npm run build-storybook\"",
     "lighthouse": "lhci autorun"
   },
   "dependencies": {
