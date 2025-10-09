@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["storybook__addon-essentials", "storybook__addon-interactions"],
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler"
+  },
+  "include": ["../src/**/*.ts", "../src/**/*.tsx", "./*.ts", "./*.tsx"]
+}
