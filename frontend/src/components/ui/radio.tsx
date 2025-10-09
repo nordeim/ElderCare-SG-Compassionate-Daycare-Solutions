@@ -26,12 +26,13 @@ RadioGroup.displayName = RadioGroupPrimitive.Root.displayName
 
 export interface RadioProps extends RadioGroupPrimitive.RadioGroupItemProps {
   error?: boolean
+  visuallyHiddenLabel?: string
 }
 
 const Radio = React.forwardRef<
   React.ElementRef<typeof RadioGroupPrimitive.Item>,
   RadioProps
->(({ className, error = false, disabled, ...props }, ref) => (
+>(({ className, error = false, disabled, visuallyHiddenLabel, ...props }, ref) => (
   <RadioGroupPrimitive.Item
     ref={ref}
     className={cn(
@@ -40,8 +41,10 @@ const Radio = React.forwardRef<
       className
     )}
     disabled={disabled}
+    aria-label={visuallyHiddenLabel ?? props['aria-label']}
     {...props}
   >
+    {visuallyHiddenLabel ? <span className="sr-only">{visuallyHiddenLabel}</span> : null}
     <RadioGroupPrimitive.Indicator className="relative flex h-2.5 w-2.5 items-center justify-center">
       <span className="absolute inset-0 rounded-full bg-[var(--color-primary-500)]" />
     </RadioGroupPrimitive.Indicator>

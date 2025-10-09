@@ -43,7 +43,7 @@ export const RadioField = React.forwardRef<HTMLDivElement, RadioFieldProps>(
         <RadioGroup {...radioGroupProps}>
           {options.map((option) => (
             <div key={option.value} className="flex items-start gap-3">
-              <Radio value={option.value} {...radioProps} />
+              <Radio value={option.value} visuallyHiddenLabel={option.label} {...radioProps} />
               <div className="space-y-1">
                 <span className="text-[var(--color-text-primary)] text-[var(--font-size-base)]">
                   {option.label}
