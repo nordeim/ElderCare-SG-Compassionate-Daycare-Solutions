@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import { tokens, colorScales, semanticColors, typographyTokens, spaceTokens } from '@/lib/theme/tokens'
+import { colorScales, semanticColors, typographyTokens, spaceTokens } from '@/lib/theme/tokens'
 import React from 'react'
 
 const TokenSection = ({ title, children }: { title: string; children: React.ReactNode }) => (

@@ -1,8 +1,11 @@
-/* stylelint-disable at-rule-no-unknown */
+/* stylelint-disable-next-line at-rule-no-unknown */
 @import '../styles/design-tokens.css';
 
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind components;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind utilities;
 
 @layer base {
@@ -13,6 +16,7 @@
   }
 
   body {
+    /* stylelint-disable-next-line at-rule-no-unknown */
     @apply bg-surface text-text-primary antialiased;
   }
 
@@ -41,6 +45,7 @@
 
 /* Focus styles for accessibility */
 .focus-visible:focus {
+  /* stylelint-disable-next-line at-rule-no-unknown */
   @apply outline-2 outline-offset-2 outline-primary-500;
 }
 

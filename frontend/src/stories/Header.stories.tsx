@@ -5,9 +5,7 @@ import Header from '@/components/layout/header'
 import { isLocale, type Locale } from '@/lib/i18n/config'
 import { within, userEvent } from '@storybook/test'
 
-const locales = ['en', 'zh', 'ms', 'ta'] as const
-
-type LocaleKey = (typeof locales)[number]
+type LocaleKey = 'en' | 'zh' | 'ms' | 'ta'
 
 type HeaderCopy = {
   appName: string
