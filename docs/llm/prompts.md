@@ -27,7 +27,11 @@ please meticulously review the build log below and then carefully and systematic
 
 ---
 
-lease proceed meticulously according to your next step/task according to suggested plan. If necessary, please execute the command npm run build  yourself to very the result/outcome of your recent changes.
+please proceed meticulously according to the next step/task in your suggested plan. If necessary, please execute the command `npm run build` yourself to verify the result/outcome of your recent changes.
+
+---
+
+awesome job! now, please meticulously proceed with the next item/task in your phase 2 sub-plan.
 
 ---
 

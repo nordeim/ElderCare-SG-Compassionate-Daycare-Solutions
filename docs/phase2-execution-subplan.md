@@ -39,6 +39,14 @@
 - Configure `next-intl` (routing middleware, locale detection, provider wrapper).
 - Create translation namespaces (`common`, `navigation`, `forms`, `errors`) for English (`en`), Mandarin (`zh`); provision scaffolds for Malay (`ms`) and Tamil (`ta`) per PAD §10.0.
 - Build language switcher component with keyboard navigation and analytics events.
+- **Status Log (2025-10-09 11:23 SGT):**
+  - Root config (`next-intl.config.ts`, `src/lib/i18n/request.ts`) integrated with `createNextIntlPlugin` in `next.config.mjs`; `middleware` & locale-aware layouts redirect correctly.
+  - All homepage sections (`header`, `hero`, `program-highlights`, `footer`) consume translations; language switcher operational across desktop/mobile.
+  - Build completes successfully but emits `ENVIRONMENT_FALLBACK` warnings. Suspected cause: at least one server component still calls `useTranslations()` without being client-only (investigate remaining layout/section imports). TODO captured in Workstream B follow-ups.
+  - Follow-up actions:
+    1. Audit any server components invoking `useTranslations()`; either mark `'use client'` or refactor to fetch translations server-side.
+    2. Re-run `npm run build` post-audit to confirm warnings cleared; document outcome here.
+    3. Update QA checklist once warning-free build achieved.
 
 ### Workstream C — Component Library (Days 3-6)
 - **Atoms:** Button, Icon, Badge, Input, Label, Toggle, Checkbox, Radio, Select, Textarea.
