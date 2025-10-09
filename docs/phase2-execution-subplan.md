@@ -82,6 +82,10 @@
   - **Existing suites:** `src/components/ui/__tests__/atoms.test.tsx` (Buttons, Inputs, Toggles basic rendering).
   - **Gaps:** no dedicated tests for `Card` molecule, `CheckboxField`/`RadioField` accessibility props, or locale-driven copy.
   - **Next actions:** add RTL tests covering required/error messaging, design token class assertions, and theme toggling through context providers.
+- **Testing Update (2025-10-09 19:58 SGT):**
+  - Added `src/components/ui/__tests__/molecules.test.tsx` to cover `Card`, `CheckboxField`, `RadioField` behaviors with Radix state assertions.
+  - Installed Storybook Test Runner (`@storybook/test-runner`, `start-server-and-test`) and verified `npm run storybook:test` passes locally after Playwright browser install.
+  - CI workflow (`.github/workflows/ci.yml`) now installs Playwright chromium build and executes Storybook interaction tests with telemetry disabled.
 
 ### Workstream E — Testing & Quality Gates (Days 7-8)
 - Implement Jest + Testing Library unit tests (coverage targets per master plan).

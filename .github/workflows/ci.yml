@@ -40,6 +40,19 @@ jobs:
         cd frontend
         npm run test:coverage
 
+    - name: Install Playwright browsers for Storybook tests
+      run: |
+        cd frontend
+        npx playwright install --with-deps chromium
+
+    - name: Run Storybook interaction tests
+      env:
+        STORYBOOK_DISABLE_TELEMETRY: '1'
+        NEXT_TELEMETRY_DISABLED: '1'
+      run: |
+        cd frontend
+        npm run storybook:test
+
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
       with:

@@ -28,6 +28,10 @@ const config: StorybookConfig = {
         ...config.define,
         ...(configType === 'PRODUCTION' ? { 'process.env': {} } : {})
       },
+      esbuild: {
+        ...config.esbuild,
+        jsx: 'automatic'
+      },
       resolve: {
         ...config.resolve,
         alias: {
