@@ -38,6 +38,15 @@ const preview: Preview = {
         color: /(background|color)$/i,
         date: /Date$/
       }
+    },
+    a11y: {
+      test: 'error',
+      options: {
+        runOnly: {
+          type: 'tag',
+          values: ['wcag2a', 'wcag2aa', 'wcag21aa']
+        }
+      }
     }
   },
   globalTypes: {
