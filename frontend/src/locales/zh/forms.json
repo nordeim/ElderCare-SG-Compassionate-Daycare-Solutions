@@ -1,0 +1,10 @@
+{
+  "form.name": "姓名",
+  "form.email": "电子邮件",
+  "form.phone": "联系电话",
+  "form.message": "留言内容",
+  "form.submit": "提交",
+  "form.reset": "重置",
+  "form.success": "感谢您的联系，我们会尽快回复。",
+  "form.error": "发生错误，请稍后再试。"
+}

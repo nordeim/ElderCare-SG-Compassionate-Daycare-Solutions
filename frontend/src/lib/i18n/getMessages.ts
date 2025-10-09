@@ -2,7 +2,7 @@ import { DEFAULT_LOCALE, Locale } from '@/lib/i18n/config'
 
 export type Messages = Record<string, unknown>
 
-export async function getMessages(locale: Locale): Promise<Messages> {
+export async function loadMessages(locale: Locale): Promise<Messages> {
   try {
     const messages = await import(`@/locales/${locale}/index`)
     return messages.default

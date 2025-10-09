@@ -1,0 +1,7 @@
+{
+  "error.generic": "发生未知错误，请稍后再试。",
+  "error.required": "此栏位为必填项。",
+  "error.invalidEmail": "请输入有效的电子邮件地址。",
+  "error.minLength": "请至少输入 {min} 个字符。",
+  "error.maxLength": "请不要超过 {max} 个字符。"
+}
