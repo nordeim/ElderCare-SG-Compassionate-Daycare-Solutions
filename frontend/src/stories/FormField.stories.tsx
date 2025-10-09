@@ -4,7 +4,10 @@ import React from 'react'
 import { FormField } from '@/components/forms/form-field'
 import { Input } from '@/components/ui/input'
 
-const copyByLocale = {
+const locales = ['en', 'zh', 'ms', 'ta'] as const
+type Locale = (typeof locales)[number]
+
+const copyByLocale: Record<Locale, { label: string; description: string; helper: string; placeholder: string; error: string }> = {
   en: {
     label: 'Resident contact number',
     description: 'We will only call for care coordination updates.',
@@ -33,9 +36,11 @@ const copyByLocale = {
     placeholder: '+65 9876 5432',
     error: 'சரியான தொலைபேசி எண்ணை உள்ளிடவும்.'
   }
-} satisfies Record<string, { label: string; description: string; helper: string; placeholder: string; error: string }>
+}
 
-const resolveCopy = (locale: string | undefined) => copyByLocale[locale ?? 'en'] ?? copyByLocale.en
+const isLocale = (value: unknown): value is Locale => typeof value === 'string' && locales.includes(value as Locale)
+
+const resolveCopy = (locale: string | undefined) => (isLocale(locale) ? copyByLocale[locale] : copyByLocale.en)
 
 const meta = {
   title: 'Molecules/FormField',
@@ -45,7 +50,8 @@ const meta = {
   },
   tags: ['autodocs'],
   args: {
-    required: false
+    required: false,
+    children: <Input />
   }
 } satisfies Meta<typeof FormField>
 
@@ -64,7 +70,9 @@ export const Playground: Story = {
         description={copy.description}
         helperText={copy.helper}
       >
-        <Input placeholder={copy.placeholder} />
+        {React.cloneElement(args.children as React.ReactElement, {
+          placeholder: copy.placeholder
+        })}
       </FormField>
     )
   }
@@ -72,7 +80,8 @@ export const Playground: Story = {
 
 export const RequiredWithError: Story = {
   args: {
-    required: true
+    required: true,
+    children: <Input aria-invalid placeholder="" />
   },
   render: (args, { globals }) => {
     const copy = resolveCopy(globals.locale as string)
@@ -85,7 +94,10 @@ export const RequiredWithError: Story = {
         helperText={copy.helper}
         errorMessage={copy.error}
       >
-        <Input placeholder={copy.placeholder} aria-invalid />
+        {React.cloneElement(args.children as React.ReactElement, {
+          placeholder: copy.placeholder,
+          'aria-invalid': true
+        })}
       </FormField>
     )
   }
