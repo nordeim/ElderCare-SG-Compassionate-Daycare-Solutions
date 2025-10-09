@@ -78,6 +78,10 @@
   - **Stories present:** `Button`, `Checkbox`, `Input`, `Radio`, `Toggle` (`src/stories/`).
   - **UI gaps:** `Card`, `Label`, `FormField`-based controls (`forms/checkbox-field.tsx`, `forms/radio-field.tsx`), `Section` components.
   - **Enhancement opportunities:** add locale-aware copy, surface theme variations via `context.globals.theme`, and document accessibility interactions per component.
+- **Testing Audit (2025-10-09 19:28 SGT):**
+  - **Existing suites:** `src/components/ui/__tests__/atoms.test.tsx` (Buttons, Inputs, Toggles basic rendering).
+  - **Gaps:** no dedicated tests for `Card` molecule, `CheckboxField`/`RadioField` accessibility props, or locale-driven copy.
+  - **Next actions:** add RTL tests covering required/error messaging, design token class assertions, and theme toggling through context providers.
 
 ### Workstream E — Testing & Quality Gates (Days 7-8)
 - Implement Jest + Testing Library unit tests (coverage targets per master plan).
