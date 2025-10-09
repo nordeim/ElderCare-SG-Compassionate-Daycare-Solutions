@@ -1,16 +1,39 @@
 'use client'
 
 import Link from 'next/link'
-import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Mail, Phone, MapPin } from 'lucide-react'
 
-const Footer = () => {
-  const locale = useLocale()
-  const tFooterSections = useTranslations('footer.sections')
-  const tFooterLegal = useTranslations('footer.legal')
-  const currentYear = new Date().getFullYear()
+type FooterCertifications = {
+  moh: string
+  iso: string
+  eldercare: string
+  sg: string
+}
 
+type FooterSections = {
+  contactHeading: string
+  newsletterHeading: string
+  newsletterDescription: string
+  newsletterPlaceholder: string
+  newsletterCta: string
+  certificationsHeading: string
+  certifications: FooterCertifications
+}
+
+type FooterLegal = {
+  rights: string
+  privacy: string
+  terms: string
+}
+
+type FooterProps = {
+  locale: string
+  sections: FooterSections
+  legal: FooterLegal
+}
+
+const Footer = ({ locale, sections, legal }: FooterProps) => {
   return (
     <footer className="bg-eldercare-deep-blue text-white">
       <div className="container mx-auto px-6 py-12">
@@ -18,7 +41,7 @@ const Footer = () => {
           {/* Contact Information */}
           <div>
             <h3 className="text-xl font-playfair font-semibold mb-4">
-              {tFooterSections('contact.heading')}
+              {sections.contactHeading}
             </h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
@@ -39,20 +62,20 @@ const Footer = () => {
           {/* Newsletter */}
           <div>
             <h3 className="text-xl font-playfair font-semibold mb-4">
-              {tFooterSections('newsletter.heading')}
+              {sections.newsletterHeading}
             </h3>
             <p className="mb-4 text-eldercare-off-white">
-              {tFooterSections('newsletter.description')}
+              {sections.newsletterDescription}
             </p>
             <form className="flex flex-col space-y-2">
               <input
                 type="email"
-                placeholder={tFooterSections('newsletter.placeholder')}
+                placeholder={sections.newsletterPlaceholder}
                 className="px-4 py-2 rounded-md text-eldercare-deep-blue"
                 required
               />
               <Button variant="secondary" type="submit">
-                {tFooterSections('newsletter.cta')}
+                {sections.newsletterCta}
               </Button>
             </form>
           </div>
@@ -60,12 +83,12 @@ const Footer = () => {
           {/* Certifications */}
           <div>
             <h3 className="text-xl font-playfair font-semibold mb-4">
-              {tFooterSections('certifications.heading')}
+              {sections.certificationsHeading}
             </h3>
             <div className="grid grid-cols-2 gap-4">
               {(['moh', 'iso', 'eldercare', 'sg'] as const).map((key) => (
                 <div key={key} className="bg-white/10 rounded-md p-3 flex items-center justify-center">
-                  <span className="text-sm">{tFooterSections(`certifications.labels.${key}`)}</span>
+                  <span className="text-sm">{sections.certifications[key]}</span>
                 </div>
               ))}
             </div>
@@ -73,13 +96,13 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-white/20 mt-8 pt-8 text-center text-eldercare-off-white">
-          <p>{tFooterLegal('rights', { year: currentYear })}</p>
+          <p>{legal.rights}</p>
           <div className="mt-4 space-x-4">
             <Link href={`/${locale}/privacy`} className="hover:text-eldercare-gold transition-colors">
-              {tFooterLegal('privacy')}
+              {legal.privacy}
             </Link>
             <Link href={`/${locale}/terms`} className="hover:text-eldercare-gold transition-colors">
-              {tFooterLegal('terms')}
+              {legal.terms}
             </Link>
           </div>
         </div>

@@ -2,18 +2,33 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useLocale, useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Menu, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/layout/language-switcher'
+import { Locale } from '@/lib/i18n/config'
 
-const Header = () => {
+type HeaderNavigationLabels = {
+  programs: string
+  philosophy: string
+  testimonials: string
+  contact: string
+}
+
+type HeaderActionLabels = {
+  bookVisit: string
+  languageSwitch: string
+}
+
+type HeaderProps = {
+  locale: Locale
+  appName: string
+  navigation: HeaderNavigationLabels
+  actions: HeaderActionLabels
+}
+
+const Header = ({ locale, appName, navigation, actions }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const locale = useLocale()
-  const tNav = useTranslations('navigation.primary')
-  const tActions = useTranslations('navigation.actions')
-  const tCommon = useTranslations('common.app')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,28 +54,28 @@ const Header = () => {
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <div className="flex items-center">
           <Link href={`/${locale}`} className="text-2xl font-playfair font-bold text-eldercare-deep-blue">
-            {tCommon('name')}
+            {appName}
           </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link href="#programs" className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors">
-            {tNav('programs')}
+            {navigation.programs}
           </Link>
           <Link href="#philosophy" className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors">
-            {tNav('philosophy')}
+            {navigation.philosophy}
           </Link>
           <Link href="#testimonials" className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors">
-            {tNav('testimonials')}
+            {navigation.testimonials}
           </Link>
           <Link href="#contact" className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors">
-            {tNav('contact')}
+            {navigation.contact}
           </Link>
           <Button variant="cta" asChild>
-            <Link href="#booking">{tActions('bookVisit')}</Link>
+            <Link href="#booking">{actions.bookVisit}</Link>
           </Button>
-          <LanguageSwitcher inline />
+          <LanguageSwitcher label={actions.languageSwitch} locale={locale} inline />
         </nav>
 
         {/* Mobile Menu Button */}
@@ -82,36 +97,36 @@ const Header = () => {
               className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              {tNav('programs')}
+              {navigation.programs}
             </Link>
             <Link
               href="#philosophy"
               className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              {tNav('philosophy')}
+              {navigation.philosophy}
             </Link>
             <Link
               href="#testimonials"
               className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              {tNav('testimonials')}
+              {navigation.testimonials}
             </Link>
             <Link
               href="#contact"
               className="text-eldercare-slate-gray-1 hover:text-eldercare-deep-blue transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              {tNav('contact')}
+              {navigation.contact}
             </Link>
             <Button variant="cta" asChild className="w-full">
               <Link href="#booking" onClick={() => setIsMobileMenuOpen(false)}>
-                {tActions('bookVisit')}
+                {actions.bookVisit}
               </Link>
             </Button>
             <div className="pt-2 border-t border-eldercare-slate-gray-3">
-              <LanguageSwitcher />
+              <LanguageSwitcher label={actions.languageSwitch} locale={locale} />
             </div>
           </nav>
         </div>

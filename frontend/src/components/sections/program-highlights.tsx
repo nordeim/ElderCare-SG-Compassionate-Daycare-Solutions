@@ -2,27 +2,40 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Heart, Activity, Users } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 
-const ProgramHighlights = () => {
-  const tHome = useTranslations('home.programs')
+type ProgramCopy = {
+  title: string
+  description: string
+}
+
+type ProgramHighlightsProps = {
+  heading: string
+  subheading: string
+  items: {
+    dayPrograms: ProgramCopy
+    wellness: ProgramCopy
+    familySupport: ProgramCopy
+  }
+}
+
+const ProgramHighlights = ({ heading, subheading, items }: ProgramHighlightsProps) => {
   const programs = [
     {
       icon: <Heart className="h-8 w-8 text-eldercare-calming-green" />,
-      title: tHome('items.dayPrograms.title'),
-      description: tHome('items.dayPrograms.description'),
+      title: items.dayPrograms.title,
+      description: items.dayPrograms.description,
       color: 'bg-eldercare-soft-amber'
     },
     {
       icon: <Activity className="h-8 w-8 text-eldercare-calming-green" />,
-      title: tHome('items.wellness.title'),
-      description: tHome('items.wellness.description'),
+      title: items.wellness.title,
+      description: items.wellness.description,
       color: 'bg-eldercare-off-white'
     },
     {
       icon: <Users className="h-8 w-8 text-eldercare-calming-green" />,
-      title: tHome('items.familySupport.title'),
-      description: tHome('items.familySupport.description'),
+      title: items.familySupport.title,
+      description: items.familySupport.description,
       color: 'bg-eldercare-soft-amber'
     }
   ]
@@ -32,9 +45,9 @@ const ProgramHighlights = () => {
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-playfair font-bold text-eldercare-deep-blue mb-4">
-            {tHome('heading')}
+            {heading}
           </h2>
-          <p className="text-lg text-eldercare-slate-gray-2 max-w-2xl mx-auto">{tHome('subheading')}</p>
+          <p className="text-lg text-eldercare-slate-gray-2 max-w-2xl mx-auto">{subheading}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

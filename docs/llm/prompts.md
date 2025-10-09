@@ -35,5 +35,9 @@ awesome job! now, please meticulously proceed with the next item/task in your ph
 
 ---
 
+ok, please move translation lookup server-side and document this down. If this is not in scope for phase 2, then we update the master plan @codebase_completion_master_plan.md with this fact and update one of the latter phases to include it. then you can proceed meticulously with the remaining tasks/items in the sub-plan for phase 2.
+
+---
+
 docs/AGENT.md Project_Architecture_Document.md , Project_Requirements_Document.md , codebase_completion_master_plan.md , and docs/ai-coding-agent-brief.md
 .

@@ -47,6 +47,10 @@
     1. Audit any server components invoking `useTranslations()`; either mark `'use client'` or refactor to fetch translations server-side.
     2. Re-run `npm run build` post-audit to confirm warnings cleared; document outcome here.
     3. Update QA checklist once warning-free build achieved.
+- **Status Log (2025-10-09 12:02 SGT):**
+  - Translation lookup moved server-side: `app/[locale]/page.tsx` now gathers localized copy via `getTranslations()` and passes typed props to `Header`, `Hero`, `ProgramHighlights`, `Footer`, and `LanguageSwitcher`.
+  - Client components no longer call `useTranslations()`/`useLocale()`, eliminating `ENVIRONMENT_FALLBACK` warnings during static generation.
+  - `npm run build` (see run at 12:01 SGT) completes cleanly with all locale pages prerendered; update recorded in QA checklist.
 
 ### Workstream C — Component Library (Days 3-6)
 - **Atoms:** Button, Icon, Badge, Input, Label, Toggle, Checkbox, Radio, Select, Textarea.

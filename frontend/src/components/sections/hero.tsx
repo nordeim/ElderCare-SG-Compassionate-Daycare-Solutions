@@ -1,13 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Play, X } from 'lucide-react'
 
-const Hero = () => {
+type HeroCtaLabels = {
+  primary: string
+  video: string
+}
+
+export type HeroProps = {
+  title: string
+  subtitle: string
+  cta: HeroCtaLabels
+}
+
+const Hero = ({ title, subtitle, cta }: HeroProps) => {
   const [isVideoOpen, setIsVideoOpen] = useState(false)
-  const tHero = useTranslations('common.hero')
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -28,11 +37,11 @@ const Hero = () => {
 
       {/* Content */}
       <div className="relative z-10 text-center text-white px-6 max-w-4xl mx-auto">
-        <h1 className="text-4xl md:text-6xl font-playfair font-bold mb-6">{tHero('title')}</h1>
-        <p className="text-xl md:text-2xl mb-8 text-eldercare-off-white">{tHero('subtitle')}</p>
+        <h1 className="text-4xl md:text-6xl font-playfair font-bold mb-6">{title}</h1>
+        <p className="text-xl md:text-2xl mb-8 text-eldercare-off-white">{subtitle}</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button variant="cta" size="lg" asChild>
-            <a href="#booking">{tHero('cta.primary')}</a>
+            <a href="#booking">{cta.primary}</a>
           </Button>
           <Button
             variant="outline"
@@ -41,7 +50,7 @@ const Hero = () => {
             onClick={() => setIsVideoOpen(true)}
           >
             <Play className="mr-2 h-4 w-4" />
-            {tHero('cta.video')}
+            {cta.video}
           </Button>
         </div>
       </div>

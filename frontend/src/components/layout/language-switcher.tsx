@@ -1,11 +1,11 @@
 'use client'
 
 import { ChangeEvent, useTransition } from 'react'
-import { useLocale, useTranslations } from 'next-intl'
 import { usePathname, useRouter } from 'next/navigation'
 
 import { locales } from '@/../i18n'
 import { getLocaleName } from '@/lib/i18n/config'
+import { Locale } from '@/lib/i18n/config'
 
 const localeOptions = Array.from(locales)
 
@@ -20,12 +20,16 @@ function buildLocalizedPath(pathname: string, nextLocale: string) {
   return `/${segments.join('/')}`
 }
 
-export function LanguageSwitcher({ inline = false }: { inline?: boolean }) {
+type LanguageSwitcherProps = {
+  label: string
+  locale: Locale
+  inline?: boolean
+}
+
+export function LanguageSwitcher({ label, locale, inline = false }: LanguageSwitcherProps) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
-  const locale = useLocale()
   const pathname = usePathname()
-  const tActions = useTranslations('navigation.actions')
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const nextLocale = event.target.value
@@ -43,7 +47,7 @@ export function LanguageSwitcher({ inline = false }: { inline?: boolean }) {
 
   return (
     <label className={`flex items-center gap-2 text-sm ${inline ? '' : 'text-eldercare-slate-gray-1'}`}>
-      <span>{tActions('languageSwitch')}</span>
+      <span>{label}</span>
       <select
         className="rounded-md border border-eldercare-slate-gray-3 bg-white px-2 py-1 text-eldercare-slate-gray-1 focus:outline-none focus:ring-2 focus:ring-primary-500"
         value={locale}
