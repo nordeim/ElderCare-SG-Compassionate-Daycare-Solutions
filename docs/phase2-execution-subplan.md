@@ -95,6 +95,9 @@
 - **Status Log (2025-10-09 21:34 SGT):**
   - Created `src/stories/Hero.stories.tsx` to cover the hero section with locale-aware CTAs; validated high-contrast token usage.
   - Rebuilt Storybook successfully, confirming new section story packaging. Next targets: `Footer` and `ProgramHighlights` stories.
+- **Status Log (2025-10-09 21:41 SGT):**
+  - Added `src/stories/Footer.stories.tsx` and `src/stories/ProgramHighlights.stories.tsx` for layout/section coverage with localized copy.
+  - `npm run build-storybook` remains green after additions; remaining gap for Workstream C is navigation/header refinement.
 - **Testing Audit (2025-10-09 19:28 SGT):**
   - **Existing suites:** `src/components/ui/__tests__/atoms.test.tsx` (Buttons, Inputs, Toggles basic rendering).
   - **Gaps:** no dedicated tests for `Card` molecule, `CheckboxField`/`RadioField` accessibility props, or locale-driven copy.
