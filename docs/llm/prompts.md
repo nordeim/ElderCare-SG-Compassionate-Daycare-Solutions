@@ -35,6 +35,10 @@ awesome job! now, please meticulously proceed with the next item/task in your ph
 
 ---
 
+awesome! please proceed meticulously with your next step.
+
+---
+
 awesome job! please meticulously review and update @codebase_completion_master_plan.md and @AGENT.md with the current status and with the progress made so far so that these documents align with the current state of the codebase.
 
 ---

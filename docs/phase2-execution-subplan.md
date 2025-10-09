@@ -88,6 +88,10 @@
   - **Stories present:** `Button`, `Checkbox`, `Input`, `Radio`, `Toggle` (`src/stories/`).
   - **UI gaps:** `Card`, `Label`, `FormField`-based controls (`forms/checkbox-field.tsx`, `forms/radio-field.tsx`), `Section` components.
   - **Enhancement opportunities:** add locale-aware copy, surface theme variations via `context.globals.theme`, and document accessibility interactions per component.
+- **Status Log (2025-10-09 21:28 SGT):**
+  - Added `src/stories/FormField.stories.tsx` demonstrating helper/error messaging propagation with localized copy.
+  - Token showcase `src/stories/Tokens.stories.tsx` (from Workstream A) referenced to validate color/spacing usage across molecules.
+  - `npm run build-storybook` passes post-update; downstream stories to tackle next include layout/section components.
 - **Testing Audit (2025-10-09 19:28 SGT):**
   - **Existing suites:** `src/components/ui/__tests__/atoms.test.tsx` (Buttons, Inputs, Toggles basic rendering).
   - **Gaps:** no dedicated tests for `Card` molecule, `CheckboxField`/`RadioField` accessibility props, or locale-driven copy.
