@@ -9,7 +9,10 @@ export interface CheckboxProps extends CheckboxPrimitive.CheckboxProps {
   error?: boolean
 }
 
-const Checkbox = React.forwardRef<CheckboxPrimitive.CheckboxElement, CheckboxProps>(
+const Checkbox = React.forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  CheckboxProps
+>(
   ({ className, indeterminate = false, error = false, disabled, ...props }, ref) => {
     return (
       <CheckboxPrimitive.Root

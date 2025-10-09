@@ -15,7 +15,8 @@ const RadioGroup = React.forwardRef<
     ref={ref}
     className={cn(
       'grid gap-3',
-      orientation === 'horizontal' ? 'grid-flow-col auto-cols-auto items-center' : 'grid-flow-row'
+      orientation === 'horizontal' ? 'grid-flow-col auto-cols-auto items-center' : 'grid-flow-row',
+      className
     )}
     {...props}
   />

@@ -1,9 +1,5 @@
-/// <reference types="@testing-library/jest-dom" />
-
 import React from 'react'
 import { describe, expect, it } from '@jest/globals'
-import '@testing-library/jest-dom'
-import matchers from '@testing-library/jest-dom/matchers'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
@@ -17,16 +13,14 @@ import { FormField } from '@/components/forms/form-field'
 import { CheckboxField } from '@/components/forms/checkbox-field'
 import { RadioField } from '@/components/forms/radio-field'
 
-expect.extend(matchers)
-
 describe('UI atoms', () => {
   it('disables Button and shows spinner when isLoading', () => {
     render(<Button isLoading>Processing</Button>)
 
     const button = screen.getByRole('button', { name: /processing/i })
 
-    expect(button).toBeDisabled()
-    expect(button).toHaveAttribute('aria-busy', 'true')
+    expect(button.hasAttribute('disabled')).toBe(true)
+    expect(button.getAttribute('aria-busy')).toBe('true')
   })
 
   it('applies aria-invalid on Input when isInvalid', () => {
@@ -34,7 +28,7 @@ describe('UI atoms', () => {
 
     const input = screen.getByRole('textbox', { name: /email/i })
 
-    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(input.getAttribute('aria-invalid')).toBe('true')
   })
 
   it('renders helper text when provided on Label', () => {
@@ -44,15 +38,15 @@ describe('UI atoms', () => {
       </Label>
     )
 
-    expect(screen.getByText(/first and last name/i)).toBeInTheDocument()
+    expect(screen.queryByText(/first and last name/i)).not.toBeNull()
   })
 
   it('renders indeterminate Checkbox with minus icon', () => {
     render(<Checkbox aria-label="Select all" checked indeterminate />)
 
     const checkbox = screen.getByRole('checkbox', { name: /select all/i })
-    expect(checkbox).toBeChecked()
-    expect(checkbox).toHaveAttribute('data-state', 'indeterminate')
+    expect((checkbox as HTMLInputElement).checked).toBe(true)
+    expect(checkbox.getAttribute('data-state')).toBe('indeterminate')
   })
 
   it('selects Radio via user interaction', async () => {
@@ -67,7 +61,7 @@ describe('UI atoms', () => {
     const radio = screen.getAllByRole('radio')[1]
     await user.click(radio)
 
-    expect(radio).toBeChecked()
+    expect((radio as HTMLInputElement).checked).toBe(true)
   })
 
   it('toggles state when Toggle is clicked', async () => {
@@ -79,11 +73,11 @@ describe('UI atoms', () => {
     )
 
     const toggle = screen.getByRole('button', { name: /mute notifications/i })
-    expect(toggle).toHaveAttribute('aria-pressed', 'false')
+    expect(toggle.getAttribute('aria-pressed')).toBe('false')
 
     await user.click(toggle)
 
-    expect(toggle).toHaveAttribute('aria-pressed', 'true')
+    expect(toggle.getAttribute('aria-pressed')).toBe('true')
   })
 
   it('links FormField labels and descriptions correctly', () => {
@@ -107,7 +101,9 @@ describe('UI atoms', () => {
     describedBy.forEach((id) => {
       expect(document.getElementById(id)).not.toBeNull()
     })
-    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(description).not.toBeNull()
+    expect(error).not.toBeNull()
+    expect(input.getAttribute('aria-invalid')).toBe('true')
   })
 
   it('renders CheckboxField with helper text', () => {
@@ -119,8 +115,8 @@ describe('UI atoms', () => {
       />
     )
 
-    expect(screen.getByRole('checkbox', { name: /enable reminders/i })).toBeChecked()
-    expect(screen.getByText(/notify you before appointments/i)).toBeInTheDocument()
+    expect((screen.getByRole('checkbox', { name: /enable reminders/i }) as HTMLInputElement).checked).toBe(true)
+    expect(screen.queryByText(/notify you before appointments/i)).not.toBeNull()
   })
 
   it('renders RadioField and selects default option', () => {
@@ -136,7 +132,7 @@ describe('UI atoms', () => {
     )
 
     const radios = screen.getAllByRole('radio')
-    expect(radios).toHaveLength(2)
-    expect(radios[1]).toBeChecked()
+    expect(radios.length).toBe(2)
+    expect((radios[1] as HTMLInputElement).checked).toBe(true)
   })
 })
