@@ -1,10 +1,10 @@
 import createMiddleware from 'next-intl/middleware'
 
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from './lib/i18n/config'
+import { locales, defaultLocale } from '../i18n'
 
 export default createMiddleware({
-  locales: Array.from(SUPPORTED_LOCALES),
-  defaultLocale: DEFAULT_LOCALE,
+  locales: Array.from(locales),
+  defaultLocale,
   localeDetection: true
 })
 

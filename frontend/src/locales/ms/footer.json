@@ -1,0 +1,27 @@
+{
+  "sections": {
+    "contact": {
+      "heading": "Hubungi Kami"
+    },
+    "newsletter": {
+      "heading": "Ikuti Perkembangan",
+      "description": "Langgan surat berita kami untuk menerima maklumat terkini tentang program dan perkhidmatan kami.",
+      "placeholder": "Alamat emel anda",
+      "cta": "Langgan"
+    },
+    "certifications": {
+      "heading": "Pensijilan",
+      "labels": {
+        "moh": "Disahkan MOH",
+        "iso": "ISO 9001",
+        "eldercare": "Diiktiraf Eldercare",
+        "sg": "Disahkan SG"
+      }
+    }
+  },
+  "legal": {
+    "rights": "© {year} ElderCare SG. Hak cipta terpelihara.",
+    "privacy": "Dasar Privasi",
+    "terms": "Syarat Perkhidmatan"
+  }
+}

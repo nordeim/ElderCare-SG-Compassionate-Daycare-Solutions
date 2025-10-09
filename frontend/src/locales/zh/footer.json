@@ -1,0 +1,27 @@
+{
+  "sections": {
+    "contact": {
+      "heading": "联络我们"
+    },
+    "newsletter": {
+      "heading": "保持关注",
+      "description": "订阅我们的通讯，获取最新计划与服务资讯。",
+      "placeholder": "请输入您的电子邮件",
+      "cta": "立即订阅"
+    },
+    "certifications": {
+      "heading": "认证项目",
+      "labels": {
+        "moh": "卫生部认证",
+        "iso": "ISO 9001",
+        "eldercare": "长者照护认可",
+        "sg": "新加坡资质"
+      }
+    }
+  },
+  "legal": {
+    "rights": "© {year} ElderCare SG。版权所有。",
+    "privacy": "隐私政策",
+    "terms": "服务条款"
+  }
+}

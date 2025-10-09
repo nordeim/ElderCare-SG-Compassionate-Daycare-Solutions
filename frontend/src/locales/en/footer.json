@@ -1,0 +1,27 @@
+{
+  "sections": {
+    "contact": {
+      "heading": "Contact Us"
+    },
+    "newsletter": {
+      "heading": "Stay Updated",
+      "description": "Subscribe to our newsletter for updates on our programs and services.",
+      "placeholder": "Your email address",
+      "cta": "Subscribe"
+    },
+    "certifications": {
+      "heading": "Certifications",
+      "labels": {
+        "moh": "MOH Certified",
+        "iso": "ISO 9001",
+        "eldercare": "Eldercare Accredited",
+        "sg": "SG Verified"
+      }
+    }
+  },
+  "legal": {
+    "rights": "© {year} ElderCare SG. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}

@@ -1,7 +1,6 @@
-export const SUPPORTED_LOCALES = ['en', 'zh', 'ms', 'ta'] as const
-export const DEFAULT_LOCALE = 'en'
+import { locales as SUPPORTED_LOCALES, defaultLocale as DEFAULT_LOCALE, Locale } from '../../../i18n'
 
-export type Locale = (typeof SUPPORTED_LOCALES)[number]
+export { SUPPORTED_LOCALES, DEFAULT_LOCALE }
 
 const localeNames: Record<Locale, string> = {
   en: 'English',
