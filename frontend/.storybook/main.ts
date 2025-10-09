@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import type { StorybookConfig } from '@storybook/react-vite'
 
 const config: StorybookConfig = {
@@ -7,16 +8,34 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {}
   },
+  typescript: {
+    check: false,
+    reactDocgen: 'react-docgen-typescript',
+    reactDocgenTypescriptOptions: {
+      shouldExtractLiteralValuesFromEnum: true,
+      shouldRemoveUndefinedFromOptional: true,
+      propFilter: (prop) => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true)
+    }
+  },
   docs: {
     autodocs: 'tag'
   },
   staticDirs: ['../public'],
-  viteFinal: async (config) => {
+  viteFinal: async (config, { configType }) => {
     return {
       ...config,
       define: {
         ...config.define,
-        'process.env': {}
+        ...(configType === 'PRODUCTION' ? { 'process.env': {} } : {})
+      },
+      resolve: {
+        ...config.resolve,
+        alias: {
+          ...config.resolve?.alias,
+          '@': resolve(process.cwd(), 'src'),
+          react: require.resolve('react'),
+          'react-dom': require.resolve('react-dom')
+        }
       }
     }
   }

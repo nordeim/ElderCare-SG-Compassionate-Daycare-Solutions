@@ -70,6 +70,14 @@
     1. Investigate Storybook builder compatibility (test `@storybook/nextjs` downgrade or Vite builder).
     2. Capture repro logs and open upstream issue if Next.js integration patch not available.
     3. Block Chromatic/Percy pipeline work until preview build is stable.
+- **Status Log (2025-10-09 18:58 SGT):**
+  - Migrated Storybook to Vite builder with updated configuration (`.storybook/main.ts`, `.storybook/preview.tsx`, `.storybook/tsconfig.json`).
+  - Alias `@` resolved to `src/` for story imports; Tailwind design token import order fixed in `src/app/globals.css` to satisfy Vite.
+  - `npm run build-storybook` now succeeds; bundle artifacts generated under `frontend/storybook-static/` with minor warnings noted for large chunks.
+- **Coverage Audit (2025-10-09 19:02 SGT):**
+  - **Stories present:** `Button`, `Checkbox`, `Input`, `Radio`, `Toggle` (`src/stories/`).
+  - **UI gaps:** `Card`, `Label`, `FormField`-based controls (`forms/checkbox-field.tsx`, `forms/radio-field.tsx`), `Section` components.
+  - **Enhancement opportunities:** add locale-aware copy, surface theme variations via `context.globals.theme`, and document accessibility interactions per component.
 
 ### Workstream E — Testing & Quality Gates (Days 7-8)
 - Implement Jest + Testing Library unit tests (coverage targets per master plan).

@@ -3,9 +3,16 @@
   "version": "1.0.0",
   "description": "ElderCare SG - Compassionate Daycare Solutions Platform",
   "private": true,
-  "workspaces": [
-    "frontend"
-  ],
+  "workspaces": {
+    "packages": ["frontend"],
+    "nohoist": [
+      "**/storybook",
+      "**/storybook/**",
+      "**/@storybook/**",
+      "**/vite",
+      "**/vite/**"
+    ]
+  },
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "cd frontend && npm run dev",
@@ -14,9 +21,6 @@
     "test": "npm run test:frontend && npm run test:backend",
     "test:frontend": "cd frontend && npm test",
     "test:backend": "cd backend && php artisan test",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:e2e": "playwright test",
     "lint": "npm run lint:frontend && npm run lint:backend",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:backend": "cd backend && ./vendor/bin/pint --test",
@@ -28,14 +32,14 @@
     "docker:build": "docker-compose build",
     "docker:logs": "docker-compose logs -f",
     "migrate": "cd backend && php artisan migrate",
-    "migrate:fresh": "cd backend && php artisan migrate:fresh --seed"
+    "migrate:fresh": "cd backend && php artisan migrate:fresh --seed",
+    "install:all": "npm install --legacy-peer-deps",
+    "postinstall": "echo 'Note: If installation fails, run: npm install --legacy-peer-deps'"
   },
   "devDependencies": {
     "axios": "^1.11.0",
     "concurrently": "^9.0.1",
-    "jsdom": "^27.0.0",
-    "vite": "^7.1.7",
-    "vitest": "^3.2.4"
+    "jsdom": "^27.0.0"
   },
   "engines": {
     "node": ">=18.0.0",

@@ -1,0 +1,74 @@
+$ npm run build-storybook
+
+> eldercare-sg-frontend@1.0.0 build-storybook
+> storybook build
+
+@storybook/core v8.6.14
+
+info => Cleaning outputDir: storybook-static
+info => Loading presets
+info => Building manager..
+info => Manager built (315 ms)
+info => Building preview..
+info Using tsconfig paths for react-docgen
+info => Copying static files: public at storybook-static
+vite v5.4.20 building for production...
+../node_modules/@radix-ui/react-toggle/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../node_modules/@radix-ui/react-toggle/dist/index.mjs" was ignored.
+../node_modules/@radix-ui/react-checkbox/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../node_modules/@radix-ui/react-checkbox/dist/index.mjs" was ignored.
+../node_modules/@radix-ui/react-radio-group/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../node_modules/@radix-ui/react-radio-group/dist/index.mjs" was ignored.
+../node_modules/@radix-ui/react-presence/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../node_modules/@radix-ui/react-presence/dist/index.mjs" was ignored.
+../node_modules/@radix-ui/react-roving-focus/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../node_modules/@radix-ui/react-roving-focus/dist/index.mjs" was ignored.
+../node_modules/@radix-ui/react-collection/dist/index.mjs (1:0): Module level directives cause errors when bundled, "use client" in "../node_modules/@radix-ui/react-collection/dist/index.mjs" was ignored.
+✓ 1925 modules transformed.
+../node_modules/@storybook/core/dist/preview/runtime.js (3683:15): Use of eval in "../node_modules/@storybook/core/dist/preview/runtime.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+../node_modules/@storybook/core/dist/preview/runtime.js (3685:16): Use of eval in "../node_modules/@storybook/core/dist/preview/runtime.js" is strongly discouraged as it poses security risks and may cause issues with minification.
+storybook-static/iframe.html                                17.57 kB │ gzip:   4.98 kB
+storybook-static/assets/preview-DphMwC_y.css                24.16 kB │ gzip:   5.36 kB
+storybook-static/assets/preview-DDhiwYgF.js                  0.16 kB │ gzip:   0.16 kB
+storybook-static/assets/preview-CvbIS5ZJ.js                  0.18 kB │ gzip:   0.16 kB
+storybook-static/assets/index-DbOW37U4.js                    0.46 kB │ gzip:   0.30 kB
+storybook-static/assets/_commonjsHelpers-BosuxZz1.js         0.69 kB │ gzip:   0.38 kB
+storybook-static/assets/chunk-XP5HYGXS-BpfKkqn7.js           0.71 kB │ gzip:   0.40 kB
+storybook-static/assets/preview-DGUiP6tS.js                  0.71 kB │ gzip:   0.50 kB
+storybook-static/assets/index-DrFu-skq.js                    0.77 kB │ gzip:   0.47 kB
+storybook-static/assets/react-18-CFH4qlV-.js                 0.84 kB │ gzip:   0.49 kB
+storybook-static/assets/jsx-runtime-CmtfZKef.js              0.92 kB │ gzip:   0.58 kB
+storybook-static/assets/preview-DG7Yu_F9.js                  0.93 kB │ gzip:   0.59 kB
+storybook-static/assets/label-CckRZuQa.js                    1.21 kB │ gzip:   0.58 kB
+storybook-static/assets/index-B1McFu0M.js                    1.71 kB │ gzip:   0.94 kB
+storybook-static/assets/createLucideIcon-DES5Jjit.js         1.86 kB │ gzip:   0.80 kB
+storybook-static/assets/index-LbsB4HyV.js                    1.87 kB │ gzip:   0.89 kB
+storybook-static/assets/preview-BpeXQBI_.js                  2.21 kB │ gzip:   1.21 kB
+storybook-static/assets/preview-DD_OYowb.js                  3.51 kB │ gzip:   1.69 kB
+storybook-static/assets/Input.stories-Cmy_lE5o.js            3.59 kB │ gzip:   1.45 kB
+storybook-static/assets/Toggle.stories-DQG4-d-Z.js           3.86 kB │ gzip:   1.55 kB
+storybook-static/assets/preview-B8lJiyuQ.js                  5.06 kB │ gzip:   1.88 kB
+storybook-static/assets/form-field-BdIs_Ydn.js               5.49 kB │ gzip:   2.19 kB
+storybook-static/assets/Button.stories-DeEIxeBZ.js           6.83 kB │ gzip:   2.29 kB
+storybook-static/assets/index-Dm8qopDP.js                    7.18 kB │ gzip:   2.92 kB
+storybook-static/assets/Checkbox.stories-9dW4tQBe.js         7.37 kB │ gzip:   2.77 kB
+storybook-static/assets/preview-BWzBA1C2.js                  7.62 kB │ gzip:   1.56 kB
+storybook-static/assets/preview-BBWR9nbA.js                  8.12 kB │ gzip:   3.10 kB
+storybook-static/assets/test-utils-Bi7nSt-U.js              12.99 kB │ gzip:   5.05 kB
+storybook-static/assets/Radio.stories-Up7lZFFk.js           13.21 kB │ gzip:   4.73 kB
+storybook-static/assets/utils-CytzSlOG.js                   20.32 kB │ gzip:   6.85 kB
+storybook-static/assets/Color-YHDXOIA2-cz9xk9cQ.js          29.37 kB │ gzip:  11.08 kB
+storybook-static/assets/matchers-7Z3WT2CE-T3xScrR7.js       29.79 kB │ gzip:  10.30 kB
+storybook-static/assets/entry-preview-B8HPUPLf.js           29.84 kB │ gzip:   9.55 kB
+storybook-static/assets/index-jimAspun.js                   57.15 kB │ gzip:  16.30 kB
+storybook-static/assets/preview-l0EwPu-x.js                 70.09 kB │ gzip:  19.98 kB
+storybook-static/assets/index-nna2CGTn.js                  134.00 kB │ gzip:  43.17 kB
+storybook-static/assets/iframe-DlY8oLFY.js                 208.87 kB │ gzip:  71.97 kB
+storybook-static/assets/entry-preview-docs-Bw1g-lkr.js     244.71 kB │ gzip:  73.44 kB
+storybook-static/assets/axe-DIzaxPWI.js                    572.49 kB │ gzip: 158.03 kB
+storybook-static/assets/index-B56iHXrJ.js                  662.09 kB │ gzip: 156.68 kB
+storybook-static/assets/DocsRenderer-CFRXHY34-DUgVxZwj.js  889.49 kB │ gzip: 275.91 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 18.76s
+info => Preview built (24 s)
+info => Output directory: /Home1/project/web-platform/frontend/storybook-static
+

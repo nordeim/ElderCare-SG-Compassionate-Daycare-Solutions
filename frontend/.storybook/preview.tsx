@@ -1,5 +1,6 @@
-import React, { ReactNode, useEffect } from 'react'
-import type { Decorator, Preview } from '@storybook/react'
+import type { Preview } from '@storybook/react'
+import type { ReactNode } from 'react'
+import { useEffect } from 'react'
 import { NextIntlClientProvider } from 'next-intl'
 
 import '../src/styles/design-tokens.css'
@@ -11,7 +12,7 @@ interface ProviderProps {
   children: ReactNode
 }
 
-const StoryProviders = ({ theme, locale, children }: ProviderProps) => {
+function StoryProvider({ theme, locale, children }: ProviderProps) {
   useEffect(() => {
     const root = document.documentElement
     root.setAttribute('data-theme', theme)
@@ -21,16 +22,10 @@ const StoryProviders = ({ theme, locale, children }: ProviderProps) => {
     }
   }, [theme])
 
-  return <NextIntlClientProvider locale={locale} messages={{}}>{children}</NextIntlClientProvider>
-}
-
-const withProviders: Decorator = (Story, context) => {
-  const { theme, locale } = context.globals as { theme: string; locale: string }
-
   return (
-    <StoryProviders theme={theme} locale={locale}>
-      <Story />
-    </StoryProviders>
+    <NextIntlClientProvider locale={locale} messages={{}}>
+      {children}
+    </NextIntlClientProvider>
   )
 }
 
@@ -73,7 +68,13 @@ const preview: Preview = {
       }
     }
   },
-  decorators: [withProviders]
+  decorators: [
+    (Story, context) => (
+      <StoryProvider theme={context.globals.theme as string} locale={context.globals.locale as string}>
+        <Story />
+      </StoryProvider>
+    )
+  ]
 }
 
 export default preview
