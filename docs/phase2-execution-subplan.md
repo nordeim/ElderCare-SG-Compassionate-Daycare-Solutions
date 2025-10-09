@@ -98,6 +98,9 @@
 - **Status Log (2025-10-09 21:41 SGT):**
   - Added `src/stories/Footer.stories.tsx` and `src/stories/ProgramHighlights.stories.tsx` for layout/section coverage with localized copy.
   - `npm run build-storybook` remains green after additions; remaining gap for Workstream C is navigation/header refinement.
+- **Status Log (2025-10-09 21:47 SGT):**
+  - Shipped `src/stories/Header.stories.tsx` with overview/mobile variants and toolbar-driven locale switching.
+  - `npm run build-storybook` passes; Workstream C component coverage now complete pending lint cleanup.
 - **Testing Audit (2025-10-09 19:28 SGT):**
   - **Existing suites:** `src/components/ui/__tests__/atoms.test.tsx` (Buttons, Inputs, Toggles basic rendering).
   - **Gaps:** no dedicated tests for `Card` molecule, `CheckboxField`/`RadioField` accessibility props, or locale-driven copy.
