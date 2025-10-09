@@ -1,3 +1,28 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"]
+  "extends": ["next/core-web-vitals", "next/typescript", "plugin:tailwindcss/recommended"],
+  "plugins": ["tailwindcss"],
+  "settings": {
+    "tailwindcss": {
+      "whitelist": [
+        "text-eldercare-off-white",
+        "text-eldercare-slate-gray-1",
+        "text-eldercare-slate-gray-2",
+        "text-eldercare-deep-blue",
+        "bg-eldercare-deep-blue/60",
+        "bg-eldercare-off-white",
+        "border-eldercare-slate-gray-3",
+        "hover:text-eldercare-gold",
+        "hover:text-eldercare-deep-blue",
+        "font-playfair"
+      ],
+      "whitelistPatterns": ["^text-eldercare-", "^bg-eldercare-", "^border-eldercare-"],
+      "preset": "./tailwind.config.ts"
+    }
+  },
+  "rules": {
+    "tailwindcss/no-custom-classname": "off",
+    "tailwindcss/classnames-order": "off",
+    "tailwindcss/enforces-shorthand": "off",
+    "tailwindcss/no-unnecessary-arbitrary-value": "off"
+  }
 }

@@ -1,0 +1,24 @@
+$ git status
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   frontend/package.json
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        frontend/src/stories/Label.stories.tsx
+        frontend/src/stories/RadioField.stories.tsx
+
+no changes added to commit (use "git add" and/or "git commit -a")
+pete@pop-os:/Home1/project/web-platform
+$ git add .
+pete@pop-os:/Home1/project/web-platform
+$ git commit -m "storybook 2"
+[main 43274dc] storybook 2
+ 3 files changed, 194 insertions(+)
+ create mode 100644 frontend/src/stories/Label.stories.tsx
+ create mode 100644 frontend/src/stories/RadioField.stories.tsx
+
