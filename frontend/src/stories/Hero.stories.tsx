@@ -51,7 +51,15 @@ const meta = {
   parameters: {
     layout: 'fullscreen'
   },
-  tags: ['autodocs']
+  tags: ['autodocs'],
+  args: {
+    title: copyByLocale.en.title,
+    subtitle: copyByLocale.en.subtitle,
+    cta: {
+      primary: copyByLocale.en.primary,
+      video: copyByLocale.en.video
+    }
+  }
 } satisfies Meta<typeof Hero>
 
 export default meta
@@ -59,9 +67,16 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Playground: Story = {
-  render: (_args, { globals }) => {
+  render: (args, { globals }) => {
     const copy = resolveCopy(globals.locale as string)
 
-    return <Hero title={copy.title} subtitle={copy.subtitle} cta={{ primary: copy.primary, video: copy.video }} />
+    return (
+      <Hero
+        {...args}
+        title={copy.title}
+        subtitle={copy.subtitle}
+        cta={{ primary: copy.primary, video: copy.video }}
+      />
+    )
   }
 }

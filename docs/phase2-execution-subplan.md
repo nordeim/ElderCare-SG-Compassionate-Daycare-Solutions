@@ -92,6 +92,9 @@
   - Added `src/stories/FormField.stories.tsx` demonstrating helper/error messaging propagation with localized copy.
   - Token showcase `src/stories/Tokens.stories.tsx` (from Workstream A) referenced to validate color/spacing usage across molecules.
   - `npm run build-storybook` passes post-update; downstream stories to tackle next include layout/section components.
+- **Status Log (2025-10-09 21:34 SGT):**
+  - Created `src/stories/Hero.stories.tsx` to cover the hero section with locale-aware CTAs; validated high-contrast token usage.
+  - Rebuilt Storybook successfully, confirming new section story packaging. Next targets: `Footer` and `ProgramHighlights` stories.
 - **Testing Audit (2025-10-09 19:28 SGT):**
   - **Existing suites:** `src/components/ui/__tests__/atoms.test.tsx` (Buttons, Inputs, Toggles basic rendering).
   - **Gaps:** no dedicated tests for `Card` molecule, `CheckboxField`/`RadioField` accessibility props, or locale-driven copy.
