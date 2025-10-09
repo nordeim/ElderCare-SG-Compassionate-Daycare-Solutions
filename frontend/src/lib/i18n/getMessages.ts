@@ -1,16 +1,21 @@
+import type { AbstractIntlMessages } from 'next-intl'
+
 import { DEFAULT_LOCALE, Locale } from '@/lib/i18n/config'
 
-export type Messages = Record<string, unknown>
+export type Messages = AbstractIntlMessages
+
+async function importMessages(locale: Locale): Promise<AbstractIntlMessages> {
+  const messagesModule = (await import(`@/locales/${locale}/index`)) as { default: AbstractIntlMessages }
+  return messagesModule.default
+}
 
 export async function loadMessages(locale: Locale): Promise<Messages> {
   try {
-    const messages = await import(`@/locales/${locale}/index`)
-    return messages.default
+    return await importMessages(locale)
   } catch (error) {
     if (locale !== DEFAULT_LOCALE) {
       console.warn(`Falling back to ${DEFAULT_LOCALE} messages for locale "${locale}"`, error)
-      const fallbackMessages = await import(`@/locales/${DEFAULT_LOCALE}/index`)
-      return fallbackMessages.default
+      return await importMessages(DEFAULT_LOCALE)
     }
 
     console.error(`Unable to load messages for default locale "${DEFAULT_LOCALE}"`, error)

@@ -4,30 +4,18 @@ import { ReactNode } from 'react'
 import { NextIntlClientProvider } from 'next-intl'
 
 import { Locale } from '@/lib/i18n/config'
-import { loadMessages, Messages } from '@/lib/i18n/getMessages'
-
-type AsyncMessages = Messages | Promise<Messages>
+import { Messages } from '@/lib/i18n/getMessages'
 
 interface I18nProviderProps {
   children: ReactNode
   locale: Locale
-  messages: AsyncMessages
+  messages: Messages
 }
 
-export async function I18nProvider({ children, locale, messages }: I18nProviderProps) {
-  const resolvedMessages = await messages
-
+export function I18nProvider({ children, locale, messages }: I18nProviderProps) {
   return (
-    <NextIntlClientProvider locale={locale} messages={resolvedMessages}>
+    <NextIntlClientProvider locale={locale} messages={messages}>
       {children}
     </NextIntlClientProvider>
   )
-}
-
-export async function I18nProviderWithLoader({
-  children,
-  locale
-}: Omit<I18nProviderProps, 'messages'>) {
-  const messages = loadMessages(locale)
-  return <I18nProvider locale={locale} messages={messages}>{children}</I18nProvider>
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
-import { AnalyticsProvider } from '@/providers/AnalyticsProvider'
+import { DEFAULT_LOCALE } from '@/lib/i18n/config'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const playfairDisplay = Playfair_Display({
@@ -29,10 +29,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfairDisplay.variable}`}>
-      <body className="font-inter bg-eldercare-off-white text-eldercare-slate-gray-1">
-        <AnalyticsProvider>{children}</AnalyticsProvider>
-      </body>
+    <html lang={DEFAULT_LOCALE} className={`${inter.variable} ${playfairDisplay.variable}`}>
+      <body className="font-inter bg-eldercare-off-white text-eldercare-slate-gray-1">{children}</body>
     </html>
   )
 }

@@ -23,5 +23,9 @@ excellent work so far! please proceed meticulously with your next step/task acco
 
 ---
 
+please meticulously review the build log below and then carefully and systematically plan how to fix it before proceeding.
+
+---
+
 docs/AGENT.md Project_Architecture_Document.md , Project_Requirements_Document.md , codebase_completion_master_plan.md , and docs/ai-coding-agent-brief.md
 .
