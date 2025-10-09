@@ -1,0 +1,7 @@
+{
+  "error.generic": "An unexpected error occurred. Please try again later.",
+  "error.required": "This field is required.",
+  "error.invalidEmail": "Enter a valid email address.",
+  "error.minLength": "Please enter at least {min} characters.",
+  "error.maxLength": "Please enter no more than {max} characters."
+}

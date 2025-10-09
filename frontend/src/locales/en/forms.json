@@ -1,0 +1,10 @@
+{
+  "form.name": "Full name",
+  "form.email": "Email",
+  "form.phone": "Phone number",
+  "form.message": "Message",
+  "form.submit": "Submit",
+  "form.reset": "Reset",
+  "form.success": "Thank you! We will reach out soon.",
+  "form.error": "Something went wrong. Please try again."
+}
