@@ -27,5 +27,9 @@ please meticulously review the build log below and then carefully and systematic
 
 ---
 
+lease proceed meticulously according to your next step/task according to suggested plan. If necessary, please execute the command npm run build  yourself to very the result/outcome of your recent changes.
+
+---
+
 docs/AGENT.md Project_Architecture_Document.md , Project_Requirements_Document.md , codebase_completion_master_plan.md , and docs/ai-coding-agent-brief.md
 .

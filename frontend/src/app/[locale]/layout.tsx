@@ -1,6 +1,8 @@
 import { ReactNode } from 'react'
 import { notFound } from 'next/navigation'
 
+import { setRequestLocale } from 'next-intl/server'
+
 import { I18nProvider } from '@/providers/I18nProvider'
 import { AnalyticsProvider } from '@/providers/AnalyticsProvider'
 import { loadMessages } from '@/lib/i18n/getMessages'
@@ -25,6 +27,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   }
 
   const typedLocale = locale as Locale
+  setRequestLocale(typedLocale)
   const messages = await loadMessages(typedLocale)
 
   return (
