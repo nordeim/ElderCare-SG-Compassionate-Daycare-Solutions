@@ -39,6 +39,11 @@
   2. Add high-contrast custom properties and opt-in selectors aligned with accessibility roadmap.
   3. Create `src/stories/Foundation/Tokens.stories.tsx` documenting palette and typography usage.
   4. Validate via `npm run build-storybook` and update documentation once tokens propagate through components.
+- **Status Log (2025-10-09 21:24 SGT):**
+  - High-contrast variables added to `design-tokens.css`; Tailwind extensions already consume semantic tokens in `tailwind.config.ts`.
+  - `src/lib/theme/tokens.ts` exports typed token maps for runtime utilities.
+  - `src/stories/Tokens.stories.tsx` ships a design-token reference page; `npm run build-storybook` succeeds, confirming Storybook integration.
+  - Next functional focus: expand Workstream C coverage (Card/FormField stories) and align remaining layout components with tokens.
 
 ### Workstream B — Internationalization Layer (Days 2-3)
 - Configure `next-intl` (routing middleware, locale detection, provider wrapper).
