@@ -86,6 +86,10 @@
   - Added `src/components/ui/__tests__/molecules.test.tsx` to cover `Card`, `CheckboxField`, `RadioField` behaviors with Radix state assertions.
   - Installed Storybook Test Runner (`@storybook/test-runner`, `start-server-and-test`) and verified `npm run storybook:test` passes locally after Playwright browser install.
   - CI workflow (`.github/workflows/ci.yml`) now installs Playwright chromium build and executes Storybook interaction tests with telemetry disabled.
+- **Testing & Visual Regression Update (2025-10-09 20:33 SGT):**
+  - Integrated `jest-axe` into Jest setup, extending molecule tests with `expect(await axe(container)).toHaveNoViolations()` assertions.
+  - Storybook radio controls expose `visuallyHiddenLabel` to resolve axe button-name violations; `RadioField` forwards option labels.
+  - Added Percy Storybook workflow (`.percy.yml`, `npm run percy:storybook`) and conditional CI step to capture visual baselines when `PERCY_TOKEN` is configured.
 
 ### Workstream E — Testing & Quality Gates (Days 7-8)
 - Implement Jest + Testing Library unit tests (coverage targets per master plan).

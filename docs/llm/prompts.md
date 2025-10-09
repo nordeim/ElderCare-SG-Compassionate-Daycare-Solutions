@@ -35,6 +35,10 @@ awesome job! now, please meticulously proceed with the next item/task in your ph
 
 ---
 
+awesome job! please meticulously review and update @codebase_completion_master_plan.md and @AGENT.md with the current status and with the progress made so far so that these documents align with the current state of the codebase.
+
+---
+
 ok, please move translation lookup server-side and document this down. If this is not in scope for phase 2, then we update the master plan @codebase_completion_master_plan.md with this fact and update one of the latter phases to include it. then you can proceed meticulously with the remaining tasks/items in the sub-plan for phase 2.
 
 ---

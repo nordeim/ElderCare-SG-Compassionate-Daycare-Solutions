@@ -81,6 +81,11 @@
 - ✅ 100% component test coverage
 - ✅ Percy baselines captured
 
+- **Status Update (2025-10-09 20:33 SGT):**
+  - Molecule-focused Jest suite (`src/components/ui/__tests__/molecules.test.tsx`) verifies `Card`, `CheckboxField`, and `RadioField` behavior with `jest-axe` assertions to ensure zero accessibility violations.
+  - CI now runs `npm run storybook:test`, installing Playwright Chromium to execute the Storybook interaction suite via `@storybook/test-runner`.
+  - Percy Storybook snapshots are configured (`.percy.yml`, `npm run percy:storybook`) and gated in GitHub Actions behind the `PERCY_TOKEN` secret for visual regression coverage.
+
 ---
 
 ### **Phase 3: Core Backend Services & PDPA Compliance (10-11 days)**

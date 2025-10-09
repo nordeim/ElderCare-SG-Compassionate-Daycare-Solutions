@@ -190,8 +190,8 @@ flowchart LR
 - **Automated Coverage:**
   - Frontend: Jest + React Testing Library + Playwright E2E.
   - Backend: PHPUnit/Pest, Laravel Dusk (as needed).
-  - Accessibility: axe-core, Lighthouse CI.
-  - Visual Regression: Percy.
+  - Accessibility: axe-core via `jest-axe` (component suites) and Lighthouse CI.
+  - Visual Regression: Percy (`npm run percy:storybook`, `.percy.yml` baselines, CI-gated via `PERCY_TOKEN`).
 - **Manual QA:** BrowserStack multi-browser/device, assistive technology validation, stakeholder UAT for major releases.
 - **Definition of Done:** Peer review, 100% automated coverage, manual QA sign-off, documentation updates, monitoring hooks configured.
 
@@ -289,6 +289,7 @@ Refer to `Project_Architecture_Document.md` section 20 for full matrix. Highligh
 | --- | --- | --- | --- |
 | 2025-10-08 | Cascade AI Agent | Initial creation of `docs/AGENT.md` consolidating architecture insights | `Project_Architecture_Document.md` v2.1 |
 | 2025-10-08 | Cascade AI Agent | Updated Phase 1 documentation references (env templates, CI/CD, monitoring) | `docs/phase1-execution-plan.md`, `docs/ci-cd-overview.md`, `docs/deployment/monitoring.md`, `docs/git-workflow.md` |
+| 2025-10-09 | Cascade AI Agent | Documented Phase 2 testing enhancements (jest-axe, Storybook runner, Percy workflow) | `docs/phase2-execution-subplan.md`, `.github/workflows/ci.yml`, `.percy.yml` |
 
 **Update Protocol**
 - **When to Update:** Any architectural change, new integration, workflow modification, risk/mitigation update, or process adjustment affecting onboarding.
