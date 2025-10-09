@@ -34,6 +34,11 @@
 - Define global CSS variables and Tailwind extensions (colors, typography, spacing, radii, shadows) according to `docs/design-system/` and PAD §5.5.
 - Introduce dark/high-contrast variants (feature-flagged) per accessibility roadmap.
 - Deliver theme documentation page in Storybook referencing tokens.
+- **Remediation Plan (2025-10-09 21:17 SGT):**
+  1. Implement `frontend/src/styles/design-tokens.css` with semantic color/typography/spacing variables mapped to Tailwind via `tailwind.config.ts`.
+  2. Add high-contrast custom properties and opt-in selectors aligned with accessibility roadmap.
+  3. Create `src/stories/Foundation/Tokens.stories.tsx` documenting palette and typography usage.
+  4. Validate via `npm run build-storybook` and update documentation once tokens propagate through components.
 
 ### Workstream B — Internationalization Layer (Days 2-3)
 - Configure `next-intl` (routing middleware, locale detection, provider wrapper).

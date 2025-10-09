@@ -39,6 +39,14 @@ awesome job! please meticulously review and update @codebase_completion_master_p
 
 ---
 
+awesome update! please meticulously review and validate the outstanding items in @phase2-execution-subplan.md to determine which ones affect the functionalities and which ones are part of testing procedure. We will address those that affect the functionalities. please meticulously plan to address/complete the ones affecting functionalities, review and validate the sub-plan.
+
+---
+
+awesome! please stage your remediation sub-plan for future reference and course alignment. then proceed meticulously with the next step/item in the sub-plan.
+
+---
+
 ok, please move translation lookup server-side and document this down. If this is not in scope for phase 2, then we update the master plan @codebase_completion_master_plan.md with this fact and update one of the latter phases to include it. then you can proceed meticulously with the remaining tasks/items in the sub-plan for phase 2.
 
 ---
