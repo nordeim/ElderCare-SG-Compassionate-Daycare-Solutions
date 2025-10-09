@@ -11,6 +11,7 @@ const playfairDisplay = Playfair_Display({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://eldercare-sg.example.com'),
   title: 'ElderCare SG - Compassionate Daycare Solutions',
   description: 'A warm, modern, mobile-responsive platform that introduces families in Singapore to trusted elderly daycare services.',
   keywords: ['elderly care', 'daycare', 'senior care', 'Singapore', 'compassionate care'],
