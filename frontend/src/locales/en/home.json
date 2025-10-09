@@ -1,0 +1,20 @@
+{
+  "programs": {
+    "heading": "Our Programs",
+    "subheading": "We offer a range of programs designed to meet the diverse needs of our elderly community.",
+    "items": {
+      "dayPrograms": {
+        "title": "Day Programs",
+        "description": "Engaging daily activities designed to promote physical and mental well-being."
+      },
+      "wellness": {
+        "title": "Wellness",
+        "description": "Comprehensive health monitoring and wellness programs tailored to individual needs."
+      },
+      "familySupport": {
+        "title": "Family Support",
+        "description": "Resources and support for families to ensure the best care for their loved ones."
+      }
+    }
+  }
+}

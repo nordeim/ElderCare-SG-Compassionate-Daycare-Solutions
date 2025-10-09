@@ -1,12 +1,14 @@
 {
-  "app.name": "ElderCare SG",
-  "navigation.programs": "Programs",
-  "navigation.philosophy": "Our Philosophy",
-  "navigation.testimonials": "Testimonials",
-  "navigation.contact": "Hubungi Kami",
-  "navigation.bookVisit": "Buat Janji Lawatan",
-  "hero.title": "Penjagaan penuh belas kasihan, keselesaan moden",
-  "hero.subtitle": "Pengalaman penjagaan warga emas berkualiti tinggi untuk keluarga di Singapura.",
-  "hero.cta.primary": "Tempah lawatan pusat",
-  "hero.cta.secondary": "Terokai program kami"
+  "app": {
+    "name": "ElderCare SG"
+  },
+  "hero": {
+    "title": "Penjagaan penuh belas kasihan, keselesaan moden",
+    "subtitle": "Pengalaman penjagaan warga emas berkualiti tinggi untuk keluarga di Singapura.",
+    "cta": {
+      "primary": "Tempah lawatan pusat",
+      "secondary": "Terokai program kami",
+      "video": "Tonton lawatan"
+    }
+  }
 }

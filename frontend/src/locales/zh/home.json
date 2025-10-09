@@ -1,0 +1,20 @@
+{
+  "programs": {
+    "heading": "我们的服务项目",
+    "subheading": "我们提供多样化的照护计划，满足长者的不同需求。",
+    "items": {
+      "dayPrograms": {
+        "title": "日间照护",
+        "description": "丰富的每日活动，促进身心健康。"
+      },
+      "wellness": {
+        "title": "健康管理",
+        "description": "根据个人需求量身打造的健康监测与保健计划。"
+      },
+      "familySupport": {
+        "title": "家庭支援",
+        "description": "协助家属提供最合适照护的资源与支持。"
+      }
+    }
+  }
+}

@@ -1,5 +1,8 @@
 {
   "primary": {
+    "programs": "Programs",
+    "philosophy": "Our Philosophy",
+    "testimonials": "Testimonials",
     "home": "Home",
     "centers": "Centres",
     "services": "Services",
