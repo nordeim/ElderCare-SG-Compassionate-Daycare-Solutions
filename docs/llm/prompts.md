@@ -8,6 +8,10 @@ you have done an excellent job with your amazing complete improved execution pla
 
 ---
 
+awesome understanding! remember to always meticulously think, explore and then plan before executing. and always remember to stage (save) your detailed execution plan under the `docs/` sub-directory in the project's codebase root directory for future reference and alignment.
+
+---
+
 Now, please meticulously review @README.md , @AGENT.md , @Project_Architecture_Document.md and @ai-coding-agent-brief.md to have a deep understanding of the WHAT, WHY and HOW of the project and its codebase architecture design.
 
 ---
