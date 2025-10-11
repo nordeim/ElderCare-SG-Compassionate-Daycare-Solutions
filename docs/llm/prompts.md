@@ -22,6 +22,13 @@ $ find database/ -type f
 
 ---
 
+awesome job so far! please meticulously review the project database schema below to have an even deeper understanding of how you can help me to create a comprehensive sub-plan for the phase 3 (backend) code completion. we will leave the remediation items for phase 1 and 2 as post phase 3 activity. I need to complete the backend so that I can give an impressive production demo to my stakeholders. so you really have to think deeper and think harder how to design the backend logic and codebase before creating a comprehensive sub-plan with listing of the files to create, each new file with its description and its checklist of features/functions.
+
+```sql
+```
+
+---
+
 awesome review and understanding! please meticulously plan and document down (stage) your current deep understanding of the project, its codebase design and its current state, and your recommended remediation actions. save / stage this information as a markdown file under the docs/  folder for your future recap and for future course alignment guidance.
 
 ---
