@@ -23,9 +23,39 @@ The project has successfully completed its foundational phases:
 -   **Phase 1: Foundation, Infrastructure & Analytics:** The project structure, Docker environment, CI/CD pipeline, and database schema are all in place.
 -   **Phase 2: Design System, UI Components & i18n:** A comprehensive, accessible component library has been built and documented in Storybook, and the internationalization framework is complete for English and Mandarin.
 
-The project is currently in a **Pre-Phase 3 Remediation Stage**, addressing minor gaps from the initial phases before commencing **Phase 3: Core Backend Services & PDPA Compliance**.
+The project is currently in a **Pre-Phase 3 Remediation Stage**, addressing minor gaps from the initial phases before commencing **Phase 3: Core Backend Services & PDPA Compliance**. This next phase involves the complete implementation of the Laravel backend API, including authentication, all core business logic, booking system integration, and robust PDPA/MOH compliance features, as detailed in the Phase 3 execution sub-plan.
 
-## 2. Building and Running
+## 2. Backend Architecture & Data Model
+
+### Data Model & Schema
+The backend is built upon a comprehensive **18-table MySQL 8.0 schema** that is meticulously designed for compliance, scalability, and multilingual support.
+-   **Compliance-First:** The schema has dedicated tables and columns for **PDPA (Singapore)** and **MOH** regulations. This includes a polymorphic `audit_logs` table for tracking all data changes, a `consents` table for versioned user consent, and soft deletes on critical tables. MOH compliance is handled via specific fields in the `centers` and `staff` tables (e.g., `moh_license_number`).
+-   **Relational Core:** The core entities include `users`, `profiles`, `centers`, `services`, `bookings`, and `testimonials`, with well-defined relationships and constraints.
+-   **Advanced Data Structures:** The design leverages **polymorphic relationships** for reusable `media` (S3-backed) and `content_translations` tables, enabling flexible content management. **JSON columns** are used for semi-structured data like operating hours, amenities, and questionnaire responses.
+-   **Performance:** The schema is optimized with a full suite of indexes, including composite and full-text indexes, and includes pre-built `VIEWS` for complex queries like center summaries.
+-   **Integration-Ready:** Columns are pre-defined to store unique identifiers from external services like Calendly, Mailchimp, and Twilio.
+
+### Service Layer Architecture
+The Laravel backend follows a strict **service-oriented architecture** to ensure separation of concerns and maintainability. Business logic is encapsulated within dedicated service classes, keeping controllers thin and focused on handling HTTP requests.
+-   **Key Services:** The architecture is composed of specialized services, including:
+    -   `AuthService`: Handles user registration, login, and password resets.
+    -   `ConsentService` & `AuditService`: Manage all PDPA-related logic.
+    -   `UserService`: Manages user profiles, data export, and account deletion.
+    -   `CenterService`: Manages eldercare center data and MOH compliance.
+    -   `BookingService`: Orchestrates the entire booking workflow.
+    -   `CalendlyService` & `TwilioService`: Abstract external API interactions.
+    -   `NotificationService`: Manages and queues all email and SMS notifications.
+    -   `MediaService`: Handles file uploads to S3 and media associations.
+-   **Automation:** An `AuditObserver` is used to automatically log model changes, ensuring the PDPA audit trail is always complete.
+
+### API Design & Infrastructure
+The backend exposes a versioned, secure, and well-documented RESTful API.
+-   **Versioning:** All routes are prefixed with `/api/v1`.
+-   **Standardization:** The API uses a standardized JSON response format for both successes and errors, a global exception handler for predictable error codes (4xx/5xx), and Laravel API Resources for data transformation.
+-   **Security:** Authentication is handled by **Laravel Sanctum**. Authorization is managed via role-based middleware and granular policies. **Rate limiting** is applied to prevent abuse.
+-   **Documentation:** The entire API will be documented using the **OpenAPI 3.0** specification, with a Postman collection provided for easy testing and integration.
+
+## 3. Building and Running
 
 The recommended method for running the project is via Docker.
 
