@@ -1,5 +1,3 @@
-
-
 # ElderCare SG — Enhanced Phase 3 Backend Sub-Plan: Core Services & PDPA Compliance
 
 ## 1. Executive Summary
