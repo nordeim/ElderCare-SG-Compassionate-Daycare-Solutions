@@ -9285,3 +9285,4011 @@ class SendBookingConfirmationJob implements ShouldQueue
      * The number of times the job may be attempted.
      */
     public int
+**Jobs (4 files)**
+
+##### File: `app/Jobs/Booking/SendBookingConfirmationJob.php`
+```php
+<?php
+
+namespace App\Jobs\Booking;
+
+use App\Models\Booking;
+use App\Services\Notification\NotificationService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
+class SendBookingConfirmationJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    
+    /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 3;
+    
+    /**
+     * The number of seconds to wait before retrying the job.
+     */
+    public int $retryAfter = 60; // 1 minute
+    
+    protected Booking $booking;
+    
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(Booking $booking)
+    {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Execute the job.
+     */
+    public function handle(NotificationService $notificationService): void
+    {
+        try {
+            $notificationService->sendBookingConfirmation($this->booking);
+            Log::info('Booking confirmation job completed', [
+                'booking_id' => $this->booking->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking confirmation', [
+                'booking_id' => $this->booking->id,
+                'error' => $e->getMessage(),
+            ]);
+            
+            throw $e;
+        }
+    }
+    
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Booking confirmation job failed', [
+            'booking_id' => $this->booking->id,
+                'error' => $exception->getMessage(),
+            ]);
+    }
+}
+```
+**Checklist:**
+- [ ] Implement booking confirmation job
+- [ ] Add retry configuration
+- [ ] Add failure handling
+- [ ] Add logging for success and failure
+
+##### File: `app/Jobs/Booking/SendBookingReminderJob.php`
+```php
+<?php
+
+namespace App\Jobs\Booking;
+
+use App\Models\Booking;
+use App\Services\Notification\NotificationService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
+class SendBookingReminderJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    
+    /**
+     * The number of seconds the job can run before timing out.
+     */
+    public int $timeout = 300; // 5 minutes
+    
+    /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 3;
+    
+    /**
+     * The number of seconds to wait before retrying the job.
+     */
+    public int $retryAfter = 300; // 5 minutes
+    
+    protected Booking $booking;
+    
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(Booking $booking)
+    {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Execute the job.
+     */
+    public function handle(NotificationService $notificationService): void
+    {
+        try {
+            $notificationService->sendBookingReminder($this->booking);
+            Log::info('Booking reminder job completed', [
+                'booking_id' => $this->booking->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send booking reminder', [
+                'booking_id' => $this->booking->id,
+                'error' => $e->getMessage(),
+            ]);
+            
+            throw $e;
+        }
+    }
+    
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Booking reminder job failed', [
+            'booking_id' => $this->booking->id,
+                'error' => $exception->getMessage(),
+            ]);
+    }
+}
+```
+**Checklist:**
+- [ ] Implement booking reminder job
+- [ ] Add timeout configuration
+- [ ] Add retry configuration
+- [ ] Add failure handling
+- [ ] Add logging for success and failure
+
+##### File: `app/Jobs/Booking/SyncCalendlyEventJob.php`
+```php
+<?php
+
+namespace App\Jobs\Booking;
+
+use App\Models\Booking;
+use App\Services\Integration\CalendlyService;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
+
+class SyncCalendlyEventJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    
+    /**
+     * The number of seconds the job can run before timing out.
+     */
+    public int $timeout = 300; // 5 minutes
+    
+    /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 3;
+    
+    /**
+     * The number of seconds to wait before retrying the job.
+     */
+    public int $retryAfter = 60; // 1 minute
+    
+    protected Booking $booking;
+    protected array $eventData;
+    
+    /**
+     * Create a new job instance.
+     */
+    public function __construct(Booking $booking, array $eventData)
+    {
+        $this->booking = $booking;
+        $this->eventData = $eventData;
+    }
+    
+    /**
+     * Execute the job.
+     */
+    public function handle(CalendlyService $calendlyService): void
+    {
+        try {
+            $calendlyService->syncBookingWithEvent($this->booking, $this->eventData);
+            Log::info('Calendly event sync job completed', [
+                'booking_id' => $this->booking->id,
+                'calendly_event_id' => $this->eventData['id'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to sync Calendly event', [
+                'booking_id' => $this->booking->id,
+                'error' => $e->getMessage(),
+                'event_data' => $this->eventData,
+            ]);
+            
+            throw $e;
+        }
+    }
+    
+    /**
+     * Handle a job failure.
+     */
+    public function failed(\Throwable $exception): void
+    {
+        Log::error('Calendly event sync job failed', [
+            'booking_id' => $this->booking->id,
+                'error' => $exception->getMessage(),
+                'event_data' => $this->eventData,
+            ]);
+    }
+}
+```
+**Checklist:**
+- [ ] Implement Calendly event sync job
+- [ ] Add timeout configuration
+- [ ] Add retry configuration
+- [ ] Add failure handling
+- [ ] Add logging for success and failure
+
+##### File: `app/Jobs/Booking/ProcessBookingRemindersBatchJob.php`
+```php
+<?php
+
+namespace App\Jobs\Booking;
+
+use App\Services\Booking\BookingService;
+use App\Services\Notification\NotificationService;
+use Illuminate\Bus\Batchable;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+
+class ProcessBookingRemindersBatchJob implements ShouldQueue, ShouldBeUnique
+{
+    use Batchable, Dispatchable, Queueable, SerializesModels;
+    
+    /**
+     * The number of seconds the job can run before timing out.
+     */
+    public int $timeout = 600; // 10 minutes
+    
+    /**
+     * The number of seconds to wait before the job is available to process.
+     */
+    public int $delay = 0;
+    
+    /**
+     * The number of seconds to wait before a retry (backoff).
+     */
+    public int $retryAfter = 300; // 5 minutes
+    
+    /**
+     * The number of times the job may be attempted.
+     */
+    public int $tries = 3;
+    
+    /**
+     * Execute the job.
+     */
+    public function handle(BookingService $bookingService, NotificationService $notificationService): void
+    {
+        try {
+            // Get bookings that need reminders (24h before)
+            $bookings = $bookingService->bookingRepository->getBookingsNeedingReminders();
+            
+            foreach ($bookings as $booking) {
+                // Dispatch individual reminder jobs
+                SendBookingReminderJob::dispatch($booking);
+            }
+            
+            Log::info('Booking reminders batch job completed', [
+                'bookings_count' => $bookings->count(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to process booking reminders batch', [
+                'error' => $e->getMessage(),
+            ]);
+            
+            throw $e;
+        }
+    }
+    
+    /**
+     * Get the unique ID for the job.
+     */
+    public function uniqueId(): string
+    {
+        return 'booking-reminders-batch-' . date('Y-m-d-H:i');
+    }
+}
+```
+**Checklist:**
+- [ ] Implement batch reminder processing job
+- [ ] Add timeout configuration
+- [ ] Add retry configuration
+- [ ] Add unique job ID
+- [ ] Add logging for success and failure
+
+**Events (3 files)**
+
+##### File: `app/Events/BookingCreated.php`
+```php
+<?php
+
+namespace App\Events;
+
+use App\Models\Booking;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingCreated extends Dispatchable implements InteractsWithSockets
+{
+    use SerializesModels;
+    
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn()
+    {
+        return new Channel('booking.' . $this->booking->id);
+    }
+    
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'booking.created';
+    }
+    
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'booking_id' => $this->booking->id,
+            'user_id' => $this->booking->user_id,
+            'center_id' => $this->booking->center_id,
+            'service_id' => $this->booking->service_id,
+            'booking_date' => $this->booking->booking_date,
+            'booking_time' => $this->booking->booking_time,
+            'status' => $this->booking->status,
+        ];
+    }
+}
+```
+**Checklist:**
+- [ ] Define BookingCreated event
+- [ ] Implement broadcasting
+- [ ] Add serialization
+
+##### File: `app/Events/BookingCancelled.php`
+```php
+<?php
+
+namespace App\Events;
+
+use App\Models\Booking;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingCancelled extends Dispatchable implements InteractsWithSockets
+{
+    use SerializesModels;
+    
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn()
+    {
+        return new Channel('booking.' . $this->booking->id);
+    }
+    
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'booking.cancelled';
+    }
+    
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'booking_id' => $this->booking->id,
+            'user_id' => $this->booking->user_id,
+            'center_id' => $this->booking->center_id,
+            'service_id' => $this->booking->service_id,
+            'booking_date' => $this->booking->booking_date,
+            'booking_time' => $this->booking->booking_time,
+            'status' => $this->booking->status,
+            'cancellation_reason' => $this->booking->cancellation_reason,
+        ];
+    }
+}
+```
+**Checklist:**
+- [ ] Define BookingCancelled event
+- [ ] Implement broadcasting
+- [ ] Add serialization
+
+##### File: `app/Events/BookingConfirmed.php`
+```php
+<?php
+
+namespace App\Events;
+
+use App\Models\Booking;
+use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingConfirmed extends Dispatchable implements InteractsWithSockets
+{
+    use SerializesModels;
+    
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn()
+    {
+        return new Channel('booking.' . $this->booking->id);
+    }
+    
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'booking.confirmed';
+    }
+    
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'booking_id' => $this->booking->id,
+            'user_id' => $this->booking->user_id,
+            'center_id' => $this->booking->center_id,
+            'service_id' => $this->booking->service_id,
+            'booking_date' => $this->booking->booking_date,
+            'booking_time' => $this->booking->booking_time,
+            'status' => $this->booking->status,
+        ];
+    }
+}
+```
+**Checklist:**
+- [ ] Define BookingConfirmed event
+- [ ] Implement broadcasting
+- [ ] Add serialization
+
+**Listeners (3 files)**
+
+##### File: `app/Listeners/Booking/BookingCreatedListener.php`
+```php
+<?php
+
+namespace App\Listeners\Booking;
+
+use App\Events\BookingCreated;
+use App\Services\Notification\NotificationService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
+
+class BookingCreatedListener implements ShouldQueue
+{
+    use InteractsWithQueue;
+    
+    /**
+     * Handle the event.
+     */
+    public function handle(BookingCreated $event): void
+    {
+        try {
+            // Send confirmation notification
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendBookingConfirmation($event->booking);
+            
+            // Schedule reminder (24h before booking)
+            $bookingDateTime = $event->booking->booking_date->setTimeFromTimeString($event->booking_time->toTimeString());
+            $reminderTime = $bookingDateTime->subDay()->subHour();
+            
+            if ($reminderTime->isFuture()) {
+                SendBookingReminderJob::dispatch($event->booking)->delay($reminderTime);
+            }
+            
+            Log::info('Booking created listener executed', [
+                'booking_id' => $event->booking->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BookingCreatedListener', [
+                'error' => $e->getMessage(),
+                'booking_id' => $event->booking->id,
+            ]);
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Handle BookingCreated event
+- [ ] Send confirmation notification
+- [ ] Schedule reminder job
+- [ ] Add error handling and logging
+
+##### File: `app/Listeners/Booking/BookingCancelledListener.php`
+```php
+<?php
+
+namespace App\Listeners\Booking;
+
+use App\Events\BookingCancelled;
+use App\Services\Notification\NotificationService;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
+
+class BookingCancelledListener implements ShouldQueue
+{
+    use InteractsWithQueue;
+    
+    /**
+     * Handle the event.
+     */
+    public function handle(BookingCancelled $event): void
+    {
+        try {
+            // Send cancellation notification
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendBookingCancellation($event->booking);
+            
+            Log::info('Booking cancelled listener executed', [
+                'booking_id' => $event->booking->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BookingCancelledListener', [
+                'error' => $e->getMessage(),
+                'booking_id' => $event->booking->id,
+            ]);
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Handle BookingCancelled event
+- [ ] Send cancellation notification
+- [ ] Add error handling and logging
+
+##### File: `app/Listeners/Booking/BookingConfirmedListener.php`
+```php
+<?php
+
+namespace App\Listeners\Booking;
+
+use App\Events\BookingConfirmed;
+use Illuminate\Support\Facades\Log;
+
+class BookingConfirmedListener
+{
+    /**
+     * Handle the event.
+     */
+    public function handle(BookingConfirmed $event): void
+    {
+        try {
+            // Update center occupancy if applicable
+            $booking = $event->booking;
+            $center = $booking->center;
+            
+            if ($booking->status === 'confirmed' && !$booking->isPast()) {
+                $center->increment('current_occupancy');
+            }
+            
+            Log::info('Booking confirmed listener executed', [
+                'booking_id' => $event->booking->id,
+                'center_id' => $center->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error in BookingConfirmedListener', [
+                'error' => $e->getMessage(),
+                'booking_id' => $event->booking->id,
+            ]);
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Handle BookingConfirmed event
+- [ ] Update center occupancy
+- [ ] Add error handling and logging
+
+**Mail Templates (3 files)**
+
+##### File: `app/Mail/BookingConfirmationMail.php`
+```php
+<?php
+
+namespace App\Mail;
+
+use App\Models\Booking;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingConfirmationMail extends Mailable
+{
+    use Queueable, SerializesModels;
+    
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the message envelope.
+     */
+    public function envelope()
+    {
+        return $this->subject(
+            'Booking Confirmation - ' . $this->booking->center->name
+        )->view('emails.booking.confirmation');
+    }
+    
+    /**
+     * Get the attachments for the message.
+     */
+    public function attachments()
+    {
+        return [];
+    }
+    
+    /**
+     * Build the message.
+     */
+    public function build()
+    {
+        return $this->view('emails.booking.confirmation', [
+            'booking' => $this->booking,
+            'user' => $this->booking->user,
+            'center' => $this->booking->center,
+            'service' => $this->booking->service,
+        ]);
+    }
+}
+```
+**Checklist:**
+- [ ] Define booking confirmation email
+- [ ] Set subject and view
+- [ ] Pass booking data to view
+- [ ] Add attachments support
+
+##### File: `app/Mail/BookingReminderMail.php`
+```php
+<?php
+
+namespace App\Mail;
+
+use App\Models\Booking;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingReminderMail extends Mailable
+{
+    use Queueable, SerializesModels;
+    
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the message envelope.
+     */
+    public function envelope()
+    {
+        return $this->subject(
+            'Reminder: Your visit to ' . $this->booking->center->name . ' tomorrow'
+        )->view('emails.booking.reminder');
+    }
+    
+    /**
+     * Get the attachments for the message.
+     */
+    public function attachments()
+    {
+        return [];
+    }
+    
+    /**
+     * Build the message.
+     */
+    public function build()
+    {
+        return $this->view('emails.booking.reminder', [
+            'booking' => $this->booking,
+            'user' => $this->booking->user,
+            'center' => $this->booking->center,
+            'service' => $this->booking->service,
+        ]);
+    }
+}
+```
+**Checklist:**
+- [ ] Define booking reminder email
+- [ ] Set subject and view
+- [ ] Pass booking data to view
+- [ ] Add attachments support
+
+##### File: `app/Mail/BookingCancellationMail.php`
+```php
+<?php
+
+namespace App\Mail;
+
+use App\Models\Booking;
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingCancellationMail extends Mailable
+{
+    use Queueable, SerializesModels;
+    
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the message envelope.
+     */
+    public function envelope()
+    {
+        return $this->subject(
+            'Booking Cancelled - ' . $this->booking->center->name
+        )->view('emails.booking.cancellation');
+    }
+    
+    /**
+     * Get the attachments for the message.
+     */
+    public function attachments()
+    {
+        return [];
+    }
+    
+    /**
+     * Build the message.
+     */
+    public function build()
+    {
+        return $this->view('emails.booking.cancellation', [
+            'booking' => $this->booking,
+            'user' => $this->booking->user,
+            'center' => $this->booking->center,
+            'service' => $this->booking->service,
+            'cancellation_reason' => $this->booking->cancellation_reason,
+        ]);
+    }
+}
+```
+**Checklist:**
+- [ ] Define booking cancellation email
+- [ ] Set subject and view
+- [ ] Pass booking data to view
+- [ ] Add attachments support
+
+**Routes (1 file)**
+
+##### File: `routes/api.php` (BOOKING section)
+```php
+<?php
+
+use App\Http\Controllers\Api\V1\BookingController;
+use App\Http\Controllers\Api\V1\Webhooks\CalendlyWebhookController;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes - Bookings
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
+    // Bookings
+    Route::get('bookings', [BookingController::class, 'index']);
+    Route::post('bookings', [BookingController::class, 'store']);
+    Route::get('bookings/{id}', [BookingController::class, 'show']);
+    Route::put('bookings/{id}', [BookingController::class, 'update']);
+    Route::post('bookings/{id}/cancel', [BookingController::class, 'cancel']);
+    Route::get('bookings/available-slots', [BookingController::class, 'availableSlots']);
+    Route::get('bookings/questionnaire', [BookingController::class, 'questionnaire']);
+});
+
+// Webhooks
+Route::post('webhooks/calendly', [CalendlyWebhookController::class, 'handle']);
+```
+**Checklist:**
+- [ ] Define protected booking routes
+- [ ] Define webhook route
+- [ ] Add proper route grouping
+
+**Tests (3 files minimum)**
+
+##### File: `tests/Feature/Booking/BookingWorkflowTest.php`
+```php
+<?php
+
+namespace Tests\Feature\Booking;
+
+use App\Models\User;
+use App\Models\Center;
+use App\Models\Service;
+use App\Models\Booking;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
+
+class BookingWorkflowTest extends TestCase
+{
+    use RefreshDatabase;
+    
+    protected User $user;
+    protected Center $center;
+    protected Service $service;
+    
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->user = User::factory()->create();
+        $this->center = Center::factory()->create();
+        $this->service = Service::factory()->create(['center_id' => $this->center->id]);
+    }
+    
+    /**
+     * Test user can create booking
+     */
+    public function test_user_can_create_booking(): void
+    {
+        $token = $this->user->createToken('test-token');
+        
+        $bookingData = [
+            'center_id' => $this->center->id,
+            'service_id' => $this->service->id,
+            'booking_date' => now()->addDay()->format('Y-m-d'),
+            'booking_time' => '10:00',
+            'booking_type' => 'visit',
+            'questionnaire_responses' => [
+                'elderly_age' => 75,
+                'medical_conditions' => ['diabetes'],
+                'mobility' => 'walker',
+                'special_requirements' => 'Needs wheelchair access',
+            ],
+        ];
+        
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token->plainTextToken,
+        ])->postJson('/api/v1/bookings', $bookingData);
+        
+        $response->assertStatus(201)
+            ->assertJsonStructure([
+                'success',
+                'message',
+                'data' => [
+                    'booking' => [
+                        'id',
+                        'booking_number',
+                        'user_id',
+                        'center_id',
+                        'service_id',
+                        'booking_date',
+                        'booking_time',
+                        'booking_type',
+                        'status',
+                        'created_at',
+                    ],
+                ],
+            ]);
+        
+        $this->assertDatabaseHas('bookings', [
+            'user_id' => $this->user->id,
+            'center_id' => $this->center->id,
+            'service_id' => $this->service->id,
+            'status' => 'pending',
+        ]);
+    }
+    
+    /**
+     * Test user can view their bookings
+     */
+    public function test_user_can_view_their_bookings(): void
+    {
+        // Create some bookings
+        Booking::factory()->count(3)->create(['user_id' => $this->user->id]);
+        
+        $token = $this->user->createToken('test-token');
+        
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token->plainTextToken,
+        ])->getJson('/api/v1/bookings');
+        
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'success',
+                'data' => [
+                    'bookings' => [
+                        '*' => [
+                            'id',
+                            'booking_number',
+                            'status',
+                            'created_at',
+                        ],
+                    ],
+                ],
+            ]);
+        
+        $this->assertEquals(3, count($response->json('data.bookings')));
+    }
+    
+    /**
+     * Test user can cancel booking
+     */
+    public function test_user_can_cancel_booking(): void
+    {
+        $booking = Booking::factory()->create([
+            'user_id' => $this->user->id,
+            'center_id' => $this->center->id,
+            'status' => 'confirmed',
+        ]);
+        
+        $token = $this->user->createToken('test-token');
+        
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token->plainTextToken,
+        ])->postJson("/api/v1/bookings/{$booking->id}/cancel", [
+            'cancellation_reason' => 'Change of plans',
+        ]);
+        
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'message' => 'Booking cancelled successfully.',
+            ]);
+        
+        $this->assertDatabaseHas('bookings', [
+            'id' => $booking->id,
+            'status' => 'cancelled',
+            'cancellation_reason' => 'Change of plans',
+        ]);
+    }
+    
+    /**
+     * Test user cannot cancel completed booking
+     */
+    public function test_user_cannot_cancel_completed_booking(): void
+    {
+        $booking = Booking::factory()->create([
+            'user_id' => $this->user->id,
+            'center_id' => $this->center->id,
+            'status' => 'completed',
+            'booking_date' => now()->subDays(1), // Past booking
+        ]);
+        
+        $token = $this->user->createToken('test-token');
+        
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token->plainTextToken,
+        ])->postJson("/api/v1/bookings/{$booking->id}/cancel", [
+            'cancellation_reason' => 'Change of plans',
+        ]);
+        
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'status',
+            ]);
+    }
+    
+    /**
+     * Test booking validation works
+     */
+    public function test_booking_validation_works(): void
+    {
+        $token = $this->user->createToken('test-token');
+        
+        // Test invalid center_id
+        $response = $this->withHeaders([
+            'Authorization' => 'BookingConfirmationMail',
+        ])->postJson('/api/v1/bookings', [
+            'center_id' => 999, // Invalid center_id
+            'booking_date' => now()->addDay()->format('Y-m-d'),
+            'booking_time' => '10:00',
+            'booking_type' => 'visit',
+        ]);
+        
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'center_id',
+            ]);
+        
+        // Test past date
+        $response = $this->withHeaders([
+            'Authorization' => 'BookingConfirmationMail',
+        ])->postJson('/api/v1/bookings', [
+            'center_id' => $this->center->id,
+            'booking_date' => now()->subDays(1)->format('Y-m-d'), // Past date
+            'booking_time' => '10:00',
+            'booking_type' => 'visit',
+        ]);
+        
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'booking_date',
+            ]);
+        
+        // Test invalid time format
+        $response = $this->withHeaders([
+            'Authorization' => 'BookingConfirmationMail',
+        ])->postJson('/api/v1/bookings', [
+            'center_id' => $this->center->id,
+            'booking_date' => now()->addDay()->format('Y-m-d'),
+            'booking_time' => '25:00', // Outside business hours
+            'booking_type' => 'visit',
+        ]);
+        
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'booking_time',
+            ]);
+        
+        // Test missing questionnaire data
+        $response = $this->withHeaders([
+            'Authorization' => 'BookingConfirmationMail',
+        ])->postJson('/api/v1/bookings', [
+            'center_id' => $this->center->id,
+            'booking_date' => now()->addDay()->format('Y-m-d'),
+            'booking_time' => '10:00',
+            'booking_type' => 'visit',
+            'questionnaire_responses' => [
+                'elderly_age' => 50, // Below minimum age
+            ],
+        ]);
+        
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'questionnaire_responses.elderly_age',
+            ]);
+    }
+    
+    /**
+     * Test available time slots endpoint
+     */
+    public function test_available_time_slots_endpoint(): void
+    {
+        $response = Http::get('/api/v1/bookings/available-slots?' . http_build_query([
+            'center_id' => $this->center->id,
+            'date' => now()->addDay()->format('Y-m-d'),
+        ]));
+        
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'success',
+                'data' => [
+                    'center_id',
+                    'date',
+                    'slots' => [
+                        '*' => [
+                            'time',
+                            'available',
+                        ],
+                    ],
+                ],
+            ]);
+        
+        // Verify time slots are from 9am to 5pm
+        $slots = $response->json('data.slots');
+        $this->assertEquals('09:00', $slots[0]['time']);
+        $this->assertEquals('17:00', $slots[count($slots) - 1]['time']);
+        $this->assertEquals(10, count($slots)); // 9am-5pm = 10 slots
+    }
+}
+```
+**Checklist:**
+- [ ] Test: user can create booking
+- [ ] Test: user can view their bookings
+- [ ] Test: user can cancel booking
+- [ ] Test: user cannot cancel completed booking
+- [ ] Test: booking validation works
+- [ ] Test: available time slots endpoint
+
+##### File: `tests/Feature/Booking/CalendlyWebhookTest.php`
+```php
+<?php
+
+namespace Tests\Feature\Booking;
+
+use App\Models\Booking;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Tests\TestCase;
+
+class CalendlyWebhookTest extends TestCase
+{
+    use RefreshDatabase;
+    
+    protected Booking $booking;
+    
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->booking = Booking::factory()->create([
+            'calendly_event_id' => 'test-event-id',
+            'status' => 'pending',
+        ]);
+    }
+    
+    /**
+     * Test webhook signature validation
+     */
+    public function test_webhook_signature_validation(): void
+    {
+        // Create invalid signature
+        $payload = json_encode([
+            'event' => 'invitee.created',
+            'payload' => [
+                'email' => 'test@example.com',
+                'event' => [
+                    'id' => 'test-event-id',
+                    'uri' => 'https://calendly.com/event/test-event-id',
+                ],
+            ],
+        ]);
+        
+        $signature = 'invalid-signature';
+        
+        $response = Http::post('/api/v1/webhooks/calendly', [
+            'Calendly-Webhook-Signature' => $signature,
+        ], [
+                'Content-Type' => 'application/json',
+            ], $payload);
+        
+        $response->assertStatus(401)
+            ->assertJson([
+                'success' => false,
+                'message' => 'Invalid webhook signature.',
+            ]);
+    }
+    
+    /**
+     * Test webhook processing for invitee.created event
+     */
+    public function test_webhook_processing_invitee_created(): void
+    {
+        $payload = json_encode([
+            'event' => 'invitee.created',
+            'payload' => [
+                'email' => $this->booking->user->email,
+                'event' => [
+                    'id' => $this->booking->calendly_event_id,
+                    'uri' => 'https://calendly.com/event/' . $this->booking->calendly_event_id,
+                ],
+            ],
+        ]);
+        
+        $signature = hash_hmac('sha256', $payload, config('services.calendly.webhook_signing_key'));
+        
+        $response = Http::post('/api/v1/webhooks/calendly', [
+            'Calendly-Webhook-Signature' => $signature,
+        ], [
+                'Content-Type' => 'application/json',
+            ], $payload);
+        
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'message' => 'Webhook processed successfully.',
+            ]);
+        
+        // Verify booking status changed to confirmed
+        $this->assertDatabaseHas('bookings', [
+            'id' => $this->booking->id,
+            'status' => 'confirmed',
+        ]);
+    }
+    
+    /**
+     * Test webhook processing for invitee.canceled event
+     */
+    public function test_webhook_processing_invitee_cancelled(): void
+    {
+        $payload = json_encode([
+            'event' => 'invitee.canceled',
+            'payload' => [
+                'email' => $this->booking->user->email,
+                'event' => [
+                    'id' => $this->booking->calendly_event_id,
+                    'uri' => 'https://calendly.com/event/' . $this->booking->calendly_event_id,
+                ],
+            ],
+        ]);
+        
+        $signature = hash_hmac('sha256', $payload, config('services.calendly.webhook_signing_key'));
+        
+        $response = Http::post('/api/webhooks/calendly', [
+            'Calendly-Webhook-Signature' => $signature,
+        ], [
+                'Content-Type' => 'application/json',
+            ], $payload);
+        
+        $response->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'message' => 'Webhook processed successfully.',
+            ]);
+        
+        // Verify booking status changed to cancelled
+        $this->assertDatabaseHas('bookings', [
+            'id' => $this->booking->id,
+            'status' => 'cancelled',
+        ]);
+    }
+    
+    /**
+     * Test webhook processing with invalid payload
+     */
+    public function test_webhook_processing_with_invalid_payload(): void
+    {
+        $payload = json_encode([
+            'event' => 'invalid.event',
+            'payload' => [
+                'invalid' => 'data',
+            ],
+        ]);
+        
+        $signature = hash_hmac('sha256', $payload, config('services.calendly.webhook_signing_key'));
+        
+        $response = Http::post('/api/v1/webhooks/calendly', [
+            'Calendly-Webhook-Signature' => $signature,
+        ], [
+                'Content-Type' => 'application/json',
+            ], $payload);
+        
+        $response->assertStatus(400)
+            ->assertJson([
+                'success' => 'false',
+                'message' => 'Failed to process webhook.',
+            ]);
+    }
+}
+```
+**Checklist:**
+- [ ] Test webhook signature validation
+- [ ] Test webhook processing for invitee.created
+- [ ] Test webhook processing for invitee.canceled
+- [ ] Test webhook processing with invalid payload
+
+##### File: `tests/Unit/Services/BookingServiceTest.php`
+```php
+<?php
+
+namespace Tests\Unit\Services\Booking;
+
+use App\Models\User;
+use App\Models\Center;
+use App\Models\Service;
+use App\Models\Booking;
+use App\Services\Booking\BookingService;
+use App\Services\Integration\CalendlyService;
+use App\Services\Notification\NotificationService;
+use App\Services\Audit\AuditService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Tests\TestCase;
+
+class BookingServiceTest extends TestCase
+{
+    use RefreshDatabase;
+    
+    protected BookingService $bookingService;
+    protected $calendlyServiceMock;
+    protected $notificationServiceMock;
+    protected $auditServiceMock;
+    
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        $this->calendlyServiceMock = Mockery::mock(CalendlyService::class);
+        $this->notificationServiceMock = Mockery::mock(NotificationService::class);
+        $this->auditServiceMock = Mockery::mock(AuditService::class);
+        
+        $this->bookingService = new BookingService(
+            $this->calendlyServiceMock,
+            $this->notificationServiceMock,
+            $this->auditServiceMock
+        );
+    }
+    
+    /**
+     * Test booking creation
+     */
+    public function test_create_booking(): void
+    {
+        $user = User::factory()->create();
+        $center = Center::factory()->create();
+        $service = Service::factory()->create(['center_id' => $center->id]);
+        $bookingDate = now()->addDay();
+        $bookingTime = now()->setTime(10, 0);
+        
+        $booking = $this->bookingService->createBooking(
+            $user,
+            $center,
+            $service,
+            $bookingDate,
+            $bookingTime,
+            'visit',
+            ['elderly_age' => 75]
+        );
+        
+        $this->assertInstanceOf(Booking::class, $booking);
+        $this->assertEquals($user->id, $booking->user_id);
+        $this->assertEquals($center->id, $booking->center_id);
+        $this->assertEquals($service->id, $booking->service_id);
+        $this->assertEquals('pending', $booking->status);
+        $this->assertEquals($bookingDate->toDateString(), $booking->booking_date);
+        $this->assertEquals('10:00', $booking->booking_time);
+        $this->assertEquals('visit', $booking->booking_type);
+        $this->assertEquals(['elderly_age' => 75], $booking->questionnaire_responses);
+    }
+    
+    /**
+     * Test booking creation with Calendly integration
+     */
+    public function test_create_booking_with_calendly_integration(): void
+    {
+        $user = User::factory()->create();
+        $center = Center::factory()->create();
+        $service = Service::factory()->create(['center_id' => $center->id]);
+        $bookingDate = now()->addDay();
+        $bookingTime = now()->setTime(10, 0);
+        
+        // Mock Calendly service
+        $this->calendlyServiceMock
+            ->shouldReceive('createEvent')
+            ->once()
+            ->andReturn([
+                'id' => 'calendly-event-123',
+                'uri' => 'https://calendly.com/events/calendly-event-123',
+                'cancel_url' => 'https://calendly.com/cancel/calendly-event-123',
+                'reschedule_url' => 'https://calendly.com/reschedule/calendly-123',
+            ]);
+        
+        // Mock notification service
+        $this->notificationServiceMock
+            ->shouldReceive('sendBookingConfirmation')
+            ->once();
+        
+        // Mock audit service
+        $this->auditServiceMock
+            ->shouldReceive('logCreated')
+            ->once();
+        
+        $booking = $this->bookingService->createBooking(
+            $user,
+            $center,
+            $this->service,
+            $bookingDate,
+            $bookingTime,
+            'visit',
+            ['elderly_age' => 75]
+        );
+        
+        // Verify Calendly integration
+        $this->assertEquals('calendly-event-123', $booking->calendly_event_id);
+        $this->assertEquals('https://calendly.com/events/calendly-event-123', $booking->calendly_event_uri);
+        $this->assertEquals('https://calendly.com/cancel/calendly-123', $booking->calendly_cancel_url);
+        $this->assertEquals('https://calendly.com/reschedule/calendly-123', $booking->calendly_reschedule_url);
+        
+        // Verify notification and audit logging
+        $this->notificationServiceMock->shouldHaveReceived('sendBookingConfirmation', [$booking]);
+        $this->auditServiceMock->shouldHaveReceived('logCreated', [$booking]);
+    }
+    
+    /**
+     * Test booking cancellation
+     */
+    public function test_cancel_booking(): void
+    {
+        $booking = Booking::factory()->create([
+            'status' => 'confirmed',
+            'calendly_event_id' => 'calendly-event-123',
+        ]);
+        
+        // Mock Calendly service
+        $this->calendlyServiceMock
+            ->shouldReceive('cancelEvent')
+            ->once()
+            ->andReturn(true);
+        
+        // Mock notification service
+        $this->notificationServiceMock
+            ->shouldReceive('sendBookingCancellation')
+            ->once();
+        
+        // Mock audit service
+        $this->auditServiceMock
+            ->shouldReceive('logUpdated')
+            ->once();
+        
+        $result = $this->bookingService->cancelBooking($booking, 'Change of plans');
+        
+        $this->assertTrue($result);
+        $this->assertEquals('cancelled', $booking->status);
+        $this->assertEquals('Change of plans', $booking->cancellation_reason);
+        
+        // Verify Calendly integration
+        $this->calendlyServiceMock->shouldHaveReceived('cancelEvent', ['calendly-event-123']);
+        $this->notificationServiceMock->shouldHaveReceived('sendBookingCancellation', [$booking]);
+        $this->auditServiceMock->shouldHaveReceived('logUpdated', [$booking, ['status' => 'confirmed'], ['status' => 'cancelled', 'cancellation_reason' => 'Change of plans']]);
+    }
+    
+    /**
+     * Test getting available time slots
+     */
+    public function test_get_available_slots(): void
+    {
+        $center = Center::factory()->create();
+        $date = now()->addDay();
+        
+        // Create some existing bookings
+        Booking::factory()->create([
+            'center_id' => $center->id,
+            'booking_date' => $date->toDateString(),
+            'booking_time' => '10:00',
+            'status' => 'confirmed',
+        ]);
+        
+        Booking::factory()->create([
+            'center_id' => $center->id,
+            'booking_date' => $date->toDateString(),
+            'booking_time' => '11:00',
+            'status' => 'confirmed',
+        ]);
+        
+        $slots = $this->bookingService->getAvailableSlots($center, $date);
+        
+        // Should have 10 slots (9am-5pm)
+        $this->assertCount(10, $slots);
+        
+        // 10:00 and 11:00 should be unavailable
+        $this->assertFalse($slots[1]['available']); // 10:00
+        $this->assertFalse($slots[2]['available']); // 11:00
+        
+        // Other slots should be available
+        $this->assertTrue($slots[0]['available']); // 09:00
+        $this->assertTrue($slots[3]['available']); // 12:00
+    }
+    
+    /**
+     * Test questionnaire schema
+     */
+    public function test_get_questionnaire_schema(): void
+    {
+        $schema = $this->bookingService->getQuestionnaireSchema();
+        
+        $this->assertArrayHasKey('elderly_age', $schema);
+        $this->assertArrayHasKey('medical_conditions', $schema);
+        $this->assertArrayHasKey('mobility', $schema);
+        $this->assertArrayHasKey('special_requirements', $schema);
+        
+        $this->assertEquals('number', $schema['elderly_age']['type']);
+        $this->assertEquals(60, $schema['elderly_age']['min']);
+        $this->assertEquals(120, $schema['elderly_age']['max']);
+        $this->assertEquals(['independent', 'walker', 'wheelchair', 'bedridden'], $schema['mobility']['options']);
+    }
+    
+    /**
+     * Test webhook processing
+     */
+    public function test_process_calendly_webhook(): void
+    {
+        $booking = Booking::factory()->create([
+            'calendly_event_id' => 'calendly-event-123',
+            'status' => 'pending',
+        ]);
+        
+        // Mock webhook processing
+        $this->calendlyServiceMock
+            ->shouldReceive('processWebhook')
+            ->once()
+            ->with([
+                'event' => 'invitee.created',
+                'payload' => [
+                    'id' => 'calendly-event-123',
+                    'uri' => 'https://calendly.com/events/calendly-event-123',
+                ],
+            ])
+            ->andReturn([
+                'event' => 'invitee.created',
+                'invitee_email' => 'test@example.com',
+                'event_uri' => 'https://calendly.com/events/calendly-123',
+                'event_id' => 'calendly-event-123',
+            ]);
+        
+        $result = $this->bookingService->processCalendlyWebhook([
+            'event' => 'invitee.created',
+            'payload' => [
+                'id' => 'calendly-event-123',
+                'uri' => 'https://calendly.com/events/calendly-123',
+            ],
+        ]);
+        
+        $this->assertTrue($result);
+        
+        // Verify booking status changed
+        $this->assertEquals('confirmed', $booking->fresh()->status);
+    }
+    
+    /**
+     * Test webhook processing with invalid event
+     */
+    public function test_process_calendly_webhook_invalid_event(): void
+    {
+        $booking = Booking::factory()->create([
+            'calendly_event_id' => 'calendly-event-123',
+            'status' => 'pending',
+        ]);
+        
+        // Mock webhook processing
+        $this->calendlyServiceMock
+            ->shouldReceive('processWebhook')
+            ->once()
+            ->with([
+                'event' => 'invalid.event',
+                'payload' => [],
+            ])
+            ->andReturn(null);
+        
+        $result = $this->bookingService->processCalendlyWebhook([
+            'event' => 'invalid.event',
+            'payload' => [],
+        ]);
+        
+        $this->assertFalse($result);
+        
+        // Verify booking status unchanged
+        $this->assertEquals('pending', $booking->fresh()->status);
+    }
+}
+```
+**Checklist:**
+- [ ] Test booking creation
+- [ ] Test booking creation with Calendly integration
+- [ ] Test booking cancellation
+- [ ] Test available time slots
+- [ ] Test questionnaire schema
+- [ ] Test webhook processing
+- [ ] Test webhook error handling
+
+### D.4. Workstream Validation
+
+After completing all files in this workstream, validate:
+
+1. **Code Quality**
+   - [ ] All files created as per matrix
+   - [ ] All features/functions implemented per checklist
+   - [ ] No lint errors: `docker-compose exec backend ./vendor/bin/phpstan analyse`
+   - [ ] Code follows PSR-12 standards
+
+2. **Testing**
+   - [ ] Unit tests written and passing (>90% coverage)
+   - [ ] Feature tests written and passing
+   - [ ] Run tests: `docker-compose exec backend php artisan test --coverage --min=90`
+
+3. **Functionality**
+   - [ ] User can create bookings
+   - [ ] Calendly integration works
+   - [ ] Email and SMS notifications work
+   - [ ] Webhook processing works
+   - [ ] Time slot validation works
+
+4. **Integration**
+   - [ ] Calendly API integration tested
+   - [ ] Twilio SMS integration tested
+   - [ ] Email templates tested
+   - [ ] Webhook endpoints tested
+
+5. **Documentation**
+   - [ ] All methods documented with PHPDoc
+   - [ ] API endpoints documented in OpenAPI
+   - [   [ ] Code reviewed by peer
+
+6. **Performance**
+   - [ ] Booking creation < 2 seconds
+   - [ ] Notification delivery < 5 seconds
+   - [ ] Webhook processing < 1 second
+
+7. **Security**
+   - [ ] Authorization checks work correctly
+   - [ ] Input validation works
+   - [ ] Webhook signature validation works
+   - [ ] PDPA compliance maintained
+
+## Workstream E: Content & Community (2-3 days)
+
+**Owner:** Backend Dev 1
+**Dependencies:** Workstream A (authentication)
+**Priority:** MEDIUM
+
+### E.1. Prerequisites & Setup
+Before starting this workstream, ensure:
+- [ ] Workstream A is complete and all tests pass
+- [ ] User authentication system is functional
+- [ ] Database is migrated with all tables
+
+### E.2. Implementation Sequence
+1. Create Models (3 files)
+2. Create Service Classes (4 files)
+3. Create Request Validation Classes (8 files)
+4. Create Resource Transformers (3 files)
+5. Create Controllers (4 files)
+6. Create Routes (1 file)
+7. Create Tests (3 files minimum)
+8. Validate workstream completion
+
+### E.3. File Creation Matrix
+
+**Models (3 files)**
+
+##### File: `app/Models/Testimonial.php`
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
+class Testimonial extends Model
+{
+    use HasFactory, SoftDeletes;
+    
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected $fillable = [
+        'user_id',
+        'center_id',
+        'title',
+        'content',
+        'rating',
+        'status',
+        'moderation_notes',
+        'moderated_by',
+        'moderated_at',
+        'deleted_at',
+    ];
+    
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'rating' => 'integer',
+        'moderated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
+    
+    /**
+     * Get the user who wrote the testimonial.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    /**
+     * Get the center being reviewed.
+     */
+    public function center(): BelongsTo
+    {
+        return $this->belongsTo(Center::class);
+    }
+    
+    /**
+     * Get the moderator who approved/rejected the testimonial.
+     */
+    public function moderator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'moderated_by');
+    }
+    
+    /**
+     * Get the audit logs for the testimonial.
+     */
+    public function auditLogs(): MorphMany
+    {
+        return $this->morphMany(AuditLog::class, 'auditable');
+    }
+    
+    /**
+     * Scope a query to only include approved testimonials.
+     */
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+    
+    /**
+     * Scope a query to only include pending testimonials.
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
+    }
+    
+    /**
+     * Scope a query to only include testimonials for a specific center.
+     */
+    public function scopeForCenter($query, $centerId)
+    {
+        return $query->where('center_id', $centerId);
+    }
+    
+    /**
+     * Scope a query to only include testimonials with a specific rating.
+     */
+    public function scopeWithRating($query, $rating)
+    {
+        return $query->where('rating', $rating);
+    }
+    
+    /**
+     * Get the display name with rating.
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        return "{$this->title} - {$this->rating}/5";
+    }
+    
+    /**
+     * Check if the testimonial is approved.
+     */
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
+    
+    /**
+     * Check if the testimonial is pending moderation.
+     */
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+    
+    /**
+     * Check if the testimonial is rejected.
+     */
+    public function isRejected(): bool
+    {
+        return $this->status === 'rejected';
+    }
+    
+    /**
+     * Get the status badge color.
+     */
+    public function getStatusBadgeAttribute(): string
+    {
+        return match($this->status) {
+            'pending' => 'yellow',
+            'approved' => 'green',
+            'rejected' => 'red',
+            'spam' => 'red',
+            default => 'gray',
+        };
+    }
+    
+    /**
+     * Get the rating as stars.
+     */
+    public function getStarsAttribute(): string
+    {
+        return str_repeat('★', $this->rating);
+    }
+    
+    /**
+     * Get the status as a human-readable string.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return ucfirst($this->status);
+    }
+}
+```
+**Checklist:**
+- [ ] Define mass assignable attributes
+- [ ] Define attribute casts
+- [ ] Implement relationships (user, center, moderator)
+- [ ] Add scopes for status, center, rating filtering
+- [ ] Add computed attributes (display name, status badge, stars)
+- [ ] Add status checking methods
+- [ ] Add soft deletes support
+
+##### File: `app/Models/Subscription.php`
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
+
+class Subscription extends Model
+{
+    use HasFactory;
+    
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected $fillable = [
+        'email',
+        'mailchimp_subscriber_id',
+        'mailchimp_status' => 'pending',
+        'preferences' => 'json',
+        'subscribed_at' => 'datetime',
+        'unsubscribed_at' => 'datetime',
+        'last_synced_at' => 'datetime',
+    ];
+    
+    /**
+     * The attributes that should be cast.
+     */
+    protected $casts = [
+        'preferences' => 'array',
+        'subscribed_at' => 'datetime',
+        'unsubscribed_at' => 'datetime',
+        'last_synced_at' => 'datetime',
+    ];
+    
+    /**
+     * Get the user associated with the subscription.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    /**
+     * Scope a query to only include subscribed subscribers.
+     */
+    public function scopeSubscribed($query)
+    {
+        return $query->where('mailchimp_status', 'subscribed');
+    }
+    
+    /**
+     * Scope a query to only include unsubscribed users.
+     */
+    public function scopeUnsubscribed($query)
+    {
+        return $query->where('mailchimp_status', 'unsubscribed');
+    }
+    
+    /**
+     * Get the subscription status as a human-readable string.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match($this->mailchimp_status) {
+            'subscribed' => 'Subscribed',
+            'pending' => 'Pending Confirmation',
+            'unsubscribed' => 'Unsubscribed',
+            'cleaned' => 'Cleaned',
+            default => 'Unknown',
+        };
+    }
+    
+    /**
+     * Check if the subscription is active.
+     */
+    public function isActive(): bool
+    {
+        return $this->mailchimp_status === 'subscribed';
+    }
+    
+    /**
+     * Get the preferences as an array.
+     */
+    public function getPreferencesAttribute(): array
+    {
+        return $this->preferences ?? [];
+    }
+    
+    /**
+     * Set preferences attribute.
+     */
+    public function setPreferencesAttribute($value): void
+    {
+        $this->attributes['preferences'] = json_encode($value);
+    }
+    
+    /**
+     * Get the subscription status.
+     */
+    public function getSubscriptionStatus(): string
+    {
+        return $this->mailchimp_status;
+    }
+    
+    /**
+     * Check if user has consent for marketing emails.
+     */
+    public function hasEmailConsent(): bool
+    {
+        return $this->user->hasGivenConsent('marketing_email');
+    }
+    
+    /**
+     * Get the formatted preferences.
+     */
+    public function getFormattedPreferencesAttribute(): array
+    {
+        $preferences = $this->preferences;
+        
+        return [
+            'topics' => $preferences['topics'] ?? [],
+            'frequency' => $preferences['frequency'] ?? 'weekly',
+        ];
+    }
+}
+```
+**Checklist:**
+- [ ] Define mass assignable attributes
+- [ ] Define attribute casts
+- [ ] Implement user relationship
+- [ ] Add scopes for status filtering
+- [ ] Add computed attributes (status label, formatted preferences)
+- [ ] Add consent checking method
+- [ ] Add preferences handling
+
+##### File: `app/Models/ContactSubmission.php`
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+
+class ContactSubmission extends Model
+{
+    use HasFactory;
+    
+    /**
+     * The attributes that are spam detection
+     */
+    protected $fillable = [
+        'user_id',
+        'center_id',
+        'name',
+        'email',
+        'spam_score',
+        'subject',
+        'message',
+        'status',
+        'ip_address',
+        'user_agent',
+    ];
+    
+    /**
+     * The attributes that should be cast.
+     */
+    protected $cast = [
+        'spam_score' => 'float',
+        'created_at' => 'datetime',
+        'updated_at' => 'spam_score' => 'datetime',
+    ];
+    
+    /**
+     * Get the user who made the submission.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    /**
+     * Get the center the submission is about.
+     */
+    public function center(): BelongsTo
+    {
+        return $this->belongsTo(Center::class);
+    }
+    
+    /**
+     * Get the audit logs for the submission.
+     */
+    public function auditLogs(): MorphMany
+    {
+        return $this->morphMany(AuditLog::class, 'auditable');
+    }
+    
+    /**
+     * Scope a query to only include new submissions.
+     */
+    public function scopeNew($query)
+    {
+        return $query->where('status', 'new');
+    }
+    
+    /**
+     * Scope a query to only include in-progress submissions.
+     */
+    public function scopeInProgress($query)
+    {
+        return $query->where('status', 'in_progress');
+    }
+    
+    /**
+     * Scope a query to only include resolved submissions.
+     */
+    public function scopeResolved($query)
+    {
+        return $query->where('status', 'resolved');
+    }
+    
+    /**
+     * Scope a query to only include spam submissions.
+     */
+    public function scopeSpam($query)
+    {
+        return $query->where('spam_score', '>', 0.8);
+    }
+    
+    /**
+     * Get the status as a human-readable string.
+     */
+    public function getStatusLabelAttribute(): string
+    {
+        return match($this->status) {
+            'new' => 'New',
+            'in_progress' => 'In Progress',
+            'resolved' => 'Resolved',
+            'spam' => 'Spam',
+            default => 'New',
+        };
+    }
+    
+    /**
+     * Check if the submission is spam.
+     */
+    public function isSpam(): bool
+    {
+        return $this->spam_score > 0.8;
+    }
+    
+    form submissions (spam detection)
+    public function getSpamIndicators(): array
+    {
+        return [
+            'high_risk_keywords' => [
+                'lottery', 'winner', 'free', 'click here', 'download now',
+                'congratulations', 'viagra', 'cialis', 'pharmaceutical', 'casino'
+            ],
+            'suspicious_patterns' => [
+                'bit.ly/', 'tinyurl.com/', 'short.io/',
+                't.co/', 'bit.ly/',
+                'shady',
+                'test@test.com',
+            ],
+            'email_patterns' => [
+                'tempmail', '10minutemail',
+                'guaranteed',
+                'noreply@',
+                'noreply@',
+            ],
+            'repeated_submissions' => [
+                $this->getRecentSubmissionsCount() > 3,
+            ],
+        ];
+    }
+    
+    /**
+     * Get recent submissions count for spam detection.
+     */
+    protected function getRecentSubmissionsCount(): int
+    {
+        return ContactSubmission::where('email', $this->email)
+            ->where('created_at', '>=', now()->subDays(7))
+            ->count();
+    }
+    
+    /**
+     * Get the spam score.
+     */
+    public function calculateSpamScore(): float
+    {
+        $score = 0;
+        
+        // Check for high-risk keywords
+        foreach ($this->getSpamIndicators()['high_risk_keywords'] as $keyword) {
+            if (stripos(strtolower($this->message), $keyword) !== false) {
+                $score += 0.3;
+            }
+        }
+        
+        // Check for suspicious patterns
+        foreach ($this->getSpamIndicators()['suspicious_patterns'] as $pattern) {
+            if (stripos($this->message, $pattern) !== false) {
+                $score += 0.2;
+            }
+        }
+        
+        // Check for email patterns
+        foreach ($this->getSpamIndicators()['email_patterns'] as $pattern) {
+            if (str_contains($this->email, $pattern) !== false) {
+                $score += 0.2;
+            }
+        }
+        
+        // Check for repeated submissions
+        if ($this->getRecentSubmissionsCount() > 3) {
+            $score += 0.1;
+        }
+        
+        return min($score, 1.0);
+    }
+    
+    /**
+     * Update spam score automatically.
+     */
+    public function updateSpamScore(): void
+    {
+        $this->update(['spam_score' => $this->calculateSpamScore()]);
+    }
+    
+    /**
+     * Mark submission as spam
+     */
+    public function markAsSpam(): void
+    {
+        $this->update([
+            'status' => 'spam',
+            'spam_score' => 1.0,
+        ]);
+    }
+    
+    /**
+     * Mark submission as resolved
+     */
+    public function markAsResolved(): void
+    {
+        $this->update([
+            'status' => 'resolved',
+            'spam_score' => 0.0,
+        ]);
+    }
+}
+```
+**Checklist:**
+- [ ] Define mass assignable attributes
+- [ ] Define attribute casts
+- [ ] Implement relationships (user, center, audit logs)
+- [ ] Add scopes for status filtering
+- [ ] Add spam detection logic
+- [ ] Add spam scoring calculation
+- [ ] Add spam marking methods
+
+**Service Classes (4 files)**
+
+##### File: `app/Services/Testimonial/TestimonialService.php`
+```php
+<?php
+
+namespace App\Services\Testimonial;
+
+use App\Models\Testimonial;
+use App\Repositories\Testimonial\TestimonialRepository;
+use App\Services\Audit\AuditService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
+
+class TestimonialService
+{
+    protected TestimonialRepository $testimonialRepository;
+    protected AuditService $auditService;
+    
+    public function __construct(
+        TestimonialRepository $testimonialRepository,
+        AuditService $auditService
+    ) {
+        $this->testimonialRepository = $testimonialRepository;
+        $this->auditService = $this->auditService;
+    }
+    
+    /**
+     * Create testimonial submission
+     */
+    public function createTestimonial(
+        User $user,
+        Center $center,
+        array $testimonialData
+    ): Testimonial {
+        return DB::transaction(function () use ($user, $center, $testimonialData) {
+            // Create testimonial with pending status
+            $testimonial = $this->createTestimonial($user, $center, $testimonialData);
+            
+            // Log audit
+            $this->auditService->logCreated(auth()->user(), $testimonial);
+            
+            // Trigger spam detection
+            $this->detectAndHandleSpam($testimonial);
+            
+            return $testimonial;
+        });
+    }
+    
+    /**
+     * Create testimonial with spam detection
+     */
+    protected function createTestimonial(
+        User $user,
+        Center $center,
+        array $testimonialData
+    ): Testimonial {
+        $testimonial = Testimonial::create([
+            'user_id' => $user->id,
+            'center_id' => $this->getCenterId($center),
+            'title' => $testimonialData['title'],
+            'content' => $testimonialData['content'],
+            'rating' => $testimonialData['rating'],
+            'status' => 'pending',
+        ]);
+        
+        return $testimonial;
+    }
+    
+    /**
+     * Get testimonials for a center
+     */
+    public function getTestimonialsByCenterId(int $centerId, int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->testimonialRepository->getApprovedTestimonialsByCenterId($centerId, $limit);
+    }
+    
+    /**
+     * Moderate testimonial (approve/reject)
+     */
+    public function moderateTestimonial(
+        Testimonial $testimonial,
+        string $status,
+        string $moderationNotes = null,
+        int $moderatedBy = null
+    ): Testimonial {
+        return DB::transaction(function () use ($testimonial, $status, $moderationNotes, $moderatedBy) {
+            $oldValues = $testimonial->toArray();
+            
+            // Update testimonial
+            $testimonial->update([
+                'status' => $status,
+                'moderation_notes' => $moderationNotes,
+                'moderated_by' => $moderatedBy,
+                'moderated_at' => now(),
+            ]);
+            
+            // Log audit
+            $this->auditService->logUpdated(
+                auth()->user(),
+                $testimonial,
+                $oldValues,
+                $testimonial->toArray()
+            );
+            
+            return $testimonial;
+        });
+    }
+    
+    /**
+     * Delete testimonial (soft delete)
+     */
+    public function deleteTestimonial(Testimonial $testimonial): bool
+    {
+        return DB::transaction(function () use ($testimonial) {
+            // Log audit
+            $this->auditService->logDeleted(auth()->user(), $testimonial);
+            
+            // Soft delete testimonial
+            $testimonial->delete();
+            
+            return true;
+        });
+    }
+    
+    /**
+     * Get pending testimonials for moderation
+     */
+    public function getPendingTestimonials(): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->testimonialRepository->getPendingTestimonials();
+    }
+    
+    /**
+     * Get approved testimonials for a center
+     */
+    public function getApprovedTestimonialsByCenterId(int $centerId, int $limit = 10): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->testimonialRepository->getApprovedTestimonialsByCenterId($centerId, $limit);
+    }
+    
+    /**
+     * Get testimonial statistics
+     */
+    public function getTestimonialStatistics(int $centerId): array
+    {
+        return [
+            'total' => Testimonial::where('center_id', $centerId)->count(),
+            'pending' => Testimonial::where('center_id', $centerId)->where('status', 'pending')->count(),
+            'approved' => Testimonial::where('center_id', $centerId)->where('status', 'approved')->count(),
+            'rejected' => Testimonial::where('center_id', $centerId)->where('status', 'rejected')->count(),
+            'average_rating' => Testimonial::where('center_id', $centerId)->where('status', 'approved')->avg('rating'),
+        ];
+    }
+    
+    /**
+     * Detect and handle spam
+     */
+    protected function detectAndHandleSpam(Testimonial $testimonial): void
+    {
+        $spamScore = $this->calculateSpamScore($testimonial);
+        
+        if ($spamScore > 0.8) {
+            $testimonial->markAsSpam();
+            
+            Log::warning('Testimonial marked as spam', [
+                'testimonial_id' => $testimonial->id,
+                'spam_score' => $spamScore,
+            ]);
+        }
+    }
+    
+    /**
+     * Calculate spam score for testimonial
+     */
+    protected function calculateSpamScore(Testimonial $testimonial): float
+    {
+        $score = 0;
+        
+        // Check for spam indicators in content
+        $content = strtolower($testimonial->content);
+        
+        // High-risk keywords
+        $highRiskKeywords = [
+            'lottery', 'winner', 'free', 'click here', 'download now',
+            'congratulations', 'viagra', 'pharmaceutical', 'casino',
+        ];
+        
+        foreach ($highRiskKeywords as $keyword) {
+            if (str_contains($content, $keyword) !== false) {
+                $score += 0.3;
+            }
+        }
+        
+        // Check for suspicious patterns
+        $suspiciousPatterns = [
+            'bit.ly/', 'tinyurl.com/', 'short.io/',
+            't.co/', 'bit.ly/',
+            'shady',
+            'test@test.com',
+        ];
+        
+        foreach ($suspiciousPatterns as $pattern) {
+            if (str_contains($content, $pattern) !== false) {
+                $score += 0.2;
+            }
+        }
+        
+        return min($score, 1.0);
+    }
+    
+    /**
+     * Get center ID from center object or ID
+     */
+    protected function getCenterId($center): int
+    {
+        return is_object($center) ? $center->id : $center;
+    }
+}
+```
+**Checklist:**
+- [ ] Implement testimonial creation with spam detection
+- [ ] Implement testimonial moderation
+- [ ] Implement testimonial deletion
+- [ ] Implement testimonial retrieval
+- [ ] Add spam detection logic
+- [ ] Add audit logging
+- [ ] Add statistics calculation
+
+##### File: `app/Services/Newsletter/NewsletterService.php`
+```php
+<?php
+
+namespace App\Services\Newsletter;
+
+use App\Models\User;
+use App\Models\Subscription;
+use App\Services\Integration\MailchimpService;
+use App\Services\Notification\NotificationService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class NewsletterService
+{
+    protected MailchimpService $mailchimpService;
+    protected NotificationService $notificationService;
+    
+    public function __construct(
+        MailchimpService $mailchimpService,
+        NotificationService $notificationService
+    ) {
+        $this->mailchimpService = $mailchimpService;
+        $this->notificationService = $notificationService;
+    }
+    
+    /**
+     * Subscribe user to newsletter
+     */
+    public function subscribe(string $email, array $preferences = []): Subscription
+    {
+        return DB::transaction(function () use ($email, $preferences) {
+            // Check if already subscribed
+            $existingSubscription = Subscription::where('email', $email)->first();
+            
+            if ($existingSubscription && $existingSubscription->isActive()) {
+                return $existingSubscription;
+            }
+            
+            // Create subscription
+            $subscription = Subscription::create([
+                'email' => $email,
+                'mailchimp_status' => 'pending',
+                'preferences' => $preferences,
+                'subscribed_at' => now(),
+            ]);
+            
+            // Queue sync job
+            SyncSubscriberToMailchimpJob::dispatch($subscription);
+            
+            // Send confirmation email
+            $this->notificationService->sendNewsletterConfirmation($subscription);
+            
+            Log::info('Newsletter subscription created', [
+                'email' => $email,
+                'preferences' => $preferences,
+            ]);
+            
+            return $subscription;
+        });
+    }
+    
+    /**
+     * Unsubscribe user from newsletter
+     */
+    public function unsubscribe(string $email): bool
+    {
+        $subscription = Subscription::where('email', $email)->first();
+        
+        if (!$subscription) {
+            return false;
+        }
+        
+        return DB::transaction(function () use ($subscription) {
+            // Update local status
+            $subscription->update([
+                'mailchimp_status' => 'unsubscribed',
+                'unsubscribed_at' => now(),
+            ]);
+            
+            // Unsubscribe from Mailchimp
+            $this->mailchimpService->removeSubscriber($email);
+            
+            // Send confirmation email
+            $this->notificationService->sendNewsletterUnsubscribeConfirmation($subscription);
+            
+            Log::info('Newsletter unsubscribed', [
+                'email' => $email,
+            ]);
+            
+            return true;
+        });
+    }
+    
+    /**
+     * Update subscription preferences
+     */
+    public function updatePreferences(Subscription $subscription, array $preferences): Subscription
+    {
+        return DB::transaction(function () use ($subscription, $preferences) {
+            $oldPreferences = $subscription->preferences;
+            
+            $subscription->update([
+                'preferences' => array_merge($oldPreferences, $preferences),
+                'last_synced_at' => now(),
+            ]);
+            
+            // Queue sync job
+            SyncSubscriberToMailchimpJob::dispatch($subscription);
+            
+            Log::info('Newsletter preferences updated', [
+                'subscription_id' => $subscription->id,
+                'email' => $subscription->email,
+            ]);
+            
+            return $subscription;
+        });
+    }
+    
+    /**
+     * Get user's subscription status
+     */
+    public function getUserSubscription(User $user): ?Subscription
+    {
+        return Subscription::where('email', $user->email)->first();
+    }
+    
+    /**
+     * Sync subscription to Mailchimp
+     */
+    public function syncToMailchimp(Subscription $subscription): bool
+    {
+        try {
+            $result = $this->mailchimpService->updateSubscriber(
+                $subscription->email,
+                [
+                    'email' => $subscription->email,
+                    'status' => $subscription->mailchimp_status,
+                    'merge_fields' => [
+                        'FNAME' => $subscription->user->name,
+                        'PHONE' => $subscription->user->phone,
+                    ],
+                ]
+            );
+            
+            // Update local status
+            $subscription->update([
+                'mailchimp_status' => $result['status'],
+                'last_synced_at' => now(),
+            ]);
+            
+            return $result['status'] === 'subscribed';
+        } catch (\Exception $e) {
+            Log::error('Failed to sync with Mailchimp', [
+                'subscription_id' => $subscription->id,
+                'email' => $subscription->email,
+                'error' => $e->getMessage(),
+            ]);
+            
+            return false;
+        }
+    }
+    
+    /**
+     * Get subscribers by status
+     */
+    public function getSubscribersByStatus(string $status): \Illuminate\Database\Eloquent\Collection
+    {
+        return Subscription::where('mailchimp_status', $status)->get();
+    }
+    
+    /**
+     * Get subscription statistics
+     */
+    public function getSubscriptionStatistics(): array
+    {
+        return [
+            'total' => Subscription::count(),
+            'subscribed' => Subscription::subscribed()->count(),
+            'pending' => Subscription::pending()->count(),
+            'unsubscribed' => Subscription::unsubscribed()->count(),
+            'cleaned' => Subscription::cleaned()->count(),
+        ];
+    }
+    
+    /**
+     * Process batch sync with Mailchimp
+     */
+    public function processBatchSync(): int
+    {
+        $pendingSubscriptions = $this->getSubscribersByStatus('pending');
+        $syncCount = 0;
+        
+        foreach ($pendingSubscriptions as $subscription) {
+            if ($this->syncToMailchimp($subscription)) {
+                $syncCount++;
+            }
+        }
+        
+        Log::info('Batch Mailchimp sync completed', [
+            'synced_count' => $syncCount,
+            'pending_count' => $pendingSubscriptions->count(),
+        ]);
+        
+        return $syncCount;
+    }
+    
+    /**
+     * Clean up cleaned subscriptions
+     */
+    public function cleanupCleanedSubscriptions(): int
+    {
+        $cleanedSubscriptions = Subscription::where('mailchimp_status', 'cleaned')
+            ->where('updated_at', '<', now()->subDays(30))
+            ->get();
+        
+        foreach ($cleanedSubscriptions as $subscription) {
+            $subscription->delete();
+        }
+        
+        Log::info('Cleaned ' . count($cleanedSubscriptions) . ' subscriptions');
+        
+        return count($cleanedSubscriptions);
+    }
+}
+```
+**Checklist:]
+- [ ] Implement newsletter subscription
+- [ ] Implement subscription unsubscription
+- [ ] Implement preference updates
+- [ ] Implement Mailchimp synchronization
+- [ ] Add batch processing
+- [ ] Add cleanup for cleaned subscriptions
+- [ ] Add comprehensive logging
+
+##### File: `app/Services/Contact/ContactService.php`
+```php
+<?php
+
+namespace App\Services\Contact;
+
+use App\Models\ContactSubmission;
+use App\Repositories\Contact\ContactRepository;
+use App\Services\Notification\NotificationService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class ContactService
+{
+    protected ContactRepository $contactRepository;
+    protected NotificationService $notificationService;
+    
+    public function __construct(
+        ContactRepository $contactRepository,
+        NotificationService $notificationService
+    ) {
+        $this->contactRepository = $contactSubmissionRepository;
+        $emailService = $notificationService;
+    }
+    
+    /**
+     * Submit contact form submission
+     */
+    public function submitContactForm(array $contactData): ContactSubmission
+    {
+        return DB::transaction(function () use ($contactData) {
+            // Create contact submission
+            $submission = $this->contactRepository->create($contactData);
+            
+            // Log audit
+            Log::info('Contact form submitted', [
+                'submission_id' => $submission->id,
+                'email' => $submission->email,
+                'subject' => $submission->status,
+            ]);
+            
+            // Send notification to admin
+            $this->notificationService->sendContactNotification($submission);
+            
+            return $submission;
+        });
+    }
+    
+    /**
+     * Detect spam in contact submission
+     */
+    public function detectSpam(ContactSubmission $submission): bool
+    {
+        $score = $this->calculateSpamScore($submission);
+        
+        if ($score > 0.8) {
+            $submission->status = 'spam';
+            $submission->update(['spam_score' => $score]);
+            
+            Log::warning('Contact submission marked as spam', [
+                'submission_id' => $submission->id,
+                'spam_score' => $score,
+            ]);
+            
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Calculate spam score for contact submission
+     */
+    protected function calculateSpamScore(ContactSubmission $submission): float
+    {
+        $score = 0;
+        
+        // Check message content
+        $message = strtolower($submission->message);
+        
+        // High-risk keywords
+        $highRiskKeywords = [
+            'lottery', 'winner', 'free', 'click here', 'download now',
+            'congratulations', 'viagra', 'pharmaceutical', 'casino',
+        ];
+        
+        foreach ($highRiskKeywords as $keyword) {
+            if (str_contains($message, $keyword) !== false) {
+                $score += 0.3;
+            }
+        }
+        
+        // Check for suspicious patterns
+        $suspiciousPatterns = [
+            'bit.ly/', 'tinyurl.com/', 'short.io/',
+            't.co/', 'bit.ly/',
+            'shady',
+            'test@test.com',
+        ];
+        
+        foreach ($suspiciousPatterns as $pattern) {
+            if (str_contains($message, $pattern) !== false) {
+                $score += 0.2;
+            }
+        }
+        
+        // Check email patterns
+        $emailPatterns = [
+            'tempmail', '10minutemail',
+            'guaranteed', 'noreply@',
+            'noreply@',
+        ];
+        
+        foreach ($emailPatterns as $pattern) {
+            if (str_contains($submission->email, $pattern) !== false) {
+                $score += 0.2;
+            }
+        }
+        
+        // Check repeated submissions
+        $recentSubmissions = ContactSubmission::where('email', $submission->email)
+            ->where('created_at', '>=', now()->subDays(7))
+            ->count();
+        
+        if ($recentSubmissions > 3) {
+            $score += 0.1;
+        }
+        
+        return min($score, 1.0);
+    }
+    
+    /**
+     * Mark submission as spam
+     */
+    public function markAsSpam(ContactSubmission $submission): void
+    {
+        $submission->update([
+            'status' => 'spam',
+            'spam_score' => 1.0,
+        ]);
+        
+        Log::warning('Contact submission marked as spam', [
+            'submission_id' => $submission->id,
+            'email' => $submission->email,
+            'spam_score' => 1.0,
+        ]);
+    }
+    
+    /**
+     * Mark submission as resolved
+     */
+    public function markAsResolved(ContactSubmission $submission): void
+    {
+        $submission->update([
+            'status' => 'resolved',
+            'spam_score' => 0.0,
+        ]);
+        
+        Log::info('Contact submission resolved', [
+            'submission_id' => $submission->id,
+            'email' => $submission->email,
+        ]);
+    }
+    
+    /**
+     * Get new submissions
+     */
+    public function getNewSubmissions(): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->contactRepository->getNewSubmissions();
+    }
+    
+    /**
+     * Get in-progress submissions
+     */
+    public function getInProgressSubmissions(): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->contactRepository->getInProgressSubmissions();
+    }
+    
+    /**
+     * Get resolved submissions
+     */
+    public function getResolvedSubmissions(): \Illuminate\Database\Eloquent\Collection
+    {
+        return $this->contactRepository->getResolvedSubmissions();
+    }
+    
+    /**
+     * Get submission statistics
+     */
+    public function getSubmissionStatistics(): array
+    {
+        return [
+            'total' => ContactSubmission::count(),
+            'new' => ContactSubmission::new()->count(),
+            'in_progress' => ContactSubmission::in_progress()->count(),
+            'resolved' => ContactSubmission::resolved()->count(),
+            'spam' => ContactSubmission::spam()->count(),
+        ];
+    }
+    
+    /**
+     * Clean up old submissions
+     */
+    public function cleanupOldSubmissions(): int
+    {
+        $oldSubmissions = ContactSubmission::where('created_at', '<', now()->subDays(30))
+            ->get();
+        
+        foreach ($oldSubmissions as $submission) {
+            $submission->delete();
+        }
+        
+        Log::info('Cleaned ' . count($oldSubmissions) . ' old contact submissions');
+        
+        return count($oldSubmissions);
+    }
+}
+```
+**Checklist:**
+- [ ] Implement contact form submission
+- [ ] Implement spam detection
+- [ ] Implement spam handling
+- [ ] Add notification sending
+- [ ] Add statistics calculation
+- [ ] Add cleanup functionality
+
+**Request Validation Classes (8 files)**
+
+##### File: `app/Http/Requests/Testimonial/StoreTestimonialRequest.php`
+```php
+<?php
+
+namespace App\Http\Requests\Testimonial;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class StoreTestimonialRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true; // All authenticated users can submit testimonials
+    }
+    
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            'center_id' => ['required', 'exists:centers,id'],
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['required', 'string', 'min:50', 'max:1000'],
+            'rating' => ['required', 'integer', 'between:1,5'],
+            'status' => ['required', 'in:pending,approved,rejected,spam'],
+        ];
+    }
+    
+    /**
+     * Get custom error messages for validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'title.required' => 'A testimonial title is required.',
+            'content.min' => 'The testimonial content must be at least 50 characters.',
+            'content.max' => 'The testimonial content may not be greater than 1000 characters.',
+            'rating.between' => 'The rating must be between 1 and 5.',
+            'status.in' => 'The selected status is invalid.',
+        ];
+    }
+    
+    /**
+     * Configure the validator instance.
+     */
+    public function configure()
+    {
+        $this->validateUserCanSubmitTestimonial();
+    }
+    
+    /**
+     * Validate user can submit testimonial for center
+     */
+    public function validateUserCanSubmitTestimonial(): void
+    {
+        $user = $this->user();
+        $centerId = $this->input('center_id');
+        
+        // Check if user has a booking with the center
+        $hasBooking = $user->bookings()
+            ->where('center_id', $centerId)
+            ->exists();
+        
+        if (!$hasBooking) {
+            $this->validator->errors()->add('center_id', 'You must have a booking with the center before submitting a testimonial.');
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Validate: center_id (exists), title, content, rating
+- [ ] Add custom error messages
+- [ ] Add user validation for testimonial submission
+- [ ] Add authorization check
+
+##### File: `app/Http/Requests/Newsletter/SubscribeRequest.php`
+```php
+<?php
+
+namespace App\Http\Requests\Newsletter;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class SubscribeRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true; // Public endpoint
+    }
+    
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:subscriptions,email'],
+            'preferences' => ['nullable', 'array'],
+            'preferences.topics' => ['array', 'string', 'in:updates,events,promotions'],
+            'preferences.frequency' => ['string', 'in:weekly,monthly']
+            'preferences.language' => ['string', 'in:en,zh,ms,ta'],
+        ];
+    }
+    
+    /**
+     * Get custom error messages for validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email address is required.',
+            'email.unique' => 'This email is already subscribed.',
+            'preferences.topics.in' => 'Invalid topic selections.',
+            'preferences.frequency.in' => 'Invalid frequency selection.',
+            'preferences.language.in' => 'Invalid language selection.',
+        ];
+    }
+    
+    /**
+     * Configure the validator instance.
+     */
+    public function configure()
+    {
+        $this->validateUserHasConsent('marketing_email');
+    }
+    
+    /**
+     * Validate user has consent for marketing emails
+     */
+    protected function validateUserHasConsent(string $consentType): void
+    {
+        $user = $this->user();
+        
+        if (!$user->hasGivenConsent($consentType)) {
+            $this->validator->errors()->add('consents', [
+                'marketing_email' => 'You must consent to marketing emails to subscribe.',
+            ]);
+        }
+    }
+    
+    /**
+     * Validate email format
+     */
+    protected function validateEmailFormat(string $attribute): void
+    {
+        $email = $this->input($attribute);
+        
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->validator->errors()->add($attribute, 'Please provide a valid email address.');
+        }
+    }
+    
+    /**
+     * Validate preferences structure
+     */
+    protected function validatePreferencesStructure(array $preferences): void
+    {
+        $allowedTopics = ['updates', 'events', 'promotions'];
+        $allowedFrequencies = ['weekly', 'monthly'];
+        $allowedLanguages = ['en', 'zh', 'ms', 'ta'];
+        
+        // Validate topics
+        if (isset($preferences['topics'])) {
+            $invalidTopics = array_diff($allowedTopics, $preferences['topics']);
+            if (!empty($invalidTopics)) {
+                $this->validator->errors()->add('preferences.topics', 'Invalid topic selections: ' . implode(', ', $invalidTopics));
+            }
+        }
+        
+        // Validate frequency
+        if (isset($preferences['frequency']) {
+            if (!in_array($preferences['frequency'], $allowedFrequencies)) {
+                $this->validator->errors()->add('preferences.frequency', 'Invalid frequency selection: ' . implode(', ', $allowedFrequencies));
+            }
+        }
+        
+        // Validate language preferences
+        if (isset($preferences['language'])) {
+            if (!in_array($preferences['language'], $allowedLanguages)) {
+                $this->validator->errors()->add('preferences.language', 'Invalid language selection: ' . implode(', $allowedLanguages));
+            }
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Validate: email (unique), preferences (array)
+- [ ] Add custom error messages
+- [ ] Add user consent validation
+- Add email format validation
+- Add preferences structure validation
+
+##### File: `app/Http/Requests/Contact/StoreContactRequest.php`
+```php
+<?php
+
+namespace App\Http\Requests\Contact;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class StoreContactRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true; // Public endpoint
+    }
+    
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'regex:/^(\+65)?[689]\d{7}$/', 'phone' => '81234567'],
+            'subject' => ['required', 'string', 'max:255'],
+            'message' => ['required', 'string', 'min:20', 'max:1000'],
+            'center_id' => ['nullable', 'exists:centers,id'],
+            'captcha_token' => ['required', 'string', 'max:255'],
+        ];
+    }
+    
+    /**
+     * Get custom error messages for validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Your name is required.',
+            'email.required' => 'A valid email is required.',
+            'phone.regex' => 'The phone number must be a valid Singapore number.',
+            'subject.required' => 'A subject is required.',
+            'message.min' => 'The message must be at least 20 characters.',
+            'captcha_token.required' => 'Please complete the reCAPTCHA.',
+            'captcha_token.required' => 'Please complete the reCAPTCHA to continue.',
+        ];
+    }
+    
+    /**
+     * Configure the validator instance.
+     */
+    public function configure()
+    {
+        $this->validateCaptcha();
+    }
+    
+    formRequest->validateCaptcha();
+    }
+    
+    /**
+     * Validate reCAPTCHA token
+     */
+    protected function validateCaptcha(): void
+    {
+        $token = $this->input('captcha_token');
+        
+        if (!$this->validateCaptchaToken($token)) {
+            $this->validator->errors()->add('captcha_token', 'Invalid reCAPTCHA token.');
+        }
+    }
+    
+    /**
+     * Validate reCAPTCHA token
+     */
+    protected function validateCaptchaToken(string $token): bool
+    {
+        // This would integrate with a reCAPTCHA service
+        // For now, we'll accept any non-empty token
+        return !empty($token);
+    }
+    
+    /**
+     * Validate phone number format
+     */
+    protected function validatePhoneNumber(string $attribute): void
+    {
+        $phone = $this->input($attribute);
+        
+        if (!preg_match('/^(\+65)?[689]\d{7}$/', $phone)) {
+            $this->validator->errors()->add($attribute, 'The phone number must be a valid Singapore number.');
+        }
+    }
+    
+    /**
+     * Validate center existence if provided
+     */
+    protected function validateCenterExists(): void
+    {
+        $centerId = $this->input('center_id');
+        
+        if ($centerId && !\App\Models\Center::where('id', $centerId)->exists()) {
+            $this->validator->errors()->add('center_id', 'The selected center is invalid.');
+        }
+    }
+    
+    /**
+     * Configure the validator instance.
+     */
+    public function configure()
+    {
+        $this->validatePhoneNumber('phone');
+        $this->validateCenterExists();
+    }
+}
+```
+**Checklist:**
+- [ ] Validate: name, email, phone, subject, message
+- [ ] Add custom error messages
+- [ ] Add reCAPTCHA validation
+- Add phone number validation
+- Add center existence validation
+- [ ] Configure validator instance
+
+##### File: `app/Http/Requests/FAQ/StoreFAQRequest.php`
+```php
+<?php
+
+namespace App\Http\Requests\FAQ;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class StoreFAQRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return $this->user()->isAdmin() || $this->user()->isSuperAdmin();
+    }
+    
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            'category' => ['required', 'in:general,booking,services,pricing,accessibility'],
+            'question' => ['required', 'string', 'max:500'],
+            'answer' => ['required', 'string'],
+            'display_order' => ['nullable', 'integer', 'min:0'],
+            'status' => ['required', 'in:draft,published'],
+        ];
+    }
+    
+    /**
+     * Get custom error messages for validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'category.required' => 'A category is required.',
+            'question.required' => 'A question is required.',
+            'answer.required' => 'An answer is required.',
+            'display_order.min' => 'Display order must be at least 0.',
+            'status.in' => 'Invalid status selection.',
+        ];
+    }
+    
+    /**
+     * Configure the validator instance.
+     */
+    public function configure()
+    {
+        $this->validateFAQUniqueness();
+    }
+    
+    /**
+     * Validate FAQ question uniqueness
+     */
+    protected function validateFAQUniqueness(): void
+    {
+        $question = $this->input('question');
+        $category = $this->input('category');
+        
+        // Check for duplicate FAQ within category
+        $existingFAQ = \App\Models\FAQ::where('category', $category)
+            ->where('question', $question)
+            ->exists();
+        
+        if ($existingFAQ) {
+            $this->validator->errors()->add('question', 'A question with this text already exists in the selected category.');
+        }
+    }
+    
+    /**
+     * Configure the validator instance.
+     */
+    protected function validateFAQUniqueness(): void
+    {
+        $this->validateFAQUniqueness();
+        $this->validateFAQCategory();
+    }
+    
+    /**
+     * Validate FAQ category validity
+     */
+    protected function validateFAQCategory(): void
+    {
+        $category = $this->input('category');
+        
+        $validCategories = ['general', 'booking', 'services', 'pricing', 'display_order', 'accessibility'];
+        
+        if (!in_array($category, $validCategories)) {
+            $this->validator->errors()->add('category', 'Invalid category selection.');
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Validate: category, question, answer, status
+- [ ] Add custom error messages
+- [ ] Add FAQ uniqueness validation
+- [ ] Add category validation
+- [ ] Configure validator instance
+
+##### File: `app/Http/Requests/FAQ/UpdateFAQRequest.php`
+```php
+<?php
+
+namespace App\Http\Requests\FAQ;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class UpdateFAQRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return $this->user()->isAdmin() || $this->user()->isSuperAdmin();
+    }
+    
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            'category' => ['sometimes', 'in:general,booking,services,pricing,accessibility'],
+            'question' => ['sometimes', 'string', 'max:500'],
+            'answer' => ['sometimes', 'string'],
+            'display_order' => ['sometimes', 'integer', 'min:0'],
+            'status' => ['sometimes', 'in:draft,published'],
+        ];
+    }
+    
+    /**
+     * Get custom error messages for validation rules.
+     */
+    public function messages(): array
+    {
+        return [
+            'category.in' => 'Invalid category selection.',
+            'question.required' => 'A question is required.',
+            'answer.required' => 'An answer is required.',
+            'display_order.min' => 'Display order must be at least 0.',
+            'status.in' => 'Invalid status selection.',
+        ];
+    }
+    
+    /**
+     * Configure the validator instance.
+     */
+    public function configure()
+    {
+        $this->validateFAQUniqueness();
+        $this->validateFAQCategory();
+    }
+    
+    /**
+     * Validate FAQ uniqueness
+     */
+    protected function validateFAQUniqueness(): void
+    {
+        $question = $this->input('question');
+        $category = $this->input('category');
+        
+        // Check for duplicate FAQ within category
+        $existingFAQ = \App\Models\FAQ::where('category', $category)
+            ->where('question', $question)
+            ->exists();
+        
+        if ($existingFAQ) {
+            $this->validator->errors()->add('question', 'A question with this text already exists in the selected category.');
+        }
+    }
+    
+    /**
+     * Validate category validity
+     */
+    protected function validateFAQCategory(): void
+    {
+        $category = $this->input('category');
+        
+        $validCategories = ['general', 'booking', 'services', 'pricing', 'accessibility'];
+        
+        if (!in_array($category, $validCategories)) {
+            $this->validator->errors()->add('category', 'Invalid category selection.');
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Same validation as StoreFAQRequest but with 'sometimes' rules
+- [ ] Add custom error messages
+- [ ] Add FAQ uniqueness validation
+- [ ] Add category validation
+
+**Resource Transformers (3 files)**
+
+##### File: `app/Http/Resources/TestimonialResource.php`
+```php
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\Testimonial;
+use App\Http\Resources\UserResource;
+
+class TestimonialResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     */
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+        'content' => $this->content,
+        'rating' => $this->rating,
+        'status' => $this->status,
+        'status_label' => $this->status_label,
+        'stars' => $this->stars,
+        'created_at' => $this->created_at,
+        'updated_at' => $this->updated_at,
+        'deleted_at' => $this->deleted_at,
+        'user' => UserResource::make($this->whenLoaded('user')),
+        'center' => CenterResource::make($this->whenLoaded('center')),
+        'moderated_by' => UserResource::make($this->whenLoaded('moderated_by')),
+        'moderated_at' => $this->moderated_at?->format('Y-m-d'),
+    ];
+    }
+}
+```
+**Checklist:**
+- [ ] Transform all testimonial fields
+- [ ] Include user and center relationships
+- [ ] Add computed attributes (status_label, stars)
+- [ ] Add timestamps
+
+##### File: `app/Http/Resources/SubscriptionResource.php`
+```php
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\JsonResource;
+use App\Models\Subscription;
+use App\Http\Resources\UserResource;
+
+class SubscriptionResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     */
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+        'email' => $this->email,
+        'mailchimp_status' => $this->mailchimp_status,
+        'status_label' => $this->status_label,
+        'preferences' => $this->formatted_preferences,
+        'subscribed_at' => $this->subscribed_at?->format('Y-m-d'),
+        'unsubscribed_at' => $this->unsubscribed_at?->format('Y-m-d'),
+        'last_synced_at' => $this->last_synced_at?->format('Y-m-d H:i:s'),
+        'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+        'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+    ];
+    }
+}
+```
+**Checklist:**
+- [ ] Transform all subscription fields
+- [ ] Add formatted_preferences and status_label
+- [ ] Add formatted timestamps
+
+##### File: `app/Http/Resources/ContactSubmissionResource.php`
+```php
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\JsonResource;
+use App\Models\ContactSubmission;
+use App\Http\Resources\UserResource;
+
+class ContactSubmissionResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     */
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'subject' => $this->subject,
+            'message' => $this->message,
+            'status' => $this->status,
+            'status_label' => $this->status_label,
+            'spam_score' => $this->spam_score,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'ip_address' => $this->ip_address,
+            'user' => UserResource::make($this->whenLoaded('user')),
+            'center' => CenterResource::make($this->whenLoaded('center')),
+    ];
+    }
+}
+```
+**Checklist:**
+- [ ] Transform all submission fields
+- [ ] Include user and center relationships
+- [ ] Add status_label and spam_score attributes
+- [ ] Add formatted timestamps
+
+##### File: `app/Http/Resources/FAQResource.php`
+```php
+<?php
+
+namespace App\Http\Resources;
+
+use Illuminate\Http\Resources\JsonResource;
+use App\Models\FAQ;
+
+class FAQResource extends JsonResource
+{
+    /**
+     * Transform the resource into an array.
+     */
+    public function toArray($request): array
+    {
+        return [
+            'id' => $this->id,
+            'category' => $this->category,
+            'question' => $this->question,
+            'answer' => $this->answer,
+            'display_order' => $this->display_order,
+            'status' => $this->status,
+            'status_label' => $this->status_label,
+            'created_at' => $this->created_at->format('Y-m-d'),
+            'updated_at' => $this->updated_at->format('Y-m-d'),
+        ];
+    }
+}
+```
+**Checklist:**
+- [ ] Transform all FAQ fields
+- [ ] Add status_label accessor
+- [ ] Add formatted timestamps
+
+**Events (3 files)**
+
+##### File: `app/Events/BookingCreated.php`
+```php
+<?php
+
+namespace App\Events;
+
+use App\Models\Booking;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingCreated extends Dispatchable
+{
+    use SerializesModels;
+    
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn()
+    {
+        return [
+                'booking.' . $this->booking->id,
+                'booking.created',
+            ];
+    }
+    
+    /**
+     * Get the event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'booking.created';
+    }
+    
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'booking_id' => $this->booking->id,
+            'user_id' => $this->booking->user_id,
+            'center_id' => $this->booking->center_id,
+            'service_id' => $this->booking->service_id,
+            'booking_date' => $this->booking->booking_date,
+            'booking_time' => $this->booking->booking_time,
+            'status' => $this->booking->status,
+        ];
+    }
+}
+```
+**Checklist:**
+- [ ] Define BookingCreated event
+- [ ] Implement broadcasting
+- [ ] Add serialization
+- [ ] Add proper event metadata
+
+##### File: `app/Events/BookingCancelled.php`
+```php
+<?php
+
+namespace App\Events;
+
+use App\Models\Booking;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingCancelled extends Dispatchable
+{
+    use SerializesModels;
+    
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn()
+    {
+        return [
+                'booking.' . $this->booking->id,
+                'booking.cancelled',
+            ];
+    }
+    
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'booking.cancelled';
+    }
+    
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'booking_id' => $this->booking->id,
+            'user_id' => $this->booking->user_id,
+            'center_id' => $this->booking->center_id,
+            'service_id' => $this->booking->service_id,
+            'status' => $this->booking->status,
+            'cancellation_reason' => $this->booking->cancellation_reason,
+        ];
+    }
+}
+```
+**Checklist:**
+- [ ] Define BookingCancelled event
+- [ ] Implement broadcasting
+- [ ] Add serialization
+- [ ] Add proper event metadata
+
+##### File: `app/Events/BookingConfirmed.php`
+```php
+<?php
+
+namespace App\Events;
+
+use App\Models\Booking;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class BookingConfirmed extends Dispatchable
+{
+    use SerializesModels;
+    
+    /**
+     * Create a new event instance.
+     */
+    public function __construct(
+        public Booking $booking
+    ) {
+        $this->booking = $booking;
+    }
+    
+    /**
+     * Get the channels the event should broadcast on.
+     */
+    public function broadcastOn()
+    {
+        return [
+                'booking.' . $this->booking->id,
+                'booking.confirmed',
+            ];
+    }
+    
+    /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'booking.confirmed';
+    }
+    
+    /**
+     * Get the data to broadcast.
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'booking_id' => $this->booking->id,
+            'user_id' => $this->booking->user_id,
+            'center_id' => $this->booking->center_id,
+            'service_id' => $this->booking->service_id,
+            'booking_date' => $this->booking->booking_date,
+            'booking_time' => $this->booking->booking_time,
+            'status' => $this->booking->status,
+        ];
+    }
+}
+```
+**Checklist:**
+- [ ] Define BookingConfirmed event
+- [ ] Implement broadcasting
+- [ ] Add serialization
+- [ ] Add proper event metadata
+
+**Listeners (3 files)**
+
+##### File: `app/Listeners/Booking/BookingCreatedListener.php`
+```php
+<?php
+
+namespace App\Listeners\Booking;
+
+use App\Events\BookingCreated;
+use App\Services\Notification\NotificationService;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
+
+class BookingCreatedListener implements ShouldQueue
+{
+    use InteractsWithQueue;
+    
+    /**
+     * Handle the event.
+     */
+    public function handle(BookingCreated $event): void
+    {
+        try {
+            // Send confirmation notification
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendBookingConfirmation($event->booking);
+            
+            // Schedule reminder (24h before booking)
+            $bookingDateTime = \Carbon\Carbon::parse($event->booking->booking_date . ' ' . $event->booking_time);
+            $reminderTime = $bookingDateTime->subDay();
+            
+            if ($reminderTime->isFuture()) {
+                SendBookingReminderJob::dispatch($event->booking)->delay($reminderTime);
+            }
+            
+            Log::info('Booking confirmation sent', [
+                'booking_id' => $event->booking->id,
+                'user_id' => $event->booking->user_id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to handle BookingCreated event', [
+                'error' => $e->getMessage(),
+                'booking_id' => $event->booking->id,
+            ]);
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Handle BookingCreated event
+- [ ] Send confirmation notification
+- [ ] Schedule reminder job
+- [ ] Add error handling
+- [ ] Add comprehensive logging
+
+##### File: `app/Listeners/Booking/BookingCancelledListener.php`
+```php
+<?php
+
+namespace App\Listeners\Booking;
+
+use App\Events\BookingCancelled;
+use App\Services\Notification\NotificationService;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
+
+class BookingCancelledListener implements ShouldQueue
+{
+    use InteractsWithQueue;
+    
+    /**
+     * Handle the event.
+     */
+    public function handle(BookingCancelled $event): void
+    {
+        try {
+            // Send cancellation notification
+            $notificationService = app(NotificationService::class);
+            $notificationService->sendBookingCancellation($event->booking);
+            
+            // Update center occupancy
+            $center = $event->booking->center;
+            if ($center->current_occupancy > 0) {
+                $center->decrement('current_occupancy');
+            }
+            
+            // Log cancellation
+            Log::info('Booking cancelled', [
+                'booking_id' => $event->booking->id,
+                'user_id' => $event->booking->user_id,
+                'center_id' => $event->booking->center_id,
+                'cancellation_reason' => $event->booking->cancellation_reason,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to handle BookingCancelled event', [
+                'error' => $e->getMessage(),
+                'booking_id' => $event->booking->id,
+            ]);
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Handle BookingCancelled event
+- [ ] Send cancellation notification
+- [ ] Update center occupancy
+- [ ] Add comprehensive error handling
+- [ ] Add comprehensive logging
+
+##### File: `app/Listeners/Booking/BookingConfirmedListener.php`
+```php
+<?php
+
+namespace App\Listeners\Booking;
+
+use App\Events\BookingConfirmed;
+use App\Models\Booking;
+use Illuminate\Support\Facades\Log;
+
+class BookingConfirmedListener implements ShouldQueue
+{
+    use InteractsWithQueue;
+    
+    /**
+     * Handle the event.
+     */
+    public function handle(BookingConfirmed $event): void
+    {
+        try {
+            // Update center occupancy
+            $center = $event->booking->center;
+            if ($center->current_occupancy > 0) {
+                $center->decrement('current_occupancy');
+            }
+            
+            // Log confirmation
+            Log::info('Booking confirmed', [
+                'booking_id' => $event->booking->id,
+                'user_id' => $event->booking->user_id,
+                'center_id' => $event->booking->center_id,
+            ]);
+            
+            // Trigger reminder (24h before booking)
+            $bookingDateTime = \Carbon\Carbon::parse($event->booking->booking_date . ' ' . $event->booking_time);
+            $reminderTime = $bookingDateTime->subDay()->subDay()->setTime(10, 0);
+            
+            if ($reminderTime->isFuture()) {
+                SendBookingReminderJob::dispatch($event->booking)->delay($reminderTime);
+            }
+            
+            Log::info('Booking confirmed', [
+                'booking_id' => $event->booking->id,
+                'user_id' => $event->booking->user_id,
+                'center_id' => $event->booking->center_id,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to handle BookingConfirmed event', [
+                'error' => $e->getMessage(),
+                'booking_id' => $event->booking->id,
+            ]);
+        }
+    }
+}
+```
+**Checklist:**
+- [ ] Handle BookingConfirmed event
+- [ ] Update center occupancy
+- [ ] Schedule reminder jobs
+- [ ] Add comprehensive error handling
+- [ ] Add comprehensive logging
