@@ -29,6 +29,10 @@ awesome job so far! please meticulously review the project database schema below
 
 ---
 
+awesome meticulous comparative analytical review! please keep using the same rigorous and meticulous approach! yes, please think deeper and think harder to methodically and meticulously plan how to create a complete validated drop-in replacement sub-plan that combines yours and the original sub-plan to produce best-in-class sub-plan that is even more thorough and well-thought-out for independent AI coding agent to work on phase 3 autonomously without trouble and without ambiguity. review and validate your plan to create the enhanced sub-plan before proceeding cautiously.
+
+---
+
 awesome review and understanding! please meticulously plan and document down (stage) your current deep understanding of the project, its codebase design and its current state, and your recommended remediation actions. save / stage this information as a markdown file under the docs/  folder for your future recap and for future course alignment guidance.
 
 ---

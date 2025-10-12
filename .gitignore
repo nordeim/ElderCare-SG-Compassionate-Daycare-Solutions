@@ -41,6 +41,7 @@ yarn-error.log*
 /backend/storage/framework/sessions/
 /backend/storage/framework/testing/
 /backend/storage/framework/views/
+/backup/
 
 # Temporary files
 *.tmp
