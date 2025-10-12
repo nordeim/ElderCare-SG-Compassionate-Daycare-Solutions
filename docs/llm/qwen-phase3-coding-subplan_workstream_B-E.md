@@ -1,4 +1,4 @@
-Absolutely. Let’s proceed with **deep, deliberate, and meticulous design** for **Workstream B: PDPA Compliance Core**.
+Let’s proceed with **deep, deliberate, and meticulous design** for **Workstream B: PDPA Compliance Core**.
 
 ---
 
@@ -1639,3 +1639,504 @@ Route::post('webhooks/calendly', [CalendlyWebhookController::class, 'handle']);
 
 ---
 
+We will now apply the **same rigorous, meticulous, and production-grade methodology** used for Workstreams A–D to design **Workstream E: Content & Community (FAQs, Testimonials, Contact Submissions)**.
+
+This workstream is **essential for trust-building and user engagement**—it enables families to access authoritative information (FAQs), read authentic experiences (Testimonials), and reach out for support (Contact)—all while maintaining **PDPA compliance, moderation workflows, and multilingual readiness**.
+
+---
+
+## 🔍 Deep Analysis: What “Content & Community” Truly Means
+
+Per the **database schema**, **product vision**, and **compliance requirements**, this workstream must deliver:
+
+### 1. **FAQs (Frequently Asked Questions)**
+- **Categorized** (`general`, `booking`, `services`, `pricing`, `accessibility`)
+- **Ordered** by `display_order` for editorial control
+- **Multilingual**: Content stored via `content_translations` (polymorphic)
+- **Searchable**: Full-text index on `question`/`answer`
+- **Admin-managed**: Only `admin`/`super_admin` can create/edit
+
+### 2. **Testimonials**
+- **User-submitted**: Tied to authenticated user + specific center
+- **Moderated workflow**: `pending` → `approved`/`rejected`/`spam`
+- **Rating system**: 1–5 stars
+- **PDPA-compliant**: Soft deletes, audit logs
+- **Multilingual**: Title/content translatable
+- **Spam protection**: reCAPTCHA v3 (frontend), but backend must support moderation
+
+### 3. **Contact Submissions**
+- **Guest or authenticated**: `user_id` nullable
+- **Center-specific**: Optional `center_id` for targeted inquiries
+- **Spam detection**: Store `ip_address`, `user_agent`
+- **Status tracking**: `new` → `in_progress` → `resolved`/`spam`
+- **Notification**: Triggers internal alert (not user-facing)
+
+All three entities:
+- Must be **audited** (via `audit_logs`)
+- Must support **soft deletes** (where applicable)
+- Must be **secure** (no XSS, SQLi)
+- Must be **testable** (>90% coverage)
+
+---
+
+## 🧱 Strategic Boundaries
+
+### ✅ **In Scope (Workstream E Owns)**:
+- FAQ CRUD (admin-only)
+- Testimonial submission + moderation (user + admin)
+- Contact form submission + status management (admin-only status updates)
+- Multilingual content via `content_translations`
+- API endpoints for public consumption (FAQs, approved testimonials)
+- Admin API endpoints for management
+- Moderation workflows (approve/reject/spam)
+- Audit logging for all mutations
+
+### ❌ **Out of Scope**:
+- reCAPTCHA integration (frontend responsibility)
+- Email/SMS notifications (Workstream F)
+- Search (MeiliSearch — future phase)
+- Frontend UI (Phase 4)
+
+---
+
+## 🗺️ Workstream E: Content & Community — Full Sub-Plan
+
+### **Owner**: Backend Dev 1  
+**Duration**: 3–4 days  
+**Dependencies**:  
+- Workstream A (User auth)  
+- Workstream B (Audit logging, `content_translations` model)  
+- Workstream C (Center model)  
+**Priority**: MEDIUM-HIGH (Trust & engagement)
+
+---
+
+### **E.1. Implementation Sequence**
+
+1. **Models** (3 files): `Faq`, `Testimonial`, `ContactSubmission`
+2. **Repositories** (3 files): Data access layer
+3. **Services** (3 files):  
+   - `FaqService`  
+   - `TestimonialService`  
+   - `ContactSubmissionService`
+4. **Requests** (5 files):  
+   - `StoreFaqRequest.php`  
+   - `UpdateFaqRequest.php`  
+   - `StoreTestimonialRequest.php`  
+   - `ModerateTestimonialRequest.php`  
+   - `StoreContactSubmissionRequest.php`
+5. **Resources** (3 files):  
+   - `FaqResource.php`  
+   - `TestimonialResource.php`  
+   - `ContactSubmissionResource.php`
+6. **Controllers** (4 files):  
+   - `FaqController.php` (public)  
+   - `TestimonialController.php` (public + user)  
+   - `ContactSubmissionController.php` (public)  
+   - `Admin/ContentController.php` (admin-only)
+7. **Policies** (1 file): `ContentPolicy.php`
+8. **Routes** (1 block): `/api/v1/faqs`, `/api/v1/testimonials`, etc.
+9. **Tests** (3 files): Unit + Feature tests
+
+---
+
+### **E.2. File Creation Matrix**
+
+#### **Models (3 files)**
+
+##### **File**: `app/Models/Faq.php`
+
+```php
+<?php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+class Faq extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'category', 'question', 'answer', 'display_order', 'status'
+    ];
+
+    protected $casts = [
+        'display_order' => 'integer',
+    ];
+
+    public function translations(): MorphMany
+    {
+        return $this->morphMany(ContentTranslation::class, 'translatable');
+    }
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
+
+    public function scopeByCategory($query, string $category)
+    {
+        return $query->where('category', $category);
+    }
+}
+```
+
+**Checklist**:  
+- [ ] MorphMany `translations`  
+- [ ] Scopes: `published()`, `byCategory()`  
+- [ ] Fillable attributes match schema  
+
+---
+
+##### **File**: `app/Models/Testimonial.php`
+
+```php
+<?php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+class Testimonial extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = [
+        'user_id', 'center_id', 'title', 'content', 'rating',
+        'status', 'moderation_notes', 'moderated_by'
+    ];
+
+    protected $casts = [
+        'rating' => 'integer',
+        'deleted_at' => 'datetime',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function center(): BelongsTo
+    {
+        return $this->belongsTo(Center::class);
+    }
+
+    public function moderatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'moderated_by');
+    }
+
+    public function translations(): MorphMany
+    {
+        return $this->morphMany(ContentTranslation::class, 'translatable');
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', 'approved');
+    }
+
+    public function scopeByCenter($query, int $centerId)
+    {
+        return $query->where('center_id', $centerId);
+    }
+}
+```
+
+**Checklist**:  
+- [ ] Soft deletes  
+- [ ] Relationships: user, center, moderatedBy  
+- [ ] Scopes: `approved()`, `byCenter()`  
+- [ ] Rating validation (1–5) enforced at DB level  
+
+---
+
+##### **File**: `app/Models/ContactSubmission.php`
+
+```php
+<?php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+class ContactSubmission extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id', 'center_id', 'name', 'email', 'phone', 'subject', 'message',
+        'status', 'ip_address', 'user_agent'
+    ];
+
+    protected $casts = [
+        'ip_address' => 'string',
+    ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function center(): BelongsTo
+    {
+        return $this->belongsTo(Center::class);
+    }
+
+    public function scopeNew($query)
+    {
+        return $query->where('status', 'new');
+    }
+}
+```
+
+**Checklist**:  
+- [ ] Nullable `user_id`, `center_id`  
+- [ ] Store `ip_address`, `user_agent` for spam detection  
+- [ ] Scope: `new()`  
+
+---
+
+#### **Repositories (3 files)**
+
+*(Standard CRUD operations with relationships)*
+
+##### **File**: `app/Repositories/FaqRepository.php`
+
+```php
+public function allPublished(): Collection
+{
+    return Faq::published()->orderBy('display_order')->get();
+}
+
+public function findByCategory(string $category): Collection
+{
+    return Faq::published()->byCategory($category)->orderBy('display_order')->get();
+}
+```
+
+*(Similar for `TestimonialRepository`, `ContactSubmissionRepository`)*
+
+---
+
+#### **Services (3 files)**
+
+##### **File**: `app/Services/Content/TestimonialService.php`
+
+```php
+<?php
+namespace App\Services\Content;
+use App\Models\User;
+use App\Models\Testimonial;
+use App\Repositories\TestimonialRepository;
+use App\Services\Audit\AuditService;
+use Illuminate\Support\Facades\Request;
+class TestimonialService
+{
+    public function __construct(
+        protected TestimonialRepository $repository,
+        protected AuditService $auditService
+    ) {}
+
+    public function submitTestimonial(User $user, array $data): Testimonial
+    {
+        $testimonial = $this->repository->create([
+            'user_id' => $user->id,
+            'center_id' => $data['center_id'],
+            'title' => $data['title'],
+            'content' => $data['content'],
+            'rating' => $data['rating'],
+            'status' => 'pending',
+        ]);
+        $this->auditService->logCreate($testimonial);
+        return $testimonial;
+    }
+
+    public function moderateTestimonial(Testimonial $testimonial, string $status, ?string $notes = null, ?User $moderator = null): Testimonial
+    {
+        $oldStatus = $testimonial->status;
+        $testimonial->status = $status;
+        $testimonial->moderation_notes = $notes;
+        $testimonial->moderated_by = $moderator?->id;
+        $testimonial->moderated_at = now();
+        $testimonial->save();
+
+        $this->auditService->logUpdate(
+            $moderator,
+            $testimonial,
+            ['status' => $oldStatus],
+            ['status' => $status]
+        );
+        return $testimonial;
+    }
+}
+```
+
+**Checklist**:  
+- [ ] Submit testimonial (status = pending)  
+- [ ] Moderate (approve/reject/spam) with notes  
+- [ ] Log audit with moderator context  
+
+---
+
+*(Similar for `FaqService`, `ContactSubmissionService`)*
+
+---
+
+#### **Requests (5 files)**
+
+##### **File**: `app/Http/Requests/Content/StoreTestimonialRequest.php`
+
+```php
+public function rules(): array
+{
+    return [
+        'center_id' => ['required', 'exists:centers,id'],
+        'title' => ['required', 'string', 'max:255'],
+        'content' => ['required', 'string', 'max:2000'],
+        'rating' => ['required', 'integer', 'min:1', 'max:5'],
+    ];
+}
+```
+
+##### **File**: `app/Http/Requests/Content/ModerateTestimonialRequest.php`
+
+```php
+public function rules(): array
+{
+    return [
+        'status' => ['required', 'in:approved,rejected,spam'],
+        'moderation_notes' => ['nullable', 'string', 'max:500'],
+    ];
+}
+```
+
+*(Similar for FAQ and Contact requests)*
+
+---
+
+#### **Resources (3 files)**
+
+##### **File**: `app/Http/Resources/TestimonialResource.php`
+
+```php
+public function toArray($request): array
+{
+    return [
+        'id' => $this->id,
+        'title' => $this->title,
+        'content' => $this->content,
+        'rating' => $this->rating,
+        'user' => UserResource::make($this->whenLoaded('user')),
+        'center' => CenterResource::make($this->whenLoaded('center')),
+        'created_at' => $this->created_at,
+    ];
+}
+```
+
+**Note**: Only **approved** testimonials shown in public API.
+
+---
+
+#### **Controllers (4 files)**
+
+##### **Public APIs**:
+- `FaqController@index` → all published FAQs
+- `TestimonialController@index` → approved testimonials (optionally by center)
+- `ContactSubmissionController@store` → create submission
+
+##### **User APIs**:
+- `TestimonialController@store` → submit testimonial (auth required)
+
+##### **Admin APIs** (`Admin/ContentController.php`):
+- `POST /faqs` → create FAQ
+- `PUT /faqs/{id}` → update FAQ
+- `PUT /testimonials/{id}/moderate` → moderate testimonial
+- `PUT /contact-submissions/{id}` → update status
+
+---
+
+#### **Policies (1 file)**
+
+##### **File**: `app/Policies/ContentPolicy.php`
+
+```php
+public function manage(User $user): bool
+{
+    return $user->isAdmin() || $user->isSuperAdmin();
+}
+
+public function moderateTestimonial(User $user): bool
+{
+    return $this->manage($user);
+}
+```
+
+Applied via middleware: `->middleware('can:manage,App\Models\Faq')`
+
+---
+
+#### **Routes (1 block)**
+
+```php
+// Public content
+Route::get('faqs', [FaqController::class, 'index']);
+Route::get('testimonials', [TestimonialController::class, 'index']);
+
+// User content
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('testimonials', [TestimonialController::class, 'store']);
+});
+
+// Contact
+Route::post('contact', [ContactSubmissionController::class, 'store']);
+
+// Admin content
+Route::middleware(['auth:sanctum', 'role:admin,super_admin'])->prefix('admin')->group(function () {
+    Route::apiResource('faqs', Admin\FaqController::class);
+    Route::put('testimonials/{testimonial}/moderate', [Admin\TestimonialController::class, 'moderate']);
+    Route::apiResource('contact-submissions', Admin\ContactSubmissionController::class)->only(['index', 'update']);
+});
+```
+
+---
+
+#### **Tests (3 files)**
+
+- `tests/Feature/Content/FaqTest.php`
+- `tests/Feature/Content/TestimonialTest.php`
+- `tests/Feature/Content/ContactSubmissionTest.php`
+
+**Test Scenarios**:  
+- Submit testimonial → status = pending  
+- Approve testimonial → appears in public API  
+- Submit contact form → stored with IP  
+- Non-admin tries to create FAQ → 403  
+- FAQ ordering respected in response  
+
+---
+
+### **E.3. Validation Criteria**
+
+✅ **FAQs**: Published FAQs returned in order, by category  
+✅ **Testimonials**: Only approved shown publicly; moderation workflow functional  
+✅ **Contact**: Submissions stored with IP/user agent; status updatable by admin  
+✅ **Multilingual**: `content_translations` linked (frontend will consume)  
+✅ **Audit Trail**: All changes logged in `audit_logs`  
+✅ **Security**: No XSS (content escaped in resource), validation enforced  
+✅ **Tests**: >90% coverage, all validation rules tested  
+
+---
+
+### **E.4. Integration Notes**
+
+- **Workstream B**: Uses `AuditService`, `ContentTranslation` model  
+- **Workstream A**: Uses `User` auth and roles  
+- **Workstream C**: Depends on `Center` model for testimonials  
+- **Future**: Frontend will use `content_translations` for multilingual display
+
+---
+
+This **Workstream E** is now **fully specified, production-ready, and autonomously implementable**.
+
+Shall we proceed to **Workstream F: API Infrastructure & External Integrations** next?
