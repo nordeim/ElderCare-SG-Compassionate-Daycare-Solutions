@@ -61,9 +61,39 @@ The project has successfully completed its foundational phases:
 -   **Phase 1: Foundation, Infrastructure & Analytics:** The project structure, Docker environment, CI/CD pipeline, and database schema are all in place.
 -   **Phase 2: Design System, UI Components & i18n:** A comprehensive, accessible component library has been built and documented in Storybook, and the internationalization framework is complete for English and Mandarin.
 
-The project is currently in a **Pre-Phase 3 Remediation Stage**, addressing minor gaps from the initial phases before commencing **Phase 3: Core Backend Services & PDPA Compliance**.
+The project is currently in a **Pre-Phase 3 Remediation Stage**, addressing minor gaps from the initial phases before commencing **Phase 3: Core Backend Services & PDPA Compliance**. This next phase involves the complete implementation of the Laravel backend API, including authentication, all core business logic, booking system integration, and robust PDPA/MOH compliance features, as detailed in the Phase 3 execution sub-plan.
 
-## 2. Building and Running
+## 2. Backend Architecture & Data Model
+
+### Data Model & Schema
+The backend is built upon a comprehensive **18-table MySQL 8.0 schema** that is meticulously designed for compliance, scalability, and multilingual support.
+-   **Compliance-First:** The schema has dedicated tables and columns for **PDPA (Singapore)** and **MOH** regulations. This includes a polymorphic `audit_logs` table for tracking all data changes, a `consents` table for versioned user consent, and soft deletes on critical tables. MOH compliance is handled via specific fields in the `centers` and `staff` tables (e.g., `moh_license_number`).
+-   **Relational Core:** The core entities include `users`, `profiles`, `centers`, `services`, `bookings`, and `testimonials`, with well-defined relationships and constraints.
+-   **Advanced Data Structures:** The design leverages **polymorphic relationships** for reusable `media` (S3-backed) and `content_translations` tables, enabling flexible content management. **JSON columns** are used for semi-structured data like operating hours, amenities, and questionnaire responses.
+-   **Performance:** The schema is optimized with a full suite of indexes, including composite and full-text indexes, and includes pre-built `VIEWS` for complex queries like center summaries.
+-   **Integration-Ready:** Columns are pre-defined to store unique identifiers from external services like Calendly, Mailchimp, and Twilio.
+
+### Service Layer Architecture
+The Laravel backend follows a strict **service-oriented architecture** to ensure separation of concerns and maintainability. Business logic is encapsulated within dedicated service classes, keeping controllers thin and focused on handling HTTP requests.
+-   **Key Services:** The architecture is composed of specialized services, including:
+    -   `AuthService`: Handles user registration, login, and password resets.
+    -   `ConsentService` & `AuditService`: Manage all PDPA-related logic.
+    -   `UserService`: Manages user profiles, data export, and account deletion.
+    -   `CenterService`: Manages eldercare center data and MOH compliance.
+    -   `BookingService`: Orchestrates the entire booking workflow.
+    -   `CalendlyService` & `TwilioService`: Abstract external API interactions.
+    -   `NotificationService`: Manages and queues all email and SMS notifications.
+    -   `MediaService`: Handles file uploads to S3 and media associations.
+-   **Automation:** An `AuditObserver` is used to automatically log model changes, ensuring the PDPA audit trail is always complete.
+
+### API Design & Infrastructure
+The backend exposes a versioned, secure, and well-documented RESTful API.
+-   **Versioning:** All routes are prefixed with `/api/v1`.
+-   **Standardization:** The API uses a standardized JSON response format for both successes and errors, a global exception handler for predictable error codes (4xx/5xx), and Laravel API Resources for data transformation.
+-   **Security:** Authentication is handled by **Laravel Sanctum**. Authorization is managed via role-based middleware and granular policies. **Rate limiting** is applied to prevent abuse.
+-   **Documentation:** The entire API will be documented using the **OpenAPI 3.0** specification, with a Postman collection provided for easy testing and integration.
+
+## 3. Building and Running
 
 The recommended method for running the project is via Docker.
 
@@ -115,7 +145,7 @@ The recommended method for running the project is via Docker.
     docker-compose exec frontend npm run test:e2e
     ```
 
-## 3. Development Conventions
+## 4. Development Conventions
 
 ### Git Workflow
 -   Work is done on feature branches (e.g., `feature/TASK-123-auth-service`, `bugfix/login-form-validation`).
@@ -138,68 +168,26 @@ A comprehensive, multi-layered testing strategy is a core project requirement.
 -   All code changes that impact architecture, features, or operational procedures must be accompanied by corresponding documentation updates.
 -   Significant architectural decisions must be recorded in an Architectural Decision Record (ADR).
 
-# ElderCare SG — AI Coding Agent Brief
-
-## Purpose
-- Capture the essential WHAT, WHY, and HOW of the `ElderCare SG` web platform so that any AI coding agent can operate with full context.
-- Reinforce the elevated operating framework: deep analysis, systematic planning, technical excellence, strategic partnership, and transparent communication.
-
-## Product Vision & Value Proposition
-- **Mission**: Deliver a compassionate, accessibility-first digital bridge between Singaporean families and trusted elderly daycare services.
-- **Primary Outcomes**: Empower informed decisions, build trust, and enhance quality of life for seniors and caregivers.
-- **Target Audiences**: Adult children (30–55), family caregivers, healthcare professionals, and digitally literate seniors across Singapore’s multicultural landscape.
-
-## Core Features & Journeys
-- **Service Discovery**: Rich profiles of facilities, staff qualifications, certifications, and amenities.
-- **Virtual Tours**: Video.js-powered, accessible tours with adaptive streaming and WebXR options.
-- **Booking System**: Calendly-backed scheduling with pre-visit questionnaires, confirmations, reminders, and rescheduling flows.
-- **Testimonials & Stories**: Moderated, multilingual user testimonials with media consent tracking.
-- **Multilingual Experience**: English, Mandarin, Malay, and Tamil content with respectful tone and cultural sensitivity.
-- **Newsletter & Engagement**: Mailchimp integration (double opt-in) plus analytics for open/click performance.
-- **Government Support Guidance**: Subsidy calculators and guidance for Pioneer/Merdeka programs.
-
-## Technical Architecture Snapshot
-- **Frontend (`frontend/`)**: Next.js 14, React 18, TypeScript 5, Tailwind CSS, Radix UI, Zustand (client state), React Query (server state), Framer Motion (animation with reduced-motion support).
-- **Backend (`backend/`)**: Laravel 12 (PHP 8.2), service-oriented API, Sanctum authentication, MariaDB/MySQL primary store, Redis caching/queues, Elasticsearch search services, S3 (ap-southeast-1) for media.
-- **Infrastructure**: Dockerized services orchestrated by Kubernetes on AWS Singapore region; Cloudflare CDN and security; GitHub Actions CI/CD; staging via ECS; observability via Sentry, New Relic, Lighthouse CI, GA4, Hotjar.
-- **Security & Compliance**: OAuth 2.0, RBAC, secure session cookies, MFA for admins, CSP, CSRF, SQLi/XSS hardening, PDPA-compliant consent and data retention.
-
-## Compliance, Accessibility & Localization
-- **Regulatory**: PDPA adherence (consent, residency, retention, right-to-be-forgotten), MOH eldercare display requirements.
-- **Accessibility**: WCAG 2.1 AA baseline, keyboard navigation, captions/audio descriptions, adjustable typography, screen reader validation (NVDA/VoiceOver).
-- **Cultural Fit**: Multicultural imagery, respectful language, holiday-aware content, transit and parking guidance aligned with Singapore norms.
-
-## Quality Standards & Definition of Done
-- **Automated Testing**: Jest unit tests, Testing Library integration tests, Playwright E2E, Percy visual, Lighthouse CI performance audits, axe-core accessibility checks.
-- **Manual Verification**: BrowserStack cross-browser/device runs, screen-reader passes, usability feedback loops, security penetration tests.
-- **Definition of Done**: Code review, 100% automated coverage, manual QA pass, accessibility and performance targets (>90 Lighthouse), documentation updates, stakeholder approval, monitored production deployment.
-
-## Analytics & Success Metrics
-| Metric | Target | Review Cadence | Owner |
-| --- | --- | --- | --- |
-| Visit bookings increase | +30% in 3 months | Monthly | Marketing |
-| Mobile bounce rate | <40% | Bi-weekly | UX |
-| Lighthouse Perf/Accessibility | >90 | Each deploy | DevOps/QA |
-| Avg session duration | >5 minutes | Monthly | Marketing |
-| Form completion | >75% | Monthly | UX |
-| 3G load time | <3 seconds | Weekly | DevOps |
-| Video engagement | >60% completion | Monthly | Marketing |
-
-## Delivery Workflow
-1. **Branching**: Feature branches per task (`feature/*`) with peer review prior to merge.
-2. **Environment Setup**: Docker Compose local environment, `.env` configuration mirrored across stages.
-3. **CI/CD**: GitHub Actions execute tests, audits, and deploy to staging on `main` merges; production via controlled release.
-4. **Monitoring & Alerting**: Sentry for errors, New Relic for APM, UptimeRobot for uptime, ELK for logs.
-5. **Documentation Expectations**: Update `README.md`, `docs/`, and relevant runbooks with each feature.
-
-## Execution Roadmap Context
-- Refer to `codebase_completion_master_plan.md` for phased plan. Current phase emphasizes foundation (infrastructure, analytics, test scaffolding). Acceptance criteria include Dockerized local dev, accessible staging URL, and automated staging deploys from `main`.
-
-## Key References for Further Detail
-- `README.md` — project overview, stack, setup, roadmap.
-- `Project_Requirements_Document.md` — detailed requirements across clarity, compliance, technical precision, validation.
-- `codebase_completion_master_plan.md` — phased delivery plan and acceptance criteria.
-- `docs/architecture.md`, `docs/design-system.md`, `docs/accessibility.md` — deeper dives into specific domains (consult as available).
+### Database migration scripts for backend
+- Review and use the existing migration scripts. Only create new migration script if feature is not already included in any of the existing scripts. If in doubt, refer to `database_schema.sql` as source of truth.
+backend/database/migrations/2024_01_01_000001_create_users_table.php
+backend/database/migrations/2024_01_01_000002_create_password_reset_tokens_table.php
+backend/database/migrations/2024_01_01_000003_create_failed_jobs_table.php
+backend/database/migrations/2024_01_01_000004_create_personal_access_tokens_table.php
+backend/database/migrations/2024_01_01_000005_create_jobs_table.php
+backend/database/migrations/2024_01_01_100001_create_profiles_table.php
+backend/database/migrations/2024_01_01_100010_create_consents_table.php
+backend/database/migrations/2024_01_01_100011_create_audit_logs_table.php
+backend/database/migrations/2024_01_01_200000_create_centers_table.php
+backend/database/migrations/2024_01_01_200001_create_faqs_table.php
+backend/database/migrations/2024_01_01_200002_create_subscriptions_table.php
+backend/database/migrations/2024_01_01_200003_create_contact_submissions_table.php
+backend/database/migrations/2024_01_01_300000_create_services_table.php
+backend/database/migrations/2024_01_01_300001_create_staff_table.php
+backend/database/migrations/2024_01_01_400000_create_bookings_table.php
+backend/database/migrations/2024_01_01_400001_create_testimonials_table.php
+backend/database/migrations/2024_01_01_500000_create_media_table.php
+backend/database/migrations/2024_01_01_500001_create_content_translations_table.php
 
 ---
 

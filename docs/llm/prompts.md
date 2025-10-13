@@ -16,6 +16,14 @@ Now, please meticulously review @README.md , @AGENT.md , @Project_Architecture_D
 
 ---
 
+Now, please meticulously review the following project documents to have a very deep understanding of the project nature and purpose and the current codebase design and state. then update @GEMINI.md with your deep understanding after very careful and systematic review of the documents: @docs/AGENT.md @docs/ai-coding-agent-brief.md @docs/ai_agent_operational_plan.md @codebase_completion_master_plan.md @database_schema.sql M please note that phase1 and phase 2 have been completed @docs/llm/pre_phase3_remediation_execution_plan_2025-10-10.md
+
+---
+
+using @database_schema.sql as the reference please meticulously review and validate the migration scripts under the @backend/database/migrations/ to consolidate and remove redundancies.
+
+---
+
 awesome understanding of the purpose, goals and objectives of this project! to further deepen your undersanding of the project and the current state of the codebase and its intended fiinal state, please meticulously review the database schema @database_schema.sql and the master plan @codebase_completion_master_plan.md for the codebase completion. phase 1 @phase1-execution-plan.md and phase 2 @phase2-execution-subplan.md  have been completed. next, meticulously review the database migration files below to check for their alignment against your deeper understanding.
 
 $ find database/ -type f
