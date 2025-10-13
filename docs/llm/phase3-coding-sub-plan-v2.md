@@ -54,6 +54,50 @@ Let me structure this as a multi-workstream plan with:
 
 ---
 
+## Progress update — remediation performed (2025-10-13)
+
+This section records concrete remediation work that was completed during Pre‑Phase‑3 so that subsequent AI agents or engineers can skip redoing finished tasks.
+
+- Migration hardening (completed)
+   - Summary: MySQL-only SQL in several migrations was wrapped in a positive DB driver guard so SQLite-based CI/tests will not fail while preserving MySQL behaviour in production:
+      - Guard pattern used (example):
+
+```php
+use Illuminate\Support\Facades\DB;
+
+if (DB::getDriverName() === 'mysql') {
+      DB::statement("/* mysql-only SQL here */");
+}
+```
+
+      - Files patched (in-place on `main`):
+         - `backend/database/migrations/2024_01_01_200000_create_centers_table.php`
+         - `backend/database/migrations/2024_01_01_200001_create_faqs_table.php`
+         - `backend/database/migrations/2024_01_01_300000_create_services_table.php`
+         - `backend/database/migrations/2024_01_01_400001_create_testimonials_table.php` (also fixed a malformed import line discovered during edits)
+
+      - Effect: Running `php artisan migrate --database=sqlite` will skip MySQL-only ALTER/INDEX/CHECK statements and should complete successfully for these migrations.
+
+- Documentation updates (completed)
+   - `docs/ai-agent-onboarding.md` was updated to include a detailed "Migration hardening — completed work" section that lists the guarded files, the guard pattern, and the active tracked todo list. Agents should consult that file for the authoritative short checklist before making migration edits.
+
+- Current tracked todo status (canonical):
+   - Review Phase 3 plan vs code — COMPLETED
+   - Produce progress matrix — NOT STARTED
+   - List gaps and prioritized next steps — NOT STARTED
+
+- Important notes & caveats
+   - The CI workflow was NOT changed. The recommended CI change to create a `backend/database/database.sqlite` (or use :memory:) and run `php artisan migrate --database=sqlite --force` before tests remains to be implemented — this is high priority to catch regressions.
+   - A repo-wide audit for other MySQL-specific constructs (additional migrations, raw `DB::statement` uses, or package-supplied SQL) has NOT been completed. Search terms to run: `DB::statement`, `FULLTEXT`, `fullText`, `CHECK`, `ALTER TABLE`.
+   - Do NOT reapply guards to the files listed above; instead, if you identify new MySQL-only SQL, add it to the todo list and apply the same positive-driver guard pattern.
+
+- Next recommended immediate actions (priority order)
+   1. Add CI sqlite migration step so CI runs migrations before tests and fails early on incompatibilities.
+   2. Run `php artisan migrate --database=sqlite` locally/in-CI and run the test suite; fix any remaining incompatibilities surfaced.
+   3. Run a repo-wide search for MySQL-only SQL and guard or refactor findings.
+   4. Produce the progress matrix (file-by-file Implemented/Partial/Missing) and the prioritized gaps list.
+
+
 ## 2. Database Schema Deep Dive & Backend Implications
 
 ### 2.1 Schema Complexity Analysis
