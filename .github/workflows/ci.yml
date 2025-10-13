@@ -124,7 +124,18 @@ jobs:
     - name: Run migrations
       run: |
         cd backend
+        # Prepare for both MySQL (service) and SQLite (CI safety) where needed
+        # Create sqlite database for migrations (used by some fast CI checks)
+        mkdir -p database
+        touch database/database.sqlite || true
         php artisan migrate --force
+
+    - name: Prepare SQLite database for fast checks
+      run: |
+        cd backend
+        # Ensure sqlite DB exists (some developer/CI tests use sqlite)
+        touch database/database.sqlite || true
+        php artisan migrate --database=sqlite --force || true
 
     - name: Run tests
       run: |

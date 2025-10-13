@@ -50,3 +50,56 @@ Consume these via GitHub Actions environment variables or Secrets Manager for de
 - Expand tfvars for production environment.
 - Document secret management workflow (AWS Secrets Manager / SSM) to supply Laravel and Next.js runtime configuration.
 - Once Cloudflare module is added, update this README and the deployment documentation.
+
+## Infrastructure Modules (expanded)
+
+### ECS Fargate (Backend)
+- Auto-scaling configuration
+- Task definitions
+- Service discovery
+
+### RDS (MySQL 8.0)
+- Multi-AZ deployment
+- Backup retention (7 days)
+- Encryption at rest
+
+### ElastiCache (Redis 7)
+- Cluster mode enabled
+- Automatic failover
+
+### S3 Buckets
+- Media storage (public-read)
+- Private data export (signed URLs)
+- Lifecycle policies
+
+## Running Terraform
+
+### Prerequisites
+- AWS CLI configured
+- Terraform 1.5+
+- Valid AWS credentials
+
+### Commands
+```bash
+# Initialize
+terraform init
+
+# Plan (staging)
+terraform plan -var-file=environments/staging.tfvars
+
+# Apply (staging)
+terraform apply -var-file=environments/staging.tfvars
+
+# Plan (production)
+terraform plan -var-file=environments/production.tfvars
+```
+
+### State Management
+- State backend: S3
+- State locking: DynamoDB
+- State file: `terraform.tfstate`
+
+## Secrets Management
+- Secrets Manager for DB credentials, API keys
+- SSM Parameter Store for config values
+- Never commit `.tfvars` files with real secrets
