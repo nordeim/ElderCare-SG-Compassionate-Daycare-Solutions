@@ -9,6 +9,7 @@ use App\Policies\UserPolicy;
 use App\Policies\CenterPolicy;
 use App\Policies\ServicePolicy;
 use App\Policies\BookingPolicy;
+use App\Policies\TestimonialPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -18,6 +19,7 @@ class AuthServiceProvider extends ServiceProvider
     Center::class => CenterPolicy::class,
     Service::class => ServicePolicy::class,
     \App\Models\Booking::class => BookingPolicy::class,
+    \App\Models\Testimonial::class => TestimonialPolicy::class,
     ];
 
     public function boot(): void
