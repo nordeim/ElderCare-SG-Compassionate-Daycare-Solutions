@@ -107,7 +107,7 @@ The recommended method for running the project is via Docker.
     docker-compose exec frontend npm run test:e2e
     ```
 
-## 3. Development Conventions
+## 4. Development Conventions
 
 ### Git Workflow
 -   Work is done on feature branches (e.g., `feature/TASK-123-auth-service`, `bugfix/login-form-validation`).
@@ -129,3 +129,25 @@ A comprehensive, multi-layered testing strategy is a core project requirement.
 -   The `docs/` directory is the single source of truth for all project documentation, including architecture, plans, and runbooks.
 -   All code changes that impact architecture, features, or operational procedures must be accompanied by corresponding documentation updates.
 -   Significant architectural decisions must be recorded in an Architectural Decision Record (ADR).
+
+### Database migration scripts for backend
+- Review and use the existing migration scripts. Only create new migration script if feature is not already included in any of the existing scripts. If in doubt, refer to `database_schema.sql` as source of truth.
+backend/database/migrations/2024_01_01_000001_create_users_table.php
+backend/database/migrations/2024_01_01_000002_create_password_reset_tokens_table.php
+backend/database/migrations/2024_01_01_000003_create_failed_jobs_table.php
+backend/database/migrations/2024_01_01_000004_create_personal_access_tokens_table.php
+backend/database/migrations/2024_01_01_000005_create_jobs_table.php
+backend/database/migrations/2024_01_01_100001_create_profiles_table.php
+backend/database/migrations/2024_01_01_100010_create_consents_table.php
+backend/database/migrations/2024_01_01_100011_create_audit_logs_table.php
+backend/database/migrations/2024_01_01_200000_create_centers_table.php
+backend/database/migrations/2024_01_01_200001_create_faqs_table.php
+backend/database/migrations/2024_01_01_200002_create_subscriptions_table.php
+backend/database/migrations/2024_01_01_200003_create_contact_submissions_table.php
+backend/database/migrations/2024_01_01_300000_create_services_table.php
+backend/database/migrations/2024_01_01_300001_create_staff_table.php
+backend/database/migrations/2024_01_01_400000_create_bookings_table.php
+backend/database/migrations/2024_01_01_400001_create_testimonials_table.php
+backend/database/migrations/2024_01_01_500000_create_media_table.php
+backend/database/migrations/2024_01_01_500001_create_content_translations_table.php
+
