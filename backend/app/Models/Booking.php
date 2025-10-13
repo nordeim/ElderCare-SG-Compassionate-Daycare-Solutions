@@ -43,7 +43,8 @@ class Booking extends Model
      */
     protected $casts = [
         'booking_date' => 'date',
-        'booking_time' => 'datetime',
+        // booking_time is stored as a SQL TIME column; treat as string in model
+        'booking_time' => 'string',
         'questionnaire_responses' => 'array',
         'sms_sent' => 'boolean',
         'confirmation_sent_at' => 'datetime',

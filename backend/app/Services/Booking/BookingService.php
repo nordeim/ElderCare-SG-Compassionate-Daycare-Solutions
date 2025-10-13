@@ -87,7 +87,7 @@ class BookingService
 
             $existingBooking = Booking::where('user_id', $userId)
                 ->where('center_id', $data['center_id'])
-                ->where('booking_date', $data['booking_date'])
+                ->whereDate('booking_date', $data['booking_date'])
                 ->where('booking_time', $data['booking_time'])
                 ->whereIn('status', ['pending', 'confirmed'])
                 ->first();

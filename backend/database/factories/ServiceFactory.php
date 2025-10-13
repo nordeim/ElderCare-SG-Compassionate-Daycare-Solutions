@@ -34,7 +34,6 @@ class ServiceFactory extends Factory
             'duration' => fake()->randomElement(['2 hours', '4 hours', 'Half day', 'Full day', '8 hours']),
             'features' => $this->generateServiceFeatures(),
             'status' => 'draft',
-            'display_order' => 0,
         ];
     }
 
