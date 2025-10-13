@@ -65,10 +65,14 @@ return new class extends Migration
             // Indexes
             $table->index('status');
             $table->index('city');
-            $table->fullText(['name', 'short_description', 'description'], 'idx_search');
+            // Fulltext index is MySQL-specific; only add for mysql driver
+            if (DB::getDriverName() === 'mysql') {
+                $table->fullText(['name', 'short_description', 'description'], 'idx_search');
+            }
         });
 
-        if (DB::getDriverName() !== 'sqlite') {
+        // MySQL-only constraints: add only when running on MySQL
+        if (DB::getDriverName() === 'mysql') {
             DB::statement('ALTER TABLE centers ADD CONSTRAINT chk_capacity CHECK (capacity > 0)');
             DB::statement('ALTER TABLE centers ADD CONSTRAINT chk_occupancy CHECK (current_occupancy >= 0 AND current_occupancy <= capacity)');
             DB::statement('ALTER TABLE centers ADD CONSTRAINT chk_staff_count CHECK (staff_count >= 0)');

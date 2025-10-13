@@ -22,7 +22,10 @@ return new class extends Migration
 
             $table->index(['category', 'display_order']);
             $table->index('status');
-            $table->fullText(['question', 'answer'], 'idx_search');
+            // Fulltext index is MySQL-specific; only add for mysql driver
+            if (DB::getDriverName() === 'mysql') {
+                $table->fullText(['question', 'answer'], 'idx_search');
+            }
         });
     }
 

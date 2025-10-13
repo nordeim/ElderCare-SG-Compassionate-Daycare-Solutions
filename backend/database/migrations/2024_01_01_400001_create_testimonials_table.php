@@ -1,7 +1,6 @@
 <?php
 
-use Illuminate-
-\Database\Migrations\Migration;
+use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -32,7 +31,8 @@ return new class extends Migration
             $table->index(['center_id', 'rating', 'status']);
         });
 
-        if (DB::getDriverName() !== 'sqlite') {
+        // MySQL-only CHECK constraint
+        if (DB::getDriverName() === 'mysql') {
             DB::statement('ALTER TABLE testimonials ADD CONSTRAINT chk_rating CHECK (rating >= 1 AND rating <= 5)');
         }
     }

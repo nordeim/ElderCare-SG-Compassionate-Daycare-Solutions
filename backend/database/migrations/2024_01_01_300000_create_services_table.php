@@ -28,10 +28,14 @@ return new class extends Migration
 
             $table->unique(['center_id', 'slug']);
             $table->index('status');
-            $table->fullText(['name', 'description'], 'idx_search');
+            // Fulltext index is MySQL-specific; only add for mysql driver
+            if (DB::getDriverName() === 'mysql') {
+                $table->fullText(['name', 'description'], 'idx_search');
+            }
         });
 
-        if (DB::getDriverName() !== 'sqlite') {
+        // MySQL-only CHECK constraint
+        if (DB::getDriverName() === 'mysql') {
             DB::statement('ALTER TABLE services ADD CONSTRAINT chk_price CHECK (price IS NULL OR price >= 0)');
         }
     }
