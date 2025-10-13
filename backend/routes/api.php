@@ -69,6 +69,26 @@ Route::prefix('v1')->group(function () {
     Route::delete('/media/{media}', [\App\Http\Controllers\Api\V1\MediaController::class, 'destroy']);
     Route::post('/media/reorder', [\App\Http\Controllers\Api\V1\MediaController::class, 'reorder']);
     Route::put('/media/{media}', [\App\Http\Controllers\Api\V1\MediaController::class, 'update']);
+        // Admin users
+        Route::get('/users', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'index']);
+        Route::get('/users/{user}', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'show']);
+        Route::put('/users/{user}', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'update']);
+        Route::delete('/users/{user}', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'destroy']);
+        Route::post('/users/profile', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'updateProfile']);
+        Route::get('/users/consents', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'getConsents']);
+        Route::post('/users/export', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'exportData']);
+        Route::post('/users/request-deletion', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'requestDeletion']);
+        Route::post('/users/cancel-deletion', [\App\Http\Controllers\Api\V1\Admin\UserController::class, 'cancelDeletion']);
+        // Admin dashboard
+        Route::get('/dashboard', [\App\Http\Controllers\Api\V1\Admin\DashboardController::class, 'index']);
+        // Moderation endpoints
+        Route::get('/moderation/testimonials/pending', [\App\Http\Controllers\Api\V1\Admin\ModerationController::class, 'pendingTestimonials']);
+        Route::post('/moderation/testimonials/{testimonial}/approve', [\App\Http\Controllers\Api\V1\Admin\ModerationController::class, 'approveTestimonial']);
+        Route::post('/moderation/testimonials/{testimonial}/reject', [\App\Http\Controllers\Api\V1\Admin\ModerationController::class, 'rejectTestimonial']);
+        Route::post('/moderation/testimonials/{testimonial}/spam', [\App\Http\Controllers\Api\V1\Admin\ModerationController::class, 'spamTestimonial']);
+        Route::get('/moderation/contacts', [\App\Http\Controllers\Api\V1\Admin\ModerationController::class, 'contactSubmissions']);
+        Route::post('/moderation/contacts/{submission}/status', [\App\Http\Controllers\Api\V1\Admin\ModerationController::class, 'updateSubmissionStatus']);
+        Route::get('/moderation/statistics', [\App\Http\Controllers\Api\V1\Admin\ModerationController::class, 'statistics']);
     });
 
     // Admin translation routes accessible via /v1/admin/... already guarded
