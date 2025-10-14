@@ -444,7 +444,7 @@ php artisan package:discover --ansi
 
 Add a quick smoke-test after startup to confirm the API is reachable before starting the frontend. This reduces debugging cycles for new contributors.
 
-## 🔧 Phase 3 — Progress summary (work completed in this iteration)
+## 🔧 Phase 3 — Progress summary
 
 This summary highlights the main Phase 3 implementation and test work completed in the codebase during the recent development cycle. It focuses on backend features, tests, and integration work.
 
