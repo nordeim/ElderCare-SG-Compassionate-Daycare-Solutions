@@ -1,4 +1,4 @@
-AGENT.md v1.2 — ElderCare SG Web Platform
+# AGENT.md v1.2 — ElderCare SG Web Platform
 Version: 1.2
 Last Updated: 2025-01-[Current Date]
 Status: Phases 1-3 Complete | Alpha Development
@@ -6,15 +6,16 @@ Primary Source Documents: Project_Architecture_Document.md (PAD v2.1), Project_R
 
 Purpose: This guide is the single source of truth for any AI coding agent (and their human facilitators) to understand the ElderCare SG architecture, delivery standards, and operational guardrails before touching the codebase.
 
-⚠️ RESOLVED: Source Conflicts & Clarifications
+## ⚠️ RESOLVED: Source Conflicts & Clarifications
 The following conflicts from v1.0 have been resolved using README.md as the tiebreaker:
 
 Topic	Previous Conflict	RESOLUTION (v1.2)	Source
-Search Infrastructure	MeiliSearch vs Elasticsearch	✅ Elasticsearch 8 (current implementation)	README Tech Stack Table
-Container Orchestration	Kubernetes vs ECS Fargate	✅ Docker Compose (local) + ECS Fargate (staging/prod); Kubernetes is aspirational/roadmap	README Deployment + PAD Section 14
-Project Phase	"Foundation hardening" vs "Pre-Phase 3"	✅ Phases 1-3 COMPLETED; now in Alpha Development (feature implementation)	User confirmation + README
-Primary Database	MariaDB vs MySQL 8.0	✅ MySQL 8.0 (production); SQLite (testing/local dev fallback)	README + PAD
-Table of Contents
+- Search Infrastructure	MeiliSearch vs Elasticsearch	✅ Elasticsearch 8 (current implementation)	README Tech Stack Table
+- Container Orchestration	Kubernetes vs ECS Fargate	✅ Docker Compose (local) + ECS Fargate (staging/prod); Kubernetes is aspirational/roadmap	README Deployment + PAD Section 14
+- Project Phase	"Foundation hardening" vs "Pre-Phase 3"	✅ Phases 1-3 COMPLETED; now in Alpha Development (feature implementation)	User confirmation + README
+- Primary Database	MariaDB vs MySQL 8.0	✅ MySQL 8.0 (production); SQLite (testing/local dev fallback)	README + PAD
+
+## Table of Contents
 Executive Summary
 System Overview
 Frontend Blueprint
