@@ -37,16 +37,27 @@ class DataExportService
                 'city' => $user->profile->city,
                 'postal_code' => $user->profile->postal_code,
             ] : null,
-            'bookings' => $user->bookings->map(fn($booking) => [
+            'bookings' => $user->bookings->map(function($booking) {
+                $bookingTime = $booking->booking_time;
+                if ($bookingTime instanceof \DateTimeInterface) {
+                    $bookingTime = $bookingTime->format('H:i:s');
+                } elseif (is_string($bookingTime)) {
+                    $bookingTime = $bookingTime;
+                } else {
+                    $bookingTime = null;
+                }
+
+                return [
                 'booking_number' => $booking->booking_number,
                 'center_name' => $booking->center->name ?? null,
                 'service_name' => $booking->service?->name ?? null,
                 'booking_date' => $booking->booking_date?->toDateString(),
-                'booking_time' => $booking->booking_time?->toTimeString(),
+                'booking_time' => $bookingTime,
                 'status' => $booking->status,
                 'questionnaire_responses' => $booking->questionnaire_responses,
                 'created_at' => $booking->created_at?->toIso8601String(),
-            ]),
+                ];
+            }),
             'testimonials' => $user->testimonials->map(fn($t) => [
                 'center_name' => $t->center->name ?? null,
                 'title' => $t->title,
