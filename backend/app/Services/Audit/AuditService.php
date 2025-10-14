@@ -11,12 +11,6 @@ class AuditService
 {
     /**
      * Log an action in the audit trail.
-     *
-     * @param Model $model
-     * @param string $action
-     * @param array|null $oldValues
-     * @param array|null $newValues
-     * @return AuditLog
      */
     public function log(Model $model, string $action, ?array $oldValues = null, ?array $newValues = null): AuditLog
     {
@@ -35,9 +29,6 @@ class AuditService
 
     /**
      * Get the audit trail for a specific model.
-     *
-     * @param Model $model
-     * @return \Illuminate\Database\Eloquent\Collection
      */
     public function getAuditTrail(Model $model)
     {
@@ -46,9 +37,6 @@ class AuditService
 
     /**
      * Search the audit logs.
-     *
-     * @param array $filters
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function searchAuditLogs(array $filters = [])
     {
@@ -65,7 +53,7 @@ class AuditService
         if (isset($filters['auditable_type'])) {
             $query->where('auditable_type', $filters['auditable_type']);
         }
-        
+
         if (isset($filters['start_date'])) {
             $query->where('created_at', '>=', $filters['start_date']);
         }

@@ -2,70 +2,95 @@
 
 namespace App\Observers;
 
-use App\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class AuditObserver
 {
     public function created(Model $model): void
     {
-        $this->logAudit($model, 'created', null, $model->getAttributes());
+        $this->write('created', $model, null, $this->snapshot($model));
     }
 
     public function updated(Model $model): void
     {
-        $this->logAudit($model, 'updated', $model->getOriginal(), $model->getChanges());
+        $old = array_intersect_key($model->getOriginal(), $model->getChanges());
+        $new = array_intersect_key($model->getAttributes(), $model->getChanges());
+
+        $this->write('updated', $model, $this->filterForAudit($model, $old), $this->filterForAudit($model, $new));
     }
 
     public function deleted(Model $model): void
     {
-        $this->logAudit($model, 'deleted', $model->getAttributes(), null);
+        $this->write('deleted', $model, $this->snapshot($model), null);
     }
 
     public function restored(Model $model): void
     {
-        $this->logAudit($model, 'restored', null, $model->getAttributes());
+        $this->write('restored', $model, null, $this->snapshot($model));
     }
 
-    protected function logAudit(Model $model, string $action, ?array $oldValues, ?array $newValues): void
+    protected function snapshot(Model $model): array
     {
-        // Skip logging for the AuditLog model itself
-        if ($model instanceof AuditLog) {
+        if (method_exists($model, 'toAudit')) {
+            return $model->toAudit();
+        }
+
+        return $model->getAttributes();
+    }
+
+    protected function filterForAudit(Model $model, array $attributes): array
+    {
+        if (method_exists($model, 'scrubAuditAttributes')) {
+            return $model->scrubAuditAttributes($attributes);
+        }
+
+        if (method_exists($model, 'toAudit')) {
+            return $model->toAudit(array_keys($attributes));
+        }
+
+        return $attributes;
+    }
+
+    protected function write(string $action, Model $model, ?array $old = null, ?array $new = null): void
+    {
+        // Avoid recursion if model is AuditLog
+        if ($model instanceof \App\Models\AuditLog) {
             return;
         }
 
         try {
-            $request = request();
-            $user = auth()->user();
+            // DEBUG: trace attempts to write audit entries (test-time troubleshooting)
+            try {
+                @file_put_contents(storage_path('logs/audit_debug.log'), date('c') . " | attempt: {$action} {$model->getMorphClass()}#{$model->getKey()}\n", FILE_APPEND);
+            } catch (\Throwable $e) {
+                // ignore debug write failures
+            }
 
-            AuditLog::create([
-                'user_id' => $user?->id,
-                'auditable_type' => get_class($model),
+            $userId = Auth::check() ? Auth::id() : null;
+
+            $request = null;
+            try {
+                $request = request();
+            } catch (\Throwable $e) {
+                // no request context
+            }
+
+            \DB::table('audit_logs')->insert([
+                'user_id' => $userId,
+                'auditable_type' => $model->getMorphClass(),
                 'auditable_id' => $model->getKey(),
                 'action' => $action,
-                'old_values' => $oldValues ? $this->sanitize($oldValues) : null,
-                'new_values' => $newValues ? $this->sanitize($newValues) : null,
+                'old_values' => is_null($old) ? null : json_encode($old),
+                'new_values' => is_null($new) ? null : json_encode($new),
                 'ip_address' => $request?->ip(),
                 'user_agent' => $request?->userAgent(),
                 'url' => $request?->fullUrl(),
+                'created_at' => now(),
             ]);
         } catch (\Throwable $e) {
-            Log::warning('Audit log failed: ' . $e->getMessage());
+            Log::warning('AuditObserver failed to record audit log: ' . $e->getMessage(), ['model' => get_class($model), 'id' => $model->getKey()]);
         }
-    }
-
-    protected function sanitize(array $values): array
-    {
-        $sensitive = ['password', 'remember_token', 'api_token', 'auth_token'];
-
-        foreach ($sensitive as $key) {
-            if (array_key_exists($key, $values)) {
-                $values[$key] = '[REDACTED]';
-            }
-        }
-
-        return $values;
     }
 }
-        $sensitive = ['password', 'remember_token', 'api_token', 'auth_token'];
