@@ -285,6 +285,130 @@ DB_DATABASE=eldercare_prod
 DB_USERNAME=eldercare
 DB_PASSWORD=your_secure_password
 
+
+## 🧪 Testing (backend)
+
+This project uses PHPUnit for backend tests. The test suite includes unit and feature tests and is configured to run in the `backend` folder.
+
+Basic commands (run from the repository root):
+
+```powershell
+# Install backend dependencies
+cd backend; composer install
+
+# Run the entire backend test suite (recommended)
+./vendor/bin/phpunit --testdox
+
+# Run a single test class or filter by name
+./vendor/bin/phpunit --filter ClassNameOrTestMethod
+
+# Regenerate optimized autoload and discover packages
+composer dump-autoload -o
+php artisan package:discover --ansi
+```
+
+Notes:
+- Many tests use `RefreshDatabase` and run against an in-memory SQLite database by default for speed and isolation.
+- Integration tests that call external services (for example, Calendly) are gated behind environment variables and will be skipped automatically if the required API keys are not present. To enable them, export the required environment variables (see `CALENDLY_API_TOKEN` below).
+- CI pipelines should run `composer install` and `./vendor/bin/phpunit --testdox` from the `backend` directory. Consider running `composer dump-autoload -o` before tests in CI to match local test runs.
+
+Current local test run (recorded): PHPUnit ran 90 tests with 216 assertions. There were 59 PHPUnit deprecations reported; these should be reviewed and updated to eliminate future noise.
+
+Environment variables that affect tests and integrations:
+
+```text
+# Calendly (integration tests - optional)
+CALENDLY_API_TOKEN=
+CALENDLY_ORGANIZATION_URI=
+CALENDLY_WEBHOOK_SECRET=
+```
+
+## 🖥️ Run backend service (so the frontend can interface)
+
+You can run the backend either via Docker (recommended for parity with CI/production) or locally using PHP's built-in server.
+
+Using Docker (recommended):
+
+```powershell
+# Start all services defined in docker-compose (backend, db, redis, etc.)
+docker-compose up -d
+
+# Run database migrations inside the backend container
+docker-compose exec backend php artisan migrate --force
+
+# Tail backend logs if you want to watch output
+docker-compose logs -f backend
+```
+
+Running the backend locally (no Docker):
+
+```powershell
+cd backend
+composer install
+cp .env.example .env
+# generate app key
+php artisan key:generate
+
+# (Option A) Use SQLite file for local development
+New-Item -Path database -Name "database.sqlite" -ItemType File -Force
+set-itemproperty -path .env -name DB_CONNECTION -value sqlite
+set-itemproperty -path .env -name DB_DATABASE -value "./database/database.sqlite"
+php artisan migrate
+
+# Start local server
+php artisan serve --host=0.0.0.0 --port=8000
+
+# The API will be available at: http://localhost:8000
+```
+
+Tip: If your frontend development server runs on a different port (for example, `http://localhost:3000`), point it at `http://localhost:8000` (or the appropriate Docker host) for API requests. When using Docker, ensure the `backend` service exposes the port and that your frontend can reach the container host.
+
+## 🔧 Phase 3 — Progress summary (work completed in this iteration)
+
+This summary highlights the main Phase 3 implementation and test work completed in the codebase during the recent development cycle. It focuses on backend features, tests, and integration work.
+
+Key changes and additions
+- Calendly integration adapter (minimal, config-driven)
+   - `backend/app/Services/Integration/CalendlyService.php` — a safe adapter that uses `config('services.calendly')`, supports `isConfigured()`, `createEvent()`, `cancelEvent()`, `rescheduleEvent()` and webhook signature verification. Unit tests mock HTTP with `Http::fake()`; integration tests are gated by environment variables.
+   - `backend/app/Exceptions/CalendlyNotConfiguredException.php`
+   - `backend/tests/Unit/Services/CalendlyServiceTest.php` and a gated integration test.
+
+- Audit logging infrastructure
+   - Implemented an `Auditable` trait and an `AuditObserver` to record model changes to `audit_logs` for opt-in models (User, Center, Booking, Consent, Testimonial). Unit and integration tests validate audit records are created on create/update/delete.
+
+- API controllers and feature tests
+   - Added API controllers and request validations for authentication and bookings:
+      - `backend/app/Http/Controllers/Api/V1/Auth/RegisterController.php`
+      - `backend/app/Http/Controllers/Api/V1/BookingController.php` (store/index/show/destroy)
+      - `backend/app/Http/Controllers/Api/V1/CenterController.php` (index/show)
+   - Requests and resources:
+      - `backend/app/Http/Requests/Api/V1/RegisterRequest.php`
+      - `backend/app/Http/Requests/Api/V1/BookingRequest.php`
+      - `backend/app/Http/Resources/Api/V1/BookingResource.php`
+      - `backend/app/Http/Resources/Api/V1/CenterResource.php`
+   - Feature tests:
+      - `backend/tests/Feature/Auth/RegisterTest.php` — registration endpoint returns token and user
+      - `backend/tests/Feature/Booking/BookingHappyPathTest.php` — full booking happy-path including Calendly mock and job dispatch assertions
+
+- Bootstrapping / routing fix
+   - `backend/bootstrap/app.php` updated so `routes/api.php` is loaded by the framework builder — this fixed missing API routes during tests and local runs.
+
+Files changed (selected)
+- `backend/bootstrap/app.php` — ensure API routes are included during application boot
+- `backend/app/Http/Controllers/Api/V1/BookingController.php` — returns 201 and booking payload
+- `backend/app/Services/Integration/CalendlyService.php` and related tests
+- `backend/app/Exceptions/CalendlyNotConfiguredException.php`
+- Feature tests and unit tests for Booking, Calendly, AuditObserver, and other services
+
+Test status
+- Local run (recorded during this work): PHPUnit `backend` suite completed successfully: 90 tests, 216 assertions (with 59 deprecation notices). All tests passed.
+
+Next recommended steps
+- Address PHPUnit deprecations (59) to keep the test output clean and future-proof.
+- Add a CI job step to run `composer dump-autoload -o` before tests to ensure autoload parity.
+- Consider adding an automated route-list smoke test that verifies `/api/v1` endpoints are registered during boot to prevent the previous regression.
+
+If you'd like, I can open a PR with these README changes and the test run summary, or I can split the README edits into a dedicated `docs/` file and keep `README.md` minimal.
 # Cache
 CACHE_DRIVER=redis
 REDIS_HOST=redis
