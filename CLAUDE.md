@@ -145,10 +145,10 @@ flowchart TB
         CDN[Edge Cache & WAF]
     end
 
-    subgraph "Kubernetes Cluster — AWS ap-southeast-1"
-        NextPod[Next.js Pods]
-        LaravelPod[Laravel API Pods]
-        WorkerPod[Queue Worker Pods]
+    subgraph "AWS ECS Fargate — ap-southeast-1"
+        NextService[Next.js Service]
+        LaravelService[Laravel API Service]
+        WorkerService[Queue Worker Service]
     end
 
     subgraph "Data Layer"
@@ -174,27 +174,27 @@ flowchart TB
         ELK[ELK Stack]
     end
 
-    Browser --> CDN --> NextPod
+    Browser --> CDN --> NextService
     Crawler --> CDN
-    NextPod --> LaravelPod
-    LaravelPod --> MySQLPrimary
-    LaravelPod --> MySQLReplica
-    LaravelPod --> Redis
-    LaravelPod --> Elastic
-    LaravelPod --> S3
-    LaravelPod --> Calendly
-    LaravelPod --> Mailchimp
-    LaravelPod --> Twilio
-    NextPod --> Stream
-    WorkerPod --> Redis
-    WorkerPod --> Mailchimp
-    WorkerPod --> Twilio
-    LaravelPod --> Sentry
-    LaravelPod --> NewRelic
-    LaravelPod --> CloudWatch
-    NextPod --> NewRelic
+    NextService --> LaravelService
+    LaravelService --> MySQLPrimary
+    LaravelService --> MySQLReplica
+    LaravelService --> Redis
+    LaravelService --> Elastic
+    LaravelService --> S3
+    LaravelService --> Calendly
+    LaravelService --> Mailchimp
+    LaravelService --> Twilio
+    NextService --> Stream
+    WorkerService --> Redis
+    WorkerService --> Mailchimp
+    WorkerService --> Twilio
+    LaravelService --> Sentry
+    LaravelService --> NewRelic
+    LaravelService --> CloudWatch
+    NextService --> NewRelic
     UptimeRobot -.-> CDN
-    LaravelPod --> ELK
+    LaravelService --> ELK
 ```
 
 ### 2.6 Data Flow Patterns
@@ -331,7 +331,7 @@ frontend/
 | PHP | 8.2 | PHPStan level 8 static analysis |
 | Laravel Sanctum | Latest | API authentication (tokens + optional JWT for mobile) |
 | Laravel Nova | Latest | Admin CMS with RBAC (admin, moderator, translator roles) |
-| Laravel Horizon | Latest | Queue monitoring and management |
+| (Horizon not present) | — | — |
 
 ### 4.2 Directory Highlights (backend/app/)
 
@@ -349,9 +349,9 @@ backend/app/
 │   │   ├── BookingResource.php                 # JSON:API-inspired responses
 │   │   └── CenterResource.php
 │   └── Middleware/
-│       ├── LocaleMiddleware.php                # Locale negotiation
-│       ├── LogApiRequests.php                  # Audit trail
-│       └── CheckPdpaConsent.php                # Consent enforcement
+│       ├── CheckRole.php                       # RBAC guard (roles)
+│       ├── LogApiRequest.php                   # API request audit trail
+│       └── EnsureEmailIsVerified.php           # Email verification enforcement
 ├── Services/
 │   ├── AuthService.php                         # Registration, login, password reset
 │   ├── BookingService.php                      # Booking lifecycle (transactional)
@@ -375,8 +375,8 @@ backend/app/
 │   ├── BookingCancelled.php
 │   └── ConsentGiven.php
 ├── Jobs/
-│   ├── SendBookingConfirmationEmail.php
-│   ├── SendBookingConfirmationSMS.php
+│   ├── SendBookingConfirmationJob.php
+│   ├── SendBookingReminderJob.php
 │   ├── ProcessDataExport.php                   # PDPA right-to-access
 │   └── SyncAnalytics.php
 ├── Observers/
@@ -476,7 +476,7 @@ class BookingService
 ```
 
 ### 4.5 Queue & Background Jobs
-- **Driver**: Redis-backed, managed by Laravel Horizon
+- **Driver**: Redis-backed queues
 - **Worker Pools**: Sized per environment (local: 1 worker, staging: 2, production: 4+)
 - **Priority Queues**:
   - high: SMS confirmations, critical alerts
@@ -584,6 +584,7 @@ backend/database/migrations/
 ├── 2024_01_01_400001_create_testimonials_table.php
 ├── 2024_01_01_500000_create_media_table.php
 └── 2024_01_01_500001_create_content_translations_table.php
+└── 2025_10_14_000001_add_updated_at_to_audit_logs_table.php
 ```
 
 ### 5.3 Caching & Supporting Services
@@ -796,7 +797,7 @@ Stored in docs/runbooks/:
 - Powers PDPA right-to-access exports and compliance reports
 
 **API Request Logging**:
-- LogApiRequests middleware captures endpoint, method, IP, user, response time
+- LogApiRequest middleware captures endpoint, method, IP, user, response time
 - Stored in CloudWatch Logs; queryable via Athena
 
 ### 7.4 PDPA Compliance Features
