@@ -5,6 +5,7 @@ This document is generated from the Phase‑3 coding sub‑plan and a repository
 ## Quick summary
 - Files/areas implemented (models, migrations, two services): Core Eloquent models exist (User, Profile, Consent, AuditLog, Center, Service, Staff, Booking, Testimonial, FAQ, Subscription, ContactSubmission, Media, ContentTranslation). Migrations present (18) and four migrations were guarded for MySQL-specific SQL.
 - Services: `ConsentService` and `AuditService` implemented. Many other services (CenterService, BookingService, MediaService, TestimonialService, etc.) are missing.
+ - Services: `ConsentService`, `AuditService`, `BookingService`, `MediaService`, `TestimonialService`, and `DataExportService` are implemented or updated in this iteration. Several tests were added covering these services.
 - Controllers: API controllers under `app/Http/Controllers/Api/V1` are not present in the repository scan (missing).
 - Tests: Only example tests exist; the planned unit/feature tests are absent.
 - CI: No workflow changes yet to run sqlite migrations before tests.
@@ -26,6 +27,30 @@ This document is generated from the Phase‑3 coding sub‑plan and a repository
 | F.1 | `backend/tests/Unit/Models/UserTest.php` | Missing | Not found | Tests are placeholders only |
 
 > Full CSV-export of this matrix is available at `docs/phase3-progress-matrix.csv`.
+
+## Changes applied in this iteration (2025-10-14)
+- Implemented and tested `BookingService` and added `BookingServiceTest` (unit tests mock Calendly).
+- Implemented `MediaService` and `MediaServiceTest`. Adjusted path normalization and GD-free fake upload pattern.
+- Implemented `TestimonialService` and adjusted `TestimonialServiceTest` to match signatures and DB constraints.
+- Implemented `DataExportService` and `DataExportServiceTest`; updated `audit_logs` migration to include `updated_at` and adjusted `ContentTranslationFactory` to use valid default status.
+- Fixed multiple factories and model casts (Booking.booking_time cast to datetime with time format) so tests are DB-agnostic.
+- Added test-only `APP_KEY` to `backend/phpunit.xml` to avoid missing key errors in Feature tests.
+
+## Remaining high-value items
+- API controllers under `app/Http/Controllers/Api/V1` (Auth, Center, Booking controllers) need implementation.
+- `CenterService`, `FAQService`, `CalendlyService` integration implementation (tests currently mock CalendlyService).
+- Observer `AuditObserver` file not present — if automatic model auditing is desired, add observer wiring or document use of `AuditService`.
+- Feature tests for authentication flows and many controller-level integration tests remain to be implemented.
+- CI workflow change to run sqlite migrations before tests is still pending.
+
+## Recommended next steps
+1. Add `AuditObserver` and register it in `AppServiceProvider` to ensure automatic audit logging across models.
+2. Implement `CalendlyService` (or a minimal adapter) so staging integration tests can be performed; keep tests mocking the service for unit tests.
+3. Implement core API controllers (Auth, Center, Booking) and feature tests for registration/login/booking flows.
+4. Create a new migration (instead of editing historical migrations) to add `updated_at` to `audit_logs` if you prefer immutable migration history; otherwise document earlier migration edit in release notes.
+5. Update CI workflow to create a sqlite DB and run migrations prior to PHPUnit in CI.
+
+Generated: 2025-10-14 — updated after running and verifying full test suite in local environment.
 
 ## Notes for incoming agents
 - Do not re-apply migration guards already listed in `docs/ai-agent-onboarding.md` and the Phase‑3 progress update — they were applied to these migrations:
