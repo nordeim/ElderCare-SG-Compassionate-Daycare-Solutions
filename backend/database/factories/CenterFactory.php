@@ -24,7 +24,11 @@ class CenterFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(1, 9999),
+            // Slug should be derived from the final 'name' attribute (which may be overridden by caller)
+            'slug' => function (array $attributes) use ($name) {
+                $finalName = $attributes['name'] ?? $name;
+                return Str::slug($finalName) . '-' . fake()->unique()->numberBetween(1, 9999);
+            },
             'short_description' => fake()->sentence(12),
             'description' => fake()->paragraphs(3, true),
             
@@ -77,10 +81,12 @@ class CenterFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (Center $center) {
-            // Set realistic occupancy
-            $center->update([
-                'current_occupancy' => fake()->numberBetween(0, $center->capacity),
-            ]);
+            // Only set a randomized current_occupancy if it wasn't explicitly provided
+            if ($center->current_occupancy === 0) {
+                $center->update([
+                    'current_occupancy' => fake()->numberBetween(0, $center->capacity),
+                ]);
+            }
         });
     }
 

@@ -24,7 +24,8 @@ class ContentTranslationFactory extends Factory
             'locale' => fake()->randomElement(['en', 'zh', 'ms', 'ta']),
             'field' => fake()->randomElement($fields),
             'value' => fake()->paragraphs(1, true),
-            'translation_status' => 'pending',
+            // Must match migration enum: draft, translated, reviewed, published
+            'translation_status' => 'draft',
             'translated_by' => null,
             'reviewed_by' => null,
         ];

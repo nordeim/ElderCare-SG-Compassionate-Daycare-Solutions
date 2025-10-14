@@ -43,8 +43,9 @@ class Booking extends Model
      */
     protected $casts = [
         'booking_date' => 'date',
-        // booking_time is stored as a SQL TIME column; treat as string in model
-        'booking_time' => 'string',
+    // booking_time is stored as a SQL TIME column; cast to datetime (time only)
+    // so Eloquent returns a Carbon instance for tests expecting date/time objects.
+    'booking_time' => 'datetime:H:i:s',
         'questionnaire_responses' => 'array',
         'sms_sent' => 'boolean',
         'confirmation_sent_at' => 'datetime',

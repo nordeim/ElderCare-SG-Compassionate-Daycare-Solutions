@@ -109,8 +109,10 @@ class BookingServiceTest extends TestCase
         // Create the first booking via the service
         $created = $this->service->create($user->id, $data);
 
-        // Normalize booking_time to the stored format (Booking model returns string)
-        $data['booking_time'] = $created->booking_time;
+        // Normalize booking_time to the stored format (Booking model may return DateTime)
+        $data['booking_time'] = $created->booking_time instanceof \DateTimeInterface
+            ? $created->booking_time->toTimeString()
+            : $created->booking_time;
 
         // Replicate BookingService's existing booking lookup to ensure precondition
         $found = Booking::where('user_id', $user->id)
