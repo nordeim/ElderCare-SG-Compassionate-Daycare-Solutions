@@ -321,6 +321,14 @@ Environment variables that affect tests and integrations:
 CALENDLY_API_TOKEN=
 CALENDLY_ORGANIZATION_URI=
 CALENDLY_WEBHOOK_SECRET=
+
+# Cache
+CACHE_DRIVER=redis
+REDIS_HOST=redis
+
+# External Services
+CALENDLY_API_KEY=your_calendly_api_key
+MAILCHIMP_API_KEY=your_mailchimp_api_key
 ```
 
 ## 🖥️ Run backend service (so the frontend can interface)
@@ -475,21 +483,6 @@ Files changed (selected)
 
 Test status
 - Local run (recorded during this work): PHPUnit `backend` suite completed successfully: 90 tests, 216 assertions (with 59 deprecation notices). All tests passed.
-
-Next recommended steps
-- Address PHPUnit deprecations (59) to keep the test output clean and future-proof.
-- Add a CI job step to run `composer dump-autoload -o` before tests to ensure autoload parity.
-- Consider adding an automated route-list smoke test that verifies `/api/v1` endpoints are registered during boot to prevent the previous regression.
-
-If you'd like, I can open a PR with these README changes and the test run summary, or I can split the README edits into a dedicated `docs/` file and keep `README.md` minimal.
-# Cache
-CACHE_DRIVER=redis
-REDIS_HOST=redis
-
-# External Services
-CALENDLY_API_KEY=your_calendly_api_key
-MAILCHIMP_API_KEY=your_mailchimp_api_key
-```
 
 ### Monitoring
 
