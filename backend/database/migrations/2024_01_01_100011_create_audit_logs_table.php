@@ -24,12 +24,15 @@ return new class extends Migration
             $table->text('user_agent')->nullable();
             $table->string('url', 500)->nullable();
             $table->timestamp('created_at')->useCurrent();
+            // Optional updated_at for audit log records (not always modified)
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate()->useCurrent();
             
             // Indexes
             $table->index('user_id');
             $table->index(['auditable_type', 'auditable_id']);
             $table->index('action');
             $table->index('created_at');
+            $table->index('updated_at');
         });
     }
 

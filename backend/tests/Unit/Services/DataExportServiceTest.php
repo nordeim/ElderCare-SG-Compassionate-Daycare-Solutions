@@ -33,7 +33,9 @@ class DataExportServiceTest extends TestCase
             \App\Models\Consent::factory()->for($user)->create();
         }
 
-        // Skip audit log creation here to avoid migration timestamp column mismatch in test DB
+        if (class_exists(\App\Models\AuditLog::class)) {
+            \App\Models\AuditLog::factory()->for($user)->create();
+        }
 
         $result = $this->service->exportUserData($user->id);
 
