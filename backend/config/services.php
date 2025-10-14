@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'calendly' => [
+        'api_token' => env('CALENDLY_API_TOKEN'),
+        'organization_uri' => env('CALENDLY_ORGANIZATION_URI'),
+        'webhook_secret' => env('CALENDLY_WEBHOOK_SECRET'),
+    ],
+
 ];
