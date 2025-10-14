@@ -180,6 +180,18 @@ class MediaService
     protected function getPathFromUrl(string $url): ?string
     {
         $parsed = parse_url($url);
-        return $parsed['path'] ?? null;
+        if (empty($parsed['path'])) {
+            return null;
+        }
+
+        // Normalize path to match storage keys used by Storage::disk()->put/delete
+        $path = ltrim($parsed['path'], '/');
+
+        // Some storage drivers (local) prefix URLs with 'storage/', strip that
+        if (str_starts_with($path, 'storage/')) {
+            $path = substr($path, strlen('storage/'));
+        }
+
+        return $path;
     }
 }

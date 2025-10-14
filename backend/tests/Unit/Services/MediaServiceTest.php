@@ -32,7 +32,8 @@ class MediaServiceTest extends TestCase
 
         $center = Center::factory()->create();
 
-        $file = UploadedFile::fake()->image('photo.jpg', 100, 100)->size(150);
+    // Use a fake uploaded file without requiring GD extension (create raw file)
+    $file = UploadedFile::fake()->create('photo.jpg', 150, 'image/jpeg');
 
         $media = $this->service->upload($file, Center::class, $center->id, 'image', [
             'caption' => 'A caption',
@@ -43,8 +44,12 @@ class MediaServiceTest extends TestCase
         $this->assertEquals('A caption', $media->caption);
         $this->assertEquals('Alt text', $media->alt_text);
 
-        // File put to storage
-        Storage::disk('s3')->assertExists(parse_url($media->url, PHP_URL_PATH));
+    // File put to storage — normalize path
+        $path = ltrim(parse_url($media->url, PHP_URL_PATH), '/');
+        if (str_starts_with($path, 'storage/')) {
+            $path = substr($path, strlen('storage/'));
+        }
+        Storage::disk('s3')->assertExists($path);
 
         // Job dispatched
         Queue::assertPushed(OptimizeImageJob::class, function ($job) use ($media) {
@@ -58,9 +63,9 @@ class MediaServiceTest extends TestCase
 
         $center = Center::factory()->create();
 
-        // Simulate an uploaded file
-        $path = 'center/' . $center->id . '/image/photo.jpg';
-        Storage::disk('s3')->put($path, 'contents');
+    // Simulate an uploaded file
+    $path = 'center/' . $center->id . '/image/photo.jpg';
+    Storage::disk('s3')->put($path, 'contents');
 
         $media = Media::factory()->create([
             'mediable_type' => Center::class,
@@ -73,7 +78,8 @@ class MediaServiceTest extends TestCase
 
         $this->assertTrue($result);
         $this->assertDatabaseMissing('media', ['id' => $media->id]);
-        Storage::disk('s3')->assertMissing($path);
+    // Assert the normalized path is missing
+    Storage::disk('s3')->assertMissing($path);
     }
 
     public function test_reorder_updates_display_order()

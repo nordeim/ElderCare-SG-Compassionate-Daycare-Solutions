@@ -34,26 +34,39 @@ class TestimonialServiceTest extends TestCase
             'comment' => 'Great service',
         ];
 
-        $t1 = $this->service->submit($payload);
+        $t1 = $this->service->submit($user->id, $center->id, [
+            'title' => 'Feedback',
+            'content' => $payload['comment'],
+            'rating' => $payload['rating'],
+        ]);
         $this->assertInstanceOf(Testimonial::class, $t1);
 
         // Attempt duplicate
-        $t2 = $this->service->submit($payload);
+        try {
+            $t2 = $this->service->submit($user->id, $center->id, [
+                'title' => 'Another',
+                'content' => $payload['comment'],
+                'rating' => $payload['rating'],
+            ]);
+        } catch (\RuntimeException $e) {
+            $t2 = null;
+        }
         $this->assertNull($t2, 'Duplicate testimonial should be prevented');
     }
 
     /** @test */
     public function it_can_approve_and_reject_testimonials()
     {
-        $testimonial = Testimonial::factory()->create(['status' => 'pending']);
+    // Use separate testimonials for approve and reject to keep each in 'pending' state
+    $toApprove = Testimonial::factory()->create(['status' => 'pending']);
+    $approved = $this->service->approve($toApprove->id, 1);
+    $this->assertInstanceOf(\App\Models\Testimonial::class, $approved);
+    $this->assertDatabaseHas('testimonials', ['id' => $toApprove->id, 'status' => 'approved']);
 
-        $approved = $this->service->approve($testimonial->id);
-        $this->assertTrue($approved);
-        $this->assertDatabaseHas('testimonials', ['id' => $testimonial->id, 'status' => 'approved']);
-
-        $rejected = $this->service->reject($testimonial->id, 'Inappropriate');
-        $this->assertTrue($rejected);
-        $this->assertDatabaseHas('testimonials', ['id' => $testimonial->id, 'status' => 'rejected']);
+    $toReject = Testimonial::factory()->create(['status' => 'pending']);
+    $rejected = $this->service->reject($toReject->id, 1, 'Inappropriate');
+    $this->assertInstanceOf(\App\Models\Testimonial::class, $rejected);
+    $this->assertDatabaseHas('testimonials', ['id' => $toReject->id, 'status' => 'rejected']);
     }
 
     /** @test */
