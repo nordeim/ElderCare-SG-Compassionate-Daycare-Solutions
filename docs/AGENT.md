@@ -101,8 +101,7 @@ Accessibility-First: WCAG 2.1 AA baked into every layer (design tokens, componen
 Security-by-Design: TLS 1.3, HSTS, CSP, RBAC, MFA, encrypted secrets, audit trails
 Automated Governance: CI/CD gates (lint, tests, accessibility, performance), dependency scanning
 2.5 Logical Components
-mermaid
-
+```mermaid
 flowchart LR
     User((Users)) -->|HTTPS| Cloudflare[Cloudflare CDN + WAF]
     Cloudflare --> NextJS[Next.js 14 Frontend]
@@ -122,6 +121,7 @@ flowchart LR
     
     Cloudflare -.-> Observability[(Sentry/New Relic/CloudWatch/UptimeRobot)]
     NextJS -.-> Analytics[(GA4 + Hotjar via AnalyticsProvider)]
+```
 Key Actions for Agents
 
 Confirm environment context before running commands (.env, frontend/.env.local, .env.staging, .env.production.template).
@@ -139,8 +139,7 @@ Framer Motion	10	Animations with prefers-reduced-motion support
 React Query	4	Server state management (5-min stale time, background revalidation)
 Zustand	4	Global client state (auth, locale, UI toggles, feature flags)
 3.2 Directory Structure (frontend/)
-text
-
+```text
 frontend/
 ├── app/
 │   ├── [locale]/              # Dynamic locale segment (en|zh|ms|ta)
@@ -169,6 +168,7 @@ frontend/
 ├── tests/                     # Jest, Testing Library, Playwright E2E
 ├── types/                     # Shared TypeScript definitions
 └── middleware.ts              # Locale negotiation, auth guards
+```
 3.3 Rendering Strategy
 Default: React Server Components (RSC) for SEO-critical, data-heavy pages
 Client Components: Only where interactivity demands (forms, modals, animations)
@@ -205,8 +205,7 @@ Laravel Sanctum	Latest	API authentication (tokens + optional JWT for mobile)
 Laravel Nova	Latest	Admin CMS with RBAC (admin, moderator, translator roles)
 Laravel Horizon	Latest	Queue monitoring and management
 4.2 Directory Highlights (backend/app/)
-text
-
+```text
 backend/app/
 ├── Http/
 │   ├── Controllers/Api/V1/
@@ -220,9 +219,9 @@ backend/app/
 │   │   ├── BookingResource.php                 # JSON:API-inspired responses
 │   │   └── CenterResource.php
 │   └── Middleware/
-│       ├── LocaleMiddleware.php                # Locale negotiation
-│       ├── LogApiRequests.php                  # Audit trail
-│       └── CheckPdpaConsent.php                # Consent enforcement
+│       ├── CheckRole.php                       # RBAC guard (roles)
+│       ├── LogApiRequest.php                   # API request audit trail
+│       └── EnsureEmailIsVerified.php           # Email verification enforcement
 ├── Services/
 │   ├── AuthService.php                         # Registration, login, password reset
 │   ├── BookingService.php                      # Booking lifecycle (transactional)
@@ -246,8 +245,8 @@ backend/app/
 │   ├── BookingCancelled.php
 │   └── ConsentGiven.php
 ├── Jobs/
-│   ├── SendBookingConfirmationEmail.php
-│   ├── SendBookingConfirmationSMS.php
+│   ├── SendBookingConfirmationJob.php
+│   ├── SendBookingReminderJob.php
 │   ├── ProcessDataExport.php                   # PDPA right-to-access
 │   └── SyncAnalytics.php
 ├── Observers/
@@ -259,6 +258,7 @@ backend/app/
 │   └── Handler.php                             # JSON for API, masks sensitive errors, routes to Sentry
 └── Traits/
     └── Auditable.php                           # ✅ Phase 3 complete (opt-in audit logging for models)
+```
 4.3 Service-Layer Architecture
 Strict separation of concerns:
 
@@ -276,14 +276,14 @@ Pagination: ?page=1&per_page=20 with meta and links blocks
 Filtering & Sorting: filter[city]=Singapore, sort=-created_at
 Rate Limits: 60 req/min per IP (public), 1000 req/hour per authenticated user, configurable throttles for partner integrations
 Error Schema (standardized):
-JSON
-
+```json
 {
   "message": "Validation failed",
   "errors": {
     "email": ["The email field is required."]
   }
 }
+```
 4.5 Queue & Background Jobs
 Driver: Redis-backed, managed by Laravel Horizon
 Worker Pools: Sized per environment (local: 1 worker, staging: 2, production: 4+)
@@ -337,8 +337,7 @@ calendly_event_id, mailchimp_subscriber_id, twilio_message_sid for external serv
 5.2 Existing Migration Scripts
 ⚠️ CRITICAL FOR AGENTS: Review and use existing migrations. Only create new migrations if features are not already included. Consult database_schema.sql as source of truth.
 
-text
-
+```text
 backend/database/migrations/
 ├── 2024_01_01_000001_create_users_table.php
 ├── 2024_01_01_000002_create_password_reset_tokens_table.php
@@ -358,6 +357,7 @@ backend/database/migrations/
 ├── 2024_01_01_400001_create_testimonials_table.php
 ├── 2024_01_01_500000_create_media_table.php
 └── 2024_01_01_500001_create_content_translations_table.php
+```
 5.3 Caching & Supporting Services
 Service	Version	Purpose	Configuration
 Redis	7 (ElastiCache Cluster in production)	Sessions, application cache, queue driver, rate limiting	5-min TTL for API responses, tag-based invalidation
@@ -696,8 +696,7 @@ Test Pyramid: Many unit tests, fewer integration tests, critical E2E tests only
 Accessibility as QA Gate: Lighthouse + axe-core scores must pass CI before merge
 10.2 Backend Testing (PHP/Laravel)
 Test Execution
-PowerShell
-
+```powershell
 # From repository root
 cd backend
 
@@ -716,6 +715,7 @@ composer install
 # Optimize autoload before testing (matches CI)
 composer dump-autoload -o
 php artisan package:discover --ansi
+```
 Current Status (as of Phase 3 completion)
 Tests: 90 tests
 Assertions: 216
@@ -732,12 +732,12 @@ Override: Set DB_CONNECTION=mysql in .env.testing for MySQL-specific tests
 Gated Integration Tests
 External API integration tests are skipped automatically if environment variables are missing:
 
-Bash
-
+```bash
 # Required for Calendly integration tests
 CALENDLY_API_TOKEN=your_token
 CALENDLY_ORGANIZATION_URI=https://api.calendly.com/organizations/YOUR_ORG
 CALENDLY_WEBHOOK_SECRET=your_webhook_secret
+```
 CI Behavior: Integration tests run only in staging/production pipelines with secrets configured.
 
 Phase 3 Test Highlights
@@ -747,8 +747,7 @@ Phase 3 Test Highlights
 ✅ AuditObserverTest: Validates audit log creation on model changes
 10.3 Frontend Testing (Next.js/React)
 Test Execution
-PowerShell
-
+```powershell
 # From repository root
 cd frontend
 
@@ -769,6 +768,7 @@ npm run test:e2e
 
 # Run Lighthouse CI (accessibility + performance)
 npm run lighthouse
+```
 Test Structure
 Test Type	Location	Purpose	Tools
 Unit Tests	frontend/tests/unit/	Component logic, hooks, utilities	Jest
