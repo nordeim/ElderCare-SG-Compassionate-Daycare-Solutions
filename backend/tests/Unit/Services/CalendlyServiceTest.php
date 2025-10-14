@@ -54,4 +54,21 @@ class CalendlyServiceTest extends \Tests\TestCase
         $this->assertEquals('evt_123', $resp['event_id']);
         $this->assertArrayHasKey('raw', $resp);
     }
+
+    public function test_cancel_event_returns_true_on_success()
+    {
+        config(['services.calendly.api_token' => 'abc']);
+
+        Http::fake([
+            'https://api.calendly.com/scheduled_events/evt_123/cancellations' => Http::response([], 200),
+            'https://api.calendly.com/scheduled_events/evt_123/reschedule' => Http::response([], 200),
+            'https://api.calendly.com/scheduled_events/evt_123' => Http::response(['data' => ['id' => 'evt_123']], 200),
+        ]);
+
+        $svc = new CalendlyService();
+
+        $this->assertTrue($svc->cancelEvent('evt_123'));
+        $this->assertNotNull($svc->getEvent('evt_123'));
+        $this->assertNotNull($svc->rescheduleEvent('evt_123', now()->toIso8601String()));
+    }
 }

@@ -85,7 +85,7 @@ class CalendlyService
         return true;
     }
 
-    public function rescheduleEvent(string $eventUriOrId, $newDateTime): array|null
+    public function rescheduleEvent(string $eventUriOrId, $newDateTime): ?bool
     {
         if (!$this->isConfigured()) {
             throw new CalendlyNotConfiguredException();
@@ -104,10 +104,10 @@ class CalendlyService
 
         if ($response->failed()) {
             $this->logHttpError('rescheduleEvent', $response);
-            return null;
+            return false;
         }
 
-        return $response->json();
+        return true;
     }
 
     public function getEvent(string $eventUriOrId): array|null
