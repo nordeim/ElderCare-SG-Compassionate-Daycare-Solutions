@@ -363,6 +363,79 @@ php artisan serve --host=0.0.0.0 --port=8000
 
 Tip: If your frontend development server runs on a different port (for example, `http://localhost:3000`), point it at `http://localhost:8000` (or the appropriate Docker host) for API requests. When using Docker, ensure the `backend` service exposes the port and that your frontend can reach the container host.
 
+### Troubleshooting & Windows-specific notes
+
+The following checks and commands document common issues encountered when starting the backend locally (useful for anyone cloning this repo). These are written for PowerShell on Windows — adapt them for other shells as needed.
+
+- Ensure you run Composer from the `backend` directory so `vendor/autoload.php` exists:
+
+```powershell
+cd H:\project\web-platform\backend
+composer install
+```
+
+- If `php artisan` fails with "Failed opening required 'vendor/autoload.php'", running `composer install` in `backend` will regenerate `vendor/` and fix the error.
+
+- DB connection: `.env` must use a configured connection name (for example `mysql` or `sqlite`) — not a hostname. If you see "Database connection [localhost] not configured.", open `backend/.env` and set `DB_CONNECTION` to a supported driver (for local dev we recommend `sqlite` or `mysql`).
+
+Quick SQLite fallback (no DB server required):
+
+```powershell
+cd H:\project\web-platform\backend
+# create sqlite file
+New-Item -Path .\database -Name database.sqlite -ItemType File -Force
+
+# update .env to use sqlite (simple and safe for local dev)
+(Get-Content .\.env) -replace 'DB_CONNECTION=.*', 'DB_CONNECTION=sqlite' | Set-Content .\.env
+(Get-Content .\.env) -replace 'DB_DATABASE=.*', 'DB_DATABASE=./database/database.sqlite' | Set-Content .\.env
+
+# run migrations + seed
+php artisan migrate:fresh --seed
+```
+
+- If you prefer MySQL, ensure `DB_CONNECTION=mysql` and `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` are correct and that the database server is running (docker or local install). Example `.env` keys:
+
+```text
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=eldercare_local
+DB_USERNAME=root
+DB_PASSWORD=Admin1234
+```
+
+- On Windows, binding to `0.0.0.0` can fail in some setups. Use `127.0.0.1` when running the dev server locally:
+
+```powershell
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+- If `php artisan serve` fails with a port bind error, check if the port is in use:
+
+```powershell
+netstat -aon | findstr ":8000"
+# if a PID is returned, find the process and stop it
+tasklist /FI "PID eq <pid>"
+taskkill /PID <pid> /F
+```
+
+- Smoke test the running server (PowerShell):
+
+```powershell
+Invoke-WebRequest -Uri http://127.0.0.1:8000 -UseBasicParsing
+# or use curl if available
+curl http://127.0.0.1:8000
+```
+
+- If you still see autoload or missing-class errors after `composer install`, clear and regenerate autoload and run package discovery:
+
+```powershell
+composer dump-autoload -o
+php artisan package:discover --ansi
+```
+
+Add a quick smoke-test after startup to confirm the API is reachable before starting the frontend. This reduces debugging cycles for new contributors.
+
 ## 🔧 Phase 3 — Progress summary (work completed in this iteration)
 
 This summary highlights the main Phase 3 implementation and test work completed in the codebase during the recent development cycle. It focuses on backend features, tests, and integration work.
