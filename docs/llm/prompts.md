@@ -12,6 +12,10 @@ Now, please meticulously review @CLAUDE.md and validate its alignment with the c
 
 ---
 
+awesome job! please meticulously plan how best to implement the real MailchimpService, then create the execution plan with integrated checklist, review and validate the plan before proceeding to execute cautiously.
+
+---
+
 awesome understanding! remember to always meticulously think, explore and then plan before executing. and always remember to stage (save) your detailed execution plan under the `docs/` sub-directory in the project's codebase root directory for future reference and alignment.
 
 ---

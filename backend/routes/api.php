@@ -26,6 +26,8 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/password-reset/reset', [\App\Http\Controllers\Api\V1\Auth\PasswordResetController::class, 'reset']);
     Route::post('/contact', [\App\Http\Controllers\Api\V1\ContactController::class, 'store']);
     Route::post('/subscribe', [\App\Http\Controllers\Api\V1\SubscriptionController::class, 'store']);
+    // Mailchimp webhook (public endpoint; protected by token)
+    Route::post('/webhooks/mailchimp', [\App\Http\Controllers\Api\V1\Webhooks\MailchimpWebhookController::class, 'handle']);
     Route::get('/centers', [\App\Http\Controllers\Api\V1\CenterController::class, 'index']);
     Route::get('/centers/{slug}', [\App\Http\Controllers\Api\V1\CenterController::class, 'show']);
     Route::get('/faqs', [\App\Http\Controllers\Api\V1\FAQController::class, 'index']);
