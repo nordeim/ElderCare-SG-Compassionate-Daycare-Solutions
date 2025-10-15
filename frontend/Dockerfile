@@ -1,7 +1,7 @@
 # Multi-stage build for Next.js 14 application
 
 # Stage 1: Install dependencies
-FROM node:18-alpine AS deps
+FROM node:24-trixie AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY package*.json ./
 RUN npm ci --only=production && npm cache clean --force
 
 # Stage 2: Build the application
-FROM node:18-alpine AS builder
+FROM node:24-trixie AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -23,7 +23,7 @@ ENV NODE_ENV production
 RUN npm run build
 
 # Stage 3: Development image
-FROM node:18-alpine AS development
+FROM node:24-trixie AS development
 WORKDIR /app
 
 COPY package*.json ./
@@ -36,7 +36,7 @@ EXPOSE 3000
 CMD ["npm", "run", "dev"]
 
 # Stage 4: Production image
-FROM node:18-alpine AS runner
+FROM node:24-trixie AS runner
 WORKDIR /app
 
 ENV NODE_ENV production

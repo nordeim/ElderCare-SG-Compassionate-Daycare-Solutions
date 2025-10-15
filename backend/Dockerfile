@@ -1,7 +1,7 @@
 # Multi-stage build for Laravel 12 application
 
 # Stage 1: Base image with PHP extensions
-FROM php:8.2-fpm-alpine AS base
+FROM php:8.2-fpm AS base
 
 # Install system dependencies
 RUN apk add --no-cache \
@@ -33,7 +33,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     imagick
 
 # Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/local/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
