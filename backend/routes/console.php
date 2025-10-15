@@ -17,32 +17,19 @@ Artisan::command('inspire', function () {
 Artisan::command('health', function () {
     $this->comment('Running application health checks...');
 
-    $ok = true;
+    $service = app(\App\Services\Health\HealthService::class);
+    $result = $service->check(['detailed' => false]);
 
-    // 1) Database connectivity (simple query)
-    try {
-        $start = microtime(true);
-        \DB::connection()->getPdo();
-        $this->info('Database: OK');
-    } catch (\Throwable $e) {
-        $this->error('Database: FAILED - ' . $e->getMessage());
-        $ok = false;
-    }
-
-    // 2) Cache/Redis connectivity (if configured)
-    try {
-        if (config('cache.default') === 'redis' || config('database.redis.client')) {
-            \Cache::store(config('cache.default'))->put('health_check', 'ok', 5);
-            $this->info('Cache/Redis: OK');
+    // Print a small summary
+    foreach ($result['checks'] as $key => $check) {
+        if (! empty($check['ok'])) {
+            $this->info(ucfirst($key) . ': OK');
         } else {
-            $this->info('Cache: not redis (skipped)');
+            $this->error(ucfirst($key) . ': FAILED');
         }
-    } catch (\Throwable $e) {
-        $this->error('Cache/Redis: FAILED - ' . $e->getMessage());
-        $ok = false;
     }
 
-    if ($ok) {
+    if ($result['ok']) {
         $this->info('Health checks passed');
         return 0;
     }
