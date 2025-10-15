@@ -21,6 +21,7 @@
     "test": "npm run test:frontend && npm run test:backend",
     "test:frontend": "cd frontend && npm test",
     "test:backend": "cd backend && php artisan test",
+    "test:backend2": "cd backend && ./vendor/bin/phpunit --testdox",
     "lint": "npm run lint:frontend && npm run lint:backend",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:backend": "cd backend && ./vendor/bin/pint --test",
