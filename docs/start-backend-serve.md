@@ -199,3 +199,41 @@ php artisan serve --host=0.0.0.0 --port=8000
 ## File location
 
 Saved as `docs/start-backend-serve.md` in this repository.
+
+---
+
+## Kubernetes readiness & liveness probes
+
+Below are minimal example snippets you can drop into a Pod/Deployment spec to probe the application using the `/health` endpoint.
+
+Readiness probe (checks whether the app is ready to receive traffic):
+
+```yaml
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 2
+  failureThreshold: 3
+```
+
+Liveness probe (checks application liveliness — consider using a cheaper `/live` endpoint if you add one):
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 2
+  failureThreshold: 3
+```
+
+Notes:
+
+- Readiness should be used by the load balancer to decide when to send traffic. It is okay for readiness to include DB+cache checks.
+- Liveness should be cheap — if your `/health` includes external network calls (Mailchimp, third-party), prefer adding a `/live` endpoint that only checks in-process state for liveness.
+- Tune probe timings to your environment; the examples above are conservative defaults for most dev/staging setups.

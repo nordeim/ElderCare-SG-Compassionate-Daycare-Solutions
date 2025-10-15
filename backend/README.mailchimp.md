@@ -57,3 +57,24 @@ cd backend
 
 - Unit tests mock the Mailchimp SDK; the real SDK is only invoked when `MAILCHIMP_ENABLED` is true and valid credentials exist.
 - For troubleshooting, check application logs (Sentry/NewRelic) and queue worker logs.
+
+## Mailchimp health command
+
+Use the artisan command to verify Mailchimp connectivity and credentials. This command is gated and intended for staging/ops use only.
+
+```bash
+# From backend folder
+php artisan mailchimp:health
+# Or check a specific list id
+php artisan mailchimp:health --list=YOUR_LIST_ID
+```
+
+Exit codes:
+
+- 0 = success (Mailchimp reachable and list found)
+- 2 = MAILCHIMP_ENABLED=false (integration disabled)
+- 3 = missing environment variables (API key/server/list)
+- 4 = Mailchimp SDK missing or factory returned noop
+- 5 = API/network error or list not found
+
+Note: Do not run this in CI unless you intentionally inject real Mailchimp secrets for a gated integration step.
