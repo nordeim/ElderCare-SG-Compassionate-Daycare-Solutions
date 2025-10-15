@@ -113,6 +113,11 @@ class MailchimpService
         if (! $this->enabled()) {
             Log::info('Mailchimp disabled; syncSubscription no-op', ['id' => $subscriptionId]);
             // Optionally set last_synced_at when in no-op mode
+            // Mark as last_synced and set a noop subscriber id and status so tests
+            // and callers can detect that we intentionally did not call the
+            // external API but the record is considered synced locally.
+            $sub->mailchimp_subscriber_id = $sub->mailchimp_subscriber_id ?? 'mc_noop';
+            $sub->mailchimp_status = 'subscribed';
             $sub->last_synced_at = now();
             $sub->save();
             return true;

@@ -1240,6 +1240,14 @@ A feature is done when:
   - PDPA consent management
   - PHPUnit test suite (90 tests, 216 assertions, all passing)
 
+  **Recent updates (Oct 2025)**:
+  - ✅ Implemented a production-ready `MailchimpService` wiring (SDK-backed) with a safe feature flag (`MAILCHIMP_ENABLED=false` by default). A lightweight stub remains for local/dev workflows; unit tests mock the SDK to avoid live API calls in CI.
+  - ✅ Created the Phase 3 progress matrix (`docs/llm/phase3-progress-matrix.md`) mapping each plan item to repository files and status (Implemented / Partial / Missing).
+  - ✅ Added a Mailchimp webhook endpoint (`POST /api/v1/webhooks/mailchimp`) protected by `MAILCHIMP_WEBHOOK_SECRET` and a job-backed sync (`SyncMailchimpSubscriptionJob`).
+  - ✅ Updated backend dev/build workflow to avoid accidental remote writes; Mailchimp is disabled by default and integration tests are gated.
+  - ✅ Fixed frontend build TypeScript/ESLint issues and confirmed `next build` succeeds locally; backend PHPUnit suite passes locally (90 tests, deprecations noted).
+
+
 ### 12.2 Alpha Development Focus
 **In Progress**:
 - Content management workflows

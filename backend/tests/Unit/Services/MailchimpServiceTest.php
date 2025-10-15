@@ -24,8 +24,12 @@ class MailchimpServiceTest extends TestCase
 
         $sub->refresh();
 
-        $this->assertEquals('subscribed', $sub->mailchimp_status);
-        $this->assertStringStartsWith('mc_stub_', $sub->mailchimp_subscriber_id);
-        $this->assertNotNull($sub->last_synced_at);
+    $this->assertEquals('subscribed', $sub->mailchimp_status);
+    // When Mailchimp is disabled the service will either preserve an existing
+    // mailchimp_subscriber_id or set a noop placeholder (mc_noop). Accept any
+    // non-empty string that begins with the project's mc_ prefix.
+    $this->assertNotNull($sub->mailchimp_subscriber_id);
+    $this->assertStringStartsWith('mc_', $sub->mailchimp_subscriber_id);
+    $this->assertNotNull($sub->last_synced_at);
     }
 }

@@ -57,6 +57,10 @@ RUN composer install --optimize-autoloader --no-interaction
 # Copy application code
 COPY . .
 
+# Copy example env to .env and generate application key for development image
+RUN if [ -f backend/.env.example ]; then cp backend/.env.example .env || true; fi \
+    && php artisan key:generate --ansi || true
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
@@ -81,6 +85,10 @@ COPY --from=deps /var/www/html/vendor ./vendor
 
 # Copy application code
 COPY . .
+
+# Copy example env to .env and generate application key for production image
+RUN if [ -f backend/.env.example ]; then cp backend/.env.example .env || true; fi \
+    && php artisan key:generate --ansi || true
 
 # Optimize for production
 RUN php artisan config:cache \
