@@ -79,7 +79,7 @@ Our architecture is designed with scalability, security, and maintainability at 
 - **Frontend**: Next.js 14 with React Server Components for optimal performance
 - **Backend**: Laravel 12 API with service-oriented architecture
 - **Database**: MySQL 8.0 with Redis for caching and session management
-- **Search**: Elasticsearch for advanced content discovery
+- **Search**: MeiliSearch for content discovery (development and production)
 - **Infrastructure**: Docker containers orchestrated with Kubernetes
 
 ---
@@ -105,9 +105,9 @@ Our architecture is designed with scalability, security, and maintainability at 
 |------------|---------|---------|
 | Laravel | 12 | PHP framework |
 | PHP | 8.2 | Programming language |
-| MySQL | 8.0 | Primary database |
+| MySQL | 8.0 (non-containerized Ubuntu 24.04.01) | Primary database (MariaDB 10.11 is used for Docker deployments and common on Windows development instances) |
 | Redis | 7 | Caching and queues |
-| Elasticsearch | 8 | Search service |
+| MeiliSearch | v1.6+ | Search service (used in dev and production) |
 | Laravel Sanctum | Latest | Authentication |
 
 ### DevOps & Infrastructure

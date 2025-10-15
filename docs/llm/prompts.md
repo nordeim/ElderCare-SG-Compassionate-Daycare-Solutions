@@ -8,6 +8,10 @@ you have done an excellent job with your amazing complete improved execution pla
 
 ---
 
+Now, please meticulously review @CLAUDE.md and validate its alignment with the current codebase. make sure you gain a deep understanding of the WHAT, WHY and HOW of this project as well as deeply understand the design and current state of the codebase in this folder. the backend location of the application's Laravel base is @backend/ . @package.json is the source of truth. please scan the main @package.json and the secondary @frontend/package.json and @backend/package.json to double confirm. always scan the actual folders @frontend/ and  @backend/ to confirm. the actual database migrations are in the @backend/database/migrations/ sub-folder. the database should be MySQL 8.0 or MariaDB 10.11. PHP is  8.2 or higher. check @docker-compose.yml and @docker-compose.prod.yml for deployment details. always check the actual codebase to clarify and doubt and do not assume.
+
+---
+
 awesome understanding! remember to always meticulously think, explore and then plan before executing. and always remember to stage (save) your detailed execution plan under the `docs/` sub-directory in the project's codebase root directory for future reference and alignment.
 
 ---

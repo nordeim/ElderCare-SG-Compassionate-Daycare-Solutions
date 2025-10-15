@@ -34,6 +34,7 @@ yarn-error.log*
 /backend/storage/logs/
 
 # Testing
+/private/
 /coverage/
 /frontend/.nyc_output/
 /backend/storage/app/public/

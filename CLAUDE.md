@@ -12,10 +12,10 @@ The following conflicts from v1.0 have been resolved using README.md as the tieb
 
 | Topic | Previous Conflict | RESOLUTION (v4.1) | Source |
 |-------|-------------------|-------------------|--------|
-| Search Infrastructure | MeiliSearch vs Elasticsearch | ✅ Elasticsearch 8 (current implementation) | README Tech Stack Table |
+| Search Infrastructure | MeiliSearch vs Elasticsearch | ✅ MeiliSearch (current implementation for both development and production) | README Tech Stack Table |
 | Container Orchestration | Kubernetes vs ECS Fargate | ✅ Docker Compose (local) + ECS Fargate (staging/prod); Kubernetes is aspirational/roadmap | README Deployment + PAD Section 14 |
 | Project Phase | "Foundation hardening" vs "Pre-Phase 3" | ✅ Phases 1-3 COMPLETED; now in Alpha Development (feature implementation) | User confirmation + README |
-| Primary Database | MariaDB vs MySQL 8.0 | ✅ MySQL 8.0 (production); SQLite (testing/local dev fallback) | README + PAD |
+| Primary Database | MariaDB vs MySQL 8.0 | ✅ MySQL 8.0 (non-containerized Ubuntu 24.04.01); MariaDB 10.11 (Docker deployments and Windows development); SQLite (testing/local dev fallback) | README + PAD |
 
 ## Table of Contents
 
@@ -152,10 +152,10 @@ flowchart TB
     end
 
     subgraph "Data Layer"
-        MySQLPrimary[(MySQL 8.0 Primary)]
-        MySQLReplica[(MySQL Read Replica)]
-        Redis[(Redis 7 Cluster)]
-        Elastic[(Elasticsearch 8)]
+  MySQLPrimary[(MySQL 8.0 Primary)]
+  MySQLReplica[(MySQL Read Replica)]
+  Redis[(Redis 7 Cluster)]
+  Elastic[(MeiliSearch)]
         S3[(AWS S3 Media)]
     end
 
@@ -292,7 +292,7 @@ frontend/
 - **Fallback**: Forms submit via standard POST when JS disabled; enhanced with inline validation when enabled
 
 ### 3.4 Design System & Tokens
-- Comprehensive component library documented in Storybook (run npm run storybook)
+- Comprehensive component library documented in Storybook (run npm run storybook). Note: the project's Vite versions in package.json were intentionally tweaked to ensure Storybook compatibility; see frontend/package.json for the exact versions used.
 - Design tokens defined in docs/design-system/ drive Tailwind config
 - Color contrast: ≥4.5:1 (≥3:1 for large text); high-contrast theme toggle planned Phase 4
 - Typography: Self-hosted fonts via next/font with subsetting and font-display: swap
@@ -361,7 +361,7 @@ backend/app/
 │   ├── AuditService.php                        # Audit log queries
 │   ├── NotificationService.php                 # Email/SMS orchestration
 │   ├── MediaService.php                        # S3 uploads, responsive derivatives (Phase 4)
-│   ├── SearchService.php                       # Elasticsearch abstraction
+│   ├── SearchService.php                       # MeiliSearch abstraction
 │   ├── AnalyticsService.php                    # Metrics aggregation
 │   └── Integration/
 │       ├── CalendlyService.php                 # ✅ Phase 3 complete (create/cancel/reschedule, webhooks)
@@ -503,7 +503,7 @@ Critical fix: backend/bootstrap/app.php now loads routes/api.php during applicat
 ## 5. Data & Integrations
 
 ### 5.1 Database Architecture
-**Primary Store**: MySQL 8.0
+**Primary Store**: MySQL 8.0 (non-containerized Ubuntu 24.04.01); MariaDB 10.11 used for Docker deployments and common on Windows development instances
 
 | Specification | Value | Purpose |
 |---------------|-------|---------|
@@ -592,7 +592,7 @@ backend/database/migrations/
 | Service | Version | Purpose | Configuration |
 |---------|---------|---------|---------------|
 | Redis | 7 (ElastiCache Cluster in production) | Sessions, application cache, queue driver, rate limiting | 5-min TTL for API responses, tag-based invalidation |
-| Elasticsearch | 8 | Center/service discovery, multilingual search | Indexed via events; replaces MeiliSearch from earlier plans |
+| MeiliSearch | v1.6+ | Center/service discovery, multilingual search | Indexed via events; used for both development and production in this codebase |
 | AWS S3 | Latest | Media storage (images, videos, documents) | ap-southeast-1 region, lifecycle rules, versioning enabled |
 
 #### Cache Strategy
@@ -665,7 +665,7 @@ Cache::tags(['centers', "center:{$center->id}"])->flush();
 - Mock third-party APIs in tests; never call live services from automated suites (see Section 10.2).
 - Document new integration touchpoints in this file and relevant runbooks.
 - Check existing migrations before creating new schema changes.
-- Use Elasticsearch (not MeiliSearch) for search features.
+- Use MeiliSearch for search features (development and production). If a future migration to Elasticsearch is desired, update SearchService and documentation accordingly.
 
 ## 6. Operational Maturity
 

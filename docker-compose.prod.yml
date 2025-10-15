@@ -114,24 +114,29 @@ services:
         reservations:
           memory: 128M
 
-  # Elasticsearch for search
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+  # MeiliSearch for search (production-ready)
+  meilisearch:
+    image: getmeili/meilisearch:v1.6
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+      - MEILI_HTTP_ADDR=0.0.0.0:7700
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY}
+      - MEILI_ENV=production
     volumes:
-      - elasticsearch_data:/usr/share/elasticsearch/data
+      - meilisearch_data:/meili_data
     networks:
       - eldercare-network
     restart: unless-stopped
     deploy:
       resources:
         limits:
-          memory: 2G
-        reservations:
           memory: 1G
+        reservations:
+          memory: 512M
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:7700/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Laravel Horizon for queue monitoring
   horizon:
@@ -172,7 +177,7 @@ services:
 volumes:
   mysql_data:
   redis_data:
-  elasticsearch_data:
+  meilisearch_data:
 
 networks:
   eldercare-network:
