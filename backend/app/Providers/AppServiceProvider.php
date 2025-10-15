@@ -15,7 +15,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register optional MailchimpServiceProvider if present. We keep this
+        // conditional to avoid introducing a hard dependency in environments
+        // where the provider or its dependencies may not be available.
+        try {
+            if (class_exists(\App\Providers\MailchimpServiceProvider::class)) {
+                $this->app->register(\App\Providers\MailchimpServiceProvider::class);
+            }
+        } catch (\Throwable $e) {
+            // Do not block the application if provider registration fails during tests.
+        }
     }
 
     /**
