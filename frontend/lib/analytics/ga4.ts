@@ -13,9 +13,9 @@ export function initGA4(): void {
   // If using Next.js script loader, the gtag script will attach window.gtag
   // This helper simply configures the measurement id if present
   try {
-    // @ts-ignore
+    // @ts-expect-error: window.gtag is injected by the analytics script at runtime
     if (typeof window.gtag === 'function') {
-      // @ts-ignore
+      // @ts-expect-error: window.gtag is injected by the analytics script at runtime
       window.gtag('config', id);
     }
   } catch (err) {
