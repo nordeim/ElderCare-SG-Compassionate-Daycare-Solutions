@@ -187,6 +187,16 @@ Our architecture is designed with scalability, security, and maintainability at 
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
 
+   ### Backend health check
+
+   After starting the backend, you can run a quick readiness check from the backend directory:
+
+   ```bash
+   php artisan health
+   ```
+
+   For detailed instructions on starting the backend (container and non-container), see: `docs/start-backend-serve.md`.
+
 ### Manual Installation
 
 For detailed manual installation instructions, see our [Installation Guide](./docs/installation.md).
